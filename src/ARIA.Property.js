@@ -3,7 +3,7 @@
  *
  * @class ARIA.Property
  */
-ARIA.Property = ARIA.createClass({
+ARIA.Property = ARIA.createClass(/** @lends ARIA.Property.prototype */{
 
     /**
      * @constructs ARIA.Property
@@ -123,7 +123,7 @@ ARIA.Property = ARIA.createClass({
         return (
             (value === null || value === undefined)
             ? ""
-            : String(value)
+            : String(value).trim()
         );
 
     },

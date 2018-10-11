@@ -4,7 +4,7 @@
  * @class ARIA.State
  * @extends ARIA.Property
  */
-ARIA.State = ARIA.createClass(ARIA.Property, {
+ARIA.State = ARIA.createClass(ARIA.Property, /** @lends ARIA.State.prototype */{
 
     /**
      * Ensures that the given value is either a boolean or a string of "true" or

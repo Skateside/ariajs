@@ -11,6 +11,10 @@ describe("ARIA.State", function () {
 
     });
 
+    it("should inherit from ARIA.Property", function () {
+        chai.assert.isTrue(state instanceof ARIA.Property);
+    });
+
     it("should allow a state to be set", function () {
 
         state.set(true);

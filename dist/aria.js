@@ -1,4 +1,4 @@
-/*! ariajs - v1.0.0 - MIT license - 2018-10-9 */
+/*! ariajs - v1.0.0 - MIT license - 2018-10-11 */
 (function (globalVariable) {
     "use strict";
 
@@ -398,7 +398,7 @@ ARIA.identify = function (element, prefix) {
  *
  * @class ARIA.Property
  */
-ARIA.Property = ARIA.createClass({
+ARIA.Property = ARIA.createClass(/** @lends ARIA.Property.prototype */{
 
     /**
      * @constructs ARIA.Property
@@ -518,7 +518,7 @@ ARIA.Property = ARIA.createClass({
         return (
             (value === null || value === undefined)
             ? ""
-            : String(value)
+            : String(value).trim()
         );
 
     },
@@ -653,7 +653,7 @@ ARIA.Property = ARIA.createClass({
  * @class ARIA.State
  * @extends ARIA.Property
  */
-ARIA.State = ARIA.createClass(ARIA.Property, {
+ARIA.State = ARIA.createClass(ARIA.Property, /** @lends ARIA.State.prototype */{
 
     /**
      * Ensures that the given value is either a boolean or a string of "true" or
@@ -699,8 +699,19 @@ ARIA.State = ARIA.createClass(ARIA.Property, {
 
 });
 
-ARIA.UndefinedState = ARIA.createClass(ARIA.State, {
+/**
+ * Handles a WAI-ARIA state that can be true or false but can also be undefined.
+ *
+ * @class ARIA.UndefinedState
+ * @extends ARIA.State
+ */
+ARIA.UndefinedState = ARIA.createClass(ARIA.State, /** @lends ARIA.UndefinedState.prototype */{
 
+    /**
+     * Allows for true, false or undefined.
+     *
+     * @inheritDoc
+     */
     isValidToken: function (value) {
 
         return (
@@ -711,6 +722,15 @@ ARIA.UndefinedState = ARIA.createClass(ARIA.State, {
 
     },
 
+    /**
+     * Interprets undefined as "undefined.
+     *
+     * @param  {?} value
+     *         Value to interpret.
+     * @return {Boolean|String}
+     *         Either the boolean value, "undefined" or an empty string if the
+     *         value is not understood.
+     */
     interpret: function (value) {
 
         return (
@@ -719,16 +739,55 @@ ARIA.UndefinedState = ARIA.createClass(ARIA.State, {
             : this.$super(value)
         );
 
+    },
+
+    /**
+     * Returns a boolean or undefined.
+     *
+     * @return {Boolean|undefined}
+     *         Value of the attribute.
+     */
+    get: function () {
+
+        var value = this.$super();
+
+        if (value === "undefined") {
+            value = undefined;
+        }
+
+        return value;
+
     }
 
 });
 
-ARIA.Tristate = ARIA.createClass(ARIA.State, {
+/**
+ * Handles WAI-ARIA tristates. That is, a state that can be either true, false
+ * or "mixed".
+ *
+ * @class ARIA.Tristate
+ * @extends ARIA.State
+ */
+ARIA.Tristate = ARIA.createClass(ARIA.State, /** @lends ARIA.Tristate.prototype */{
 
+    /**
+     * Allows the token "mixed".
+     *
+     * @inheritDoc
+     */
     isValidToken: function (value) {
         return value === "mixed" || this.$super(value);
     },
 
+    /**
+     * Allows the token "mixed".
+     *
+     * @param  {?} value
+     *         Value to interpret.
+     * @return {Boolean|String}
+     *         Either the boolean value, "mixed" or an empty string if the value
+     *         is not understood.
+     */
     interpret: function (value) {
 
         return (
@@ -741,8 +800,25 @@ ARIA.Tristate = ARIA.createClass(ARIA.State, {
 
 });
 
+/**
+ * The arrays for {@link ARIA.List} instances. This prevents the array from
+ * being exposed and manipulated.
+ * @private
+ * @type {WeakMap}
+ */
 var lists = new WeakMap();
 
+/**
+ * Creates an iterator.
+ *
+ * @private
+ * @param   {ARIA.List} instance
+ *          Instance that should gain an iterator.
+ * @param   {Function} valueMaker
+ *          Function to get the iterator value from the item.
+ * @return  {Object}
+ *          Iterator response.
+ */
 var makeIterator = function (instance, valueMaker) {
 
    var index = 0;
@@ -768,14 +844,56 @@ var makeIterator = function (instance, valueMaker) {
 
 };
 
-ARIA.List = ARIA.createClass(ARIA.Property, {
+/**
+ * A version of DOMException that we can actually create.
+ *
+ * @class
+ * @private
+ * @extends Error
+ * @param   {String} type
+ *          Type of exception.
+ * @param   {String} message
+ *          Message for the exception.
+ */
+var DOMEx = function (type, message) {
 
+    this.name = type;
+    this.code = DOMException[type];
+    this.message = message;
+
+};
+DOMEx.prototype = Error.prototype;
+// DOMEx taken from:
+// https://github.com/yola/classlist-polyfill/blob/master/src/index.js
+
+/**
+ * Handles a WAI-ARIA attribute that should be a space-separated list. This is
+ * moddled on DOMTokenList (such as classList) so it will only accept unique
+ * values and will throw errors for invalid values (see
+ * {@link ARIA.List#isValidToken}).
+ *
+ * @class ARIA.List
+ * @extends ARIA.Property
+ */
+ARIA.List = ARIA.createClass(ARIA.Property, /** ARIA.List.prototype */{
+
+    /**
+     * @inheritDoc
+     */
     init: function (element, attribute) {
 
         let that = this;
 
         lists.set(that, []);
 
+        /**
+         * The number of items in this list.
+         *
+         * @name length
+         * @memberof ARIA.List
+         * @instance
+         * @type {Number}
+         */
         Object.defineProperty(that, "length", {
 
             get: function () {
@@ -788,23 +906,53 @@ ARIA.List = ARIA.createClass(ARIA.Property, {
 
     },
 
+    /**
+     * Ensures that the token is valid.
+     *
+     * @param  {?} token
+     *         Token to check.
+     * @return {Boolean}
+     *         true if the token is valid, false otherwise.
+     * @throws {DOMEx}
+     *         Given token cannot be an empty string.
+     * @throws {DOMEx}
+     *         Given token cannot contain a space.
+     */
     isValidToken: function (token) {
 
-        if (value === "") {
-            throw new Error("Empty value");
+        if (token === "") {
+
+            throw new DOMEx(
+                "SYNTAX_ERR",
+                "An invalid or illegal string was specified"
+            );
+
         }
 
-        if (value.includes(" ")) {
-            throw new Error("Disallowed characer");
+        if ((/\s/).test(token)) {
+
+            throw new DOMEx(
+                "INVALID_CHARACTER_ERR",
+                "String contains an invalid character"
+            );
+
         }
 
         return this.$super(token);
 
     },
 
+    /**
+     * Coerces the values into a string and splits it at the spaces.
+     *
+     * @param  {?} value
+     *         Value to interpret.
+     * @return {Array.<String>}
+     *         Array of strings.
+     */
     interpret: function (value) {
 
-        var string = String(value).trim();
+        var string = this.$super(value);
 
         return (
             string.length
@@ -814,6 +962,17 @@ ARIA.List = ARIA.createClass(ARIA.Property, {
 
     },
 
+    /**
+     * Sets the value of the list to be the given value, removing all previous
+     * values first. To add to the previous values, use {@link ARIA.List#add}.
+     * The values are interpretted as an array (see {@link ARIA.List#interpret}
+     * and validated (see {@link ARIA.List#isValidToken}); only unique values
+     * are added.
+     *
+     * @param {?} value
+     *        Value(s) to add. If the given value is a string, it is assumed to
+     *        be a space-separated list.
+     */
     set: function (value) {
 
         var values = this.interpret(value);
@@ -828,10 +987,26 @@ ARIA.List = ARIA.createClass(ARIA.Property, {
 
     },
 
+    /**
+     * Gets the value of the attribute as an array.
+     *
+     * @return {Array.<String>}
+     *         Value of the attribute as an array.
+     */
     get: function () {
         return this.interpret(this.toString());
     },
 
+    /**
+     * Checks to see if the attribute is set. If a parameter is passed, the list
+     * is checked to see if it contains the value.
+     *
+     * @param  {String} [item]
+     *         Optional value to check.
+     * @return {Boolean}
+     *         true if the attribute exists or the value is in the list, false
+     *         otherwise.
+     */
     has: function (item) {
 
         return (
@@ -842,6 +1017,15 @@ ARIA.List = ARIA.createClass(ARIA.Property, {
 
     },
 
+    /**
+     * Converts the attribute into a string. Optionally, a string can be passed
+     * to be used as the glue for the array.
+     *
+     * @param  {String} [glue=" "]
+     *         Optional glue to use to join the array.
+     * @return {String}
+     *         String from the list.
+     */
     toString: function (glue) {
 
         if (glue === undefined) {
@@ -852,6 +1036,13 @@ ARIA.List = ARIA.createClass(ARIA.Property, {
 
     },
 
+    /**
+     * Adds the given values to the list. Items are only added if they're valid
+     * (see {@link ARIA.List#isValidToken}) and not already in the list.
+     *
+     * @param {String} ...arguments
+     *        Arguments to add.
+     */
     add: function () {
 
         var list = lists.get(this);
@@ -872,23 +1063,37 @@ ARIA.List = ARIA.createClass(ARIA.Property, {
 
     },
 
+    /**
+     * Either removes one or more values from the list or the attribute itself
+     * if no parameters are passed.
+     *
+     * @param {String} [...arguments]
+     *        Optional values to remove.
+     */
     remove: function () {
 
         var list = lists.get(this);
+        var string;
 
         if (arguments.length) {
 
             arrayFrom(arguments, function (item) {
 
-                var index = isValidToken(item) && list.indexOf(item);
+                var index = this.isValidToken(item) && list.indexOf(item);
 
                 if (index > -1) {
                     list.splice(index, 1);
                 }
 
-            });
+            }, this);
 
-            this.setAttribute(this.toString());
+            string = this.toString();
+
+            if (string === "") {
+                this.removeAttribute();
+            } else {
+                this.setAttribute(string);
+            }
 
         } else {
 
@@ -899,8 +1104,16 @@ ARIA.List = ARIA.createClass(ARIA.Property, {
 
     },
 
+    /**
+     * Checks to see if the given item is within the list.
+     *
+     * @param  {String} item
+     *         Item to check for.
+     * @return {Boolean}
+     *         true if the item is within the list, false otherwise.
+     */
     contains: function (item) {
-        return isValidToken(item) && lists.get(this).indexOf(item) > -1;
+        return this.isValidToken(item) && lists.get(this).indexOf(item) > -1;
     },
 
     item: function (index) {
@@ -913,7 +1126,7 @@ ARIA.List = ARIA.createClass(ARIA.Property, {
         var list;
         var index;
 
-        if (isValidToken(oldToken) && isValidToken(newToken)) {
+        if (this.isValidToken(oldToken) && this.isValidToken(newToken)) {
 
             list = lists.get(this);
             index = list.indexOf(oldToken);
@@ -1011,10 +1224,16 @@ ARIA.ReferenceList = ARIA.createClass(ARIA.List, {
             value = arrayFrom(value, interpretReference);
         }
 
+        return value;
+
     },
 
     get: function () {
         return this.toArray(ARIA.getRef);
+    },
+
+    contains: function (item) {
+        return this.$super(this.interpret(item)[0] || "");
     }
 
 });
