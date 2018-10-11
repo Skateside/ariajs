@@ -347,6 +347,20 @@ ARIA.addAlias = function (source, aliases) {
 
 };
 
+/**
+ * Gets an element by the given ID. If the element cannot be found, null is
+ * returned. This function is just a wrapper for document.getElementById to
+ * allow the library to be easily modified in case a virtual DOM is being used.
+ *
+ * @param  {String} id
+ *         ID of the element to find.
+ * @return {Element|null}
+ *         Element with the given ID or null if the element cannot be found.
+ */
+ARIA.getById = function (id) {
+    return document.getElementById(id);
+};
+
 var counter = 0;
 
 /**
@@ -383,7 +397,7 @@ ARIA.identify = function (element, prefix) {
             id = prefix + counter;
             counter += 1;
 
-        } while (document.getElementById(id));
+        } while (ARIA.getById(id));
 
         element.id = id;
 
@@ -391,6 +405,18 @@ ARIA.identify = function (element, prefix) {
 
     return id;
 
+};
+
+/**
+ * Checks to see if the given value is a Node.
+ *
+ * @param  {?} value
+ *         Value to test.
+ * @return {Boolean}
+ *         true if the given value is a Node, false otherwise.
+ */
+ARIA.isNode = function (value) {
+    return (value instanceof Node);
 };
 
 /**
@@ -438,7 +464,7 @@ ARIA.Property = ARIA.createClass(/** @lends ARIA.Property.prototype */{
         Object.defineProperty(that, "value", {
 
             get: function () {
-                return that.get();
+                return that.toString();
             }
 
         });
@@ -642,7 +668,7 @@ ARIA.Property = ARIA.createClass(/** @lends ARIA.Property.prototype */{
      *         Value of the attribute.
      */
     toString: function () {
-        return String(this.get());
+        return this.getAttribute() || "";
     }
 
 });
@@ -822,22 +848,27 @@ var lists = new WeakMap();
 var makeIterator = function (instance, valueMaker) {
 
    var index = 0;
-   var list = lists.get(instance) | [];
+   // var list = lists.get(instance) || [];
+   var list = instance.get();
    var length = list.length;
 
    return {
 
-       next() {
+       next: function () {
 
            var iteratorValue = {
                value: valueMaker(list, index),
-               done: index < length
+               done: index >= length
            };
 
            index += 1;
 
            return iteratorValue;
 
+       },
+
+       toString: function () {
+           return "Array Iterator";
        }
 
    };
@@ -952,7 +983,12 @@ ARIA.List = ARIA.createClass(ARIA.Property, /** ARIA.List.prototype */{
      */
     interpret: function (value) {
 
-        var string = this.$super(value);
+        var val = (
+            Array.isArray(value)
+            ? value.join(" ")
+            : value
+        );
+        var string = this.$super(val);
 
         return (
             string.length
@@ -1116,10 +1152,30 @@ ARIA.List = ARIA.createClass(ARIA.Property, /** ARIA.List.prototype */{
         return this.isValidToken(item) && lists.get(this).indexOf(item) > -1;
     },
 
+    /**
+     * Gets the item from the list at the specified index. If there is no item
+     * at that index, null is returned.
+     *
+     * @param  {Number} index
+     *         Index of the item to retrieve.
+     * @return {String|null}
+     *         The item at the given index or null if there is no item at that
+     *         index.
+     */
     item: function (index) {
         return lists.get(this)[Math.floor(index)] || null;
     },
 
+    /**
+     * Replaces one value with another one.
+     *
+     * @param  {String} oldToken
+     *         Old value to replace.
+     * @param  {String} newToken
+     *         New token.
+     * @return {Boolean}
+     *         true if a replacement was made, false otherwise.
+     */
     replace: function (oldToken, newToken) {
 
         var isReplaced = false;
@@ -1144,14 +1200,39 @@ ARIA.List = ARIA.createClass(ARIA.Property, /** ARIA.List.prototype */{
 
     },
 
+    /**
+     * Loops over the items within the array.
+     *
+     * @param {Function} handler
+     *        Function to execute on each item.
+     * @param {?} [context]
+     *        Optional context for the function.
+     */
     forEach: function (handler, context) {
         lists.get(this).forEach(handler, context);
     },
 
+    /**
+     * Converts the list into an array. Optionally, the values can be converted
+     * by passing a mapping function.
+     *
+     * @param  {Function} [map]
+     *         Optional conversion function.
+     * @param  {?} context
+     *         Optional context for the optional function.
+     * @return {Array}
+     *         Array made from the list.
+     */
     toArray: function (map, context) {
         return arrayFrom(lists.get(this), map, context);
     },
 
+    /**
+     * Returns an iterator for the entries.
+     *
+     * @return {Object}
+     *         Iterator value.
+     */
     entries: function () {
 
         return makeIterator(this, function (list, index) {
@@ -1160,6 +1241,12 @@ ARIA.List = ARIA.createClass(ARIA.Property, /** ARIA.List.prototype */{
 
     },
 
+    /**
+     * Returns an iterator for the keys.
+     *
+     * @return {Object}
+     *         Iterator value.
+     */
     keys: function () {
 
         return makeIterator(this, function (list, index) {
@@ -1168,6 +1255,12 @@ ARIA.List = ARIA.createClass(ARIA.Property, /** ARIA.List.prototype */{
 
     },
 
+    /**
+     * Returns an iterator for the values.
+     *
+     * @return {Object}
+     *         Iterator value.
+     */
     values: function () {
 
         return makeIterator(this, function (list, index) {
@@ -1182,32 +1275,56 @@ if (window.Symbol && Symbol.iterator) {
     ARIA.List.prototype[Symbol.iterator] = ARIA.List.prototype.values;
 }
 
-ARIA.isNode = function (value) {
-    return (value instanceof Node);
-};
+/**
+ * Handles WAI-ARIA attributes that reference a single ID.
+ *
+ * @class ARIA.Reference
+ * @extends ARIA.Property
+ */
+ARIA.Reference = ARIA.createClass(ARIA.Property, /** @lends ARIA.Reference.prototype */{
 
-ARIA.getRef = function (id) {
-    return document.getElementById(id);
-};
-
-function interpretReference(value) {
-
-    return (
-        ARIA.isNode(value)
-        ? ARIA.identify(value)
-        : value
-    );
-
-}
-
-ARIA.Reference = ARIA.createClass(ARIA.Property, {
-
+    /**
+     * Interprets the given value as a string. If the value is an element, the
+     * element's ID is returned, generating one if necessary = see
+     * {@link ARIA.identify}.
+     *
+     * @param  {?} value
+     *         Value to interpret.
+     * @return {String}
+     *         The interpretted value.
+     */
     interpret: function (value) {
-        return interpretReference(value);
+
+        return (
+            ARIA.isNode(value)
+            ? ARIA.identify(value)
+            : this.$super(value)
+        );
+
     },
 
+    /**
+     * Gets the element referenced by this attribute. If the element cannot be
+     * found or the attribute isn't set, null is returned.
+     *
+     * @return {Element|null}
+     *         Element referenced by this attribute or null if the element
+     *         cannot be found or the attribute isn't set.
+     */
     get: function () {
-        return ARIA.getRef(this.getAttribute());
+        return ARIA.getById(this.getAttribute());
+    },
+
+    /**
+     * Checks to see if attribute is set and the element referenced by the
+     * attribute exists, returning true if both are true.
+     *
+     * @return {Boolean}
+     *         true if the attribute exists and references an existing element,
+     *         false otherwise.
+     */
+    has: function () {
+        return this.hasAttribute() && this.get() !== null;
     }
 
 });
@@ -1216,24 +1333,35 @@ ARIA.ReferenceList = ARIA.createClass(ARIA.List, {
 
     interpret: function (value) {
 
-        if (typeof value === "string") {
-            value = this.$super(value);
-        } else if (ARIA.isNode(value)) {
-            value = [ARIA.identify(value)];
-        } else if (value.length) {
-            value = arrayFrom(value, interpretReference);
+        var interpretted = [];
+
+        if (typeof value === "object" && typeof value.length === "number") {
+            interpretted = arrayFrom(value, this.$super, this);
+        } else if (typeof value === "string" || ARIA.isNode(value)) {
+            interpretted = [this.$super(value)];
         }
 
-        return value;
+        // Remove all falsy values such as "" or null.
+        return interpretted.filter(Boolean);
 
     },
 
     get: function () {
-        return this.toArray(ARIA.getRef);
+        return this.toArray(ARIA.getById);
     },
 
     contains: function (item) {
         return this.$super(this.interpret(item)[0] || "");
+    },
+
+    has: function (item) {
+
+        return this.hasAttribute() && (
+            item === undefined
+            ? this.get().filter(Boolean).length === this.length
+            : this.contains(item)
+        );
+
     }
 
 });

@@ -20,22 +20,27 @@ var lists = new WeakMap();
 var makeIterator = function (instance, valueMaker) {
 
    var index = 0;
-   var list = lists.get(instance) | [];
+   // var list = lists.get(instance) || [];
+   var list = instance.get();
    var length = list.length;
 
    return {
 
-       next() {
+       next: function () {
 
            var iteratorValue = {
                value: valueMaker(list, index),
-               done: index < length
+               done: index >= length
            };
 
            index += 1;
 
            return iteratorValue;
 
+       },
+
+       toString: function () {
+           return "Array Iterator";
        }
 
    };
@@ -150,7 +155,12 @@ ARIA.List = ARIA.createClass(ARIA.Property, /** ARIA.List.prototype */{
      */
     interpret: function (value) {
 
-        var string = this.$super(value);
+        var val = (
+            Array.isArray(value)
+            ? value.join(" ")
+            : value
+        );
+        var string = this.$super(val);
 
         return (
             string.length
@@ -314,10 +324,30 @@ ARIA.List = ARIA.createClass(ARIA.Property, /** ARIA.List.prototype */{
         return this.isValidToken(item) && lists.get(this).indexOf(item) > -1;
     },
 
+    /**
+     * Gets the item from the list at the specified index. If there is no item
+     * at that index, null is returned.
+     *
+     * @param  {Number} index
+     *         Index of the item to retrieve.
+     * @return {String|null}
+     *         The item at the given index or null if there is no item at that
+     *         index.
+     */
     item: function (index) {
         return lists.get(this)[Math.floor(index)] || null;
     },
 
+    /**
+     * Replaces one value with another one.
+     *
+     * @param  {String} oldToken
+     *         Old value to replace.
+     * @param  {String} newToken
+     *         New token.
+     * @return {Boolean}
+     *         true if a replacement was made, false otherwise.
+     */
     replace: function (oldToken, newToken) {
 
         var isReplaced = false;
@@ -342,14 +372,39 @@ ARIA.List = ARIA.createClass(ARIA.Property, /** ARIA.List.prototype */{
 
     },
 
+    /**
+     * Loops over the items within the array.
+     *
+     * @param {Function} handler
+     *        Function to execute on each item.
+     * @param {?} [context]
+     *        Optional context for the function.
+     */
     forEach: function (handler, context) {
         lists.get(this).forEach(handler, context);
     },
 
+    /**
+     * Converts the list into an array. Optionally, the values can be converted
+     * by passing a mapping function.
+     *
+     * @param  {Function} [map]
+     *         Optional conversion function.
+     * @param  {?} context
+     *         Optional context for the optional function.
+     * @return {Array}
+     *         Array made from the list.
+     */
     toArray: function (map, context) {
         return arrayFrom(lists.get(this), map, context);
     },
 
+    /**
+     * Returns an iterator for the entries.
+     *
+     * @return {Object}
+     *         Iterator value.
+     */
     entries: function () {
 
         return makeIterator(this, function (list, index) {
@@ -358,6 +413,12 @@ ARIA.List = ARIA.createClass(ARIA.Property, /** ARIA.List.prototype */{
 
     },
 
+    /**
+     * Returns an iterator for the keys.
+     *
+     * @return {Object}
+     *         Iterator value.
+     */
     keys: function () {
 
         return makeIterator(this, function (list, index) {
@@ -366,6 +427,12 @@ ARIA.List = ARIA.createClass(ARIA.Property, /** ARIA.List.prototype */{
 
     },
 
+    /**
+     * Returns an iterator for the values.
+     *
+     * @return {Object}
+     *         Iterator value.
+     */
     values: function () {
 
         return makeIterator(this, function (list, index) {

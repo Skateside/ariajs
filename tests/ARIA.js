@@ -1,9 +1,5 @@
 describe("ARIA", function () {
 
-    function makeId() {
-        return "id-" + Math.floor(Date.now() * Math.random());
-    }
-
     describe("VERSION", function () {
 
         it("should be a string of numbers", function () {
@@ -60,12 +56,32 @@ describe("ARIA", function () {
 
     });
 
+    describe("getById", function () {
+
+        it("should find an element by ID", function () {
+
+            var element = document.createElement("div");
+            var id = makeUniqueId();
+
+            element.id = id;
+            document.body.appendChild(element);
+            chai.assert.equal(ARIA.getById(id), element);
+            document.body.removeChild(element);
+
+        });
+
+        it("should return null for elements that can't be found", function () {
+            chai.assert.isNull(ARIA.getById(makeUniqueId()));
+        });
+
+    });
+
     describe("identify", function () {
 
         it("should return the ID of an element", function () {
 
             var div = document.createElement("div");
-            div.id =  makeId();
+            div.id =  makeUniqueId();
 
             chai.assert.equal(ARIA.identify(div), div.id);
 
@@ -97,7 +113,7 @@ describe("ARIA", function () {
                 document.createElement("div")
             ];
             var prefix = ARIA.defaultIdentifyPrefix;
-            var createdDefault = makeId();
+            var createdDefault = makeUniqueId();
 
             chai.assert.notEqual(prefix, createdDefault);
             chai.assert.isTrue(ARIA.identify(divs[0]).startsWith(prefix));
@@ -111,8 +127,8 @@ describe("ARIA", function () {
 
         it("should allow results to be translated", function () {
 
-            var one = "aria-" + makeId();
-            var two = "aria-" + makeId();
+            var one = "aria-" + makeUniqueId();
+            var two = "aria-" + makeUniqueId();
 
             ARIA.translate[one] = two;
             chai.assert.equal(ARIA.normalise(one), two);
@@ -177,7 +193,7 @@ describe("ARIA", function () {
                 }
 
             });
-            var name = makeId();
+            var name = makeUniqueId();
             var thing = new Thing(name);
 
             chai.assert.equal(thing.name, name);
@@ -210,7 +226,7 @@ describe("ARIA", function () {
                 }
 
             });
-            var name = makeId();
+            var name = makeUniqueId();
             var age = Math.floor(Math.random() * 100);
             var child = new Child(name, age);
 
@@ -246,7 +262,7 @@ describe("ARIA", function () {
                     return this.$super().toUpperCase();
                 }
             });
-            var name = "abcdef" + makeId();
+            var name = "abcdef" + makeUniqueId();
             var age = Math.floor(Math.random() * 100);
             var child = new Child(name, age);
 
@@ -262,7 +278,7 @@ describe("ARIA", function () {
 
         it("should allow a factory to be executed", function () {
 
-            var attr = makeId();
+            var attr = makeUniqueId();
             var Thing = ARIA.createClass({
 
                 init: function (name, age) {
@@ -271,7 +287,7 @@ describe("ARIA", function () {
                 }
 
             });
-            var name = makeId();
+            var name = makeUniqueId();
             var age = Math.floor(Math.random() * 100);
 
             ARIA.factories[attr] = function (name, age) {
@@ -293,15 +309,15 @@ describe("ARIA", function () {
         it("should throw an error if it cannot alias something", function () {
 
             chai.assert.throws(function () {
-                ARIA.addAlias(makeId(), makeId());
+                ARIA.addAlias(makeUniqueId(), makeUniqueId());
             });
 
         });
 
         it("should allow an alias to be created", function () {
 
-            var one = makeId();
-            var two = makeId();
+            var one = makeUniqueId();
+            var two = makeUniqueId();
             var Thing = function (age) {
                 this.age = age;
             };
@@ -321,6 +337,17 @@ describe("ARIA", function () {
             delete ARIA.factories[two];
             delete ARIA.translate[one];
             delete ARIA.translate[two];
+
+        });
+
+    });
+
+    describe("isNode", function () {
+
+        it("should detect a Node", function () {
+
+            chai.assert.isTrue(ARIA.isNode(document.createElement("div")));
+            chai.assert.isFalse(ARIA.isNode({}));
 
         });
 

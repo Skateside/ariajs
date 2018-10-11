@@ -42,14 +42,12 @@ describe("ARIA.State", function () {
 
     });
 
-    it("should always return a boolean", function () {
+    it("should always return a boolean when using the get method", function () {
 
         state.set("true");
         chai.assert.isTrue(state.get());
-        chai.assert.isTrue(state.value);
         state.set(true);
         chai.assert.isTrue(state.get());
-        chai.assert.isTrue(state.value);
 
     });
 

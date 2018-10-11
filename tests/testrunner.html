@@ -6,8 +6,14 @@
 <title>ARIA.js Mocha Tests</title>
 <link rel="stylesheet" href="../node_modules/mocha/mocha.css" />
 <script>
+// Used for testing ARIA.noConflict()
 var previousARIA = {};
 var ARIA = previousARIA;
+
+// Generates a unique string - used for testing against IDs.
+function makeUniqueId() {
+    return "id-" + Math.floor(Date.now() * Math.random());
+}
 </script>
 <script src="../dist/aria.js"></script>
 
@@ -36,6 +42,7 @@ mocha.setup({
 <script src="ARIA.UndefinedState.js"></script>
 <script src="ARIA.Tristate.js"></script>
 <script src="ARIA.List.js"></script>
+<script src="ARIA.Reference.js"></script>
 
 <script>
 // Only tests run in real browser, injected script run if options.run == true

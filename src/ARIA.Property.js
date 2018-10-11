@@ -43,7 +43,7 @@ ARIA.Property = ARIA.createClass(/** @lends ARIA.Property.prototype */{
         Object.defineProperty(that, "value", {
 
             get: function () {
-                return that.get();
+                return that.toString();
             }
 
         });
@@ -247,7 +247,7 @@ ARIA.Property = ARIA.createClass(/** @lends ARIA.Property.prototype */{
      *         Value of the attribute.
      */
     toString: function () {
-        return String(this.get());
+        return this.getAttribute() || "";
     }
 
 });

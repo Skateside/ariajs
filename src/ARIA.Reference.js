@@ -1,29 +1,53 @@
-ARIA.isNode = function (value) {
-    return (value instanceof Node);
-};
+/**
+ * Handles WAI-ARIA attributes that reference a single ID.
+ *
+ * @class ARIA.Reference
+ * @extends ARIA.Property
+ */
+ARIA.Reference = ARIA.createClass(ARIA.Property, /** @lends ARIA.Reference.prototype */{
 
-ARIA.getRef = function (id) {
-    return document.getElementById(id);
-};
-
-function interpretReference(value) {
-
-    return (
-        ARIA.isNode(value)
-        ? ARIA.identify(value)
-        : value
-    );
-
-}
-
-ARIA.Reference = ARIA.createClass(ARIA.Property, {
-
+    /**
+     * Interprets the given value as a string. If the value is an element, the
+     * element's ID is returned, generating one if necessary = see
+     * {@link ARIA.identify}.
+     *
+     * @param  {?} value
+     *         Value to interpret.
+     * @return {String}
+     *         The interpretted value.
+     */
     interpret: function (value) {
-        return interpretReference(value);
+
+        return (
+            ARIA.isNode(value)
+            ? ARIA.identify(value)
+            : this.$super(value)
+        );
+
     },
 
+    /**
+     * Gets the element referenced by this attribute. If the element cannot be
+     * found or the attribute isn't set, null is returned.
+     *
+     * @return {Element|null}
+     *         Element referenced by this attribute or null if the element
+     *         cannot be found or the attribute isn't set.
+     */
     get: function () {
-        return ARIA.getRef(this.getAttribute());
+        return ARIA.getById(this.getAttribute());
+    },
+
+    /**
+     * Checks to see if attribute is set and the element referenced by the
+     * attribute exists, returning true if both are true.
+     *
+     * @return {Boolean}
+     *         true if the attribute exists and references an existing element,
+     *         false otherwise.
+     */
+    has: function () {
+        return this.hasAttribute() && this.get() !== null;
     }
 
 });

@@ -343,6 +343,20 @@ ARIA.addAlias = function (source, aliases) {
 
 };
 
+/**
+ * Gets an element by the given ID. If the element cannot be found, null is
+ * returned. This function is just a wrapper for document.getElementById to
+ * allow the library to be easily modified in case a virtual DOM is being used.
+ *
+ * @param  {String} id
+ *         ID of the element to find.
+ * @return {Element|null}
+ *         Element with the given ID or null if the element cannot be found.
+ */
+ARIA.getById = function (id) {
+    return document.getElementById(id);
+};
+
 var counter = 0;
 
 /**
@@ -379,7 +393,7 @@ ARIA.identify = function (element, prefix) {
             id = prefix + counter;
             counter += 1;
 
-        } while (document.getElementById(id));
+        } while (ARIA.getById(id));
 
         element.id = id;
 
@@ -387,4 +401,16 @@ ARIA.identify = function (element, prefix) {
 
     return id;
 
+};
+
+/**
+ * Checks to see if the given value is a Node.
+ *
+ * @param  {?} value
+ *         Value to test.
+ * @return {Boolean}
+ *         true if the given value is a Node, false otherwise.
+ */
+ARIA.isNode = function (value) {
+    return (value instanceof Node);
 };
