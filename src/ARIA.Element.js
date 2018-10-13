@@ -1,8 +1,14 @@
+/**
+ * Handles the WAI-ARIA attributes on an element.
+ *
+ * @class ARIA.Element
+ */
 ARIA.Element = ARIA.createClass({
 
     init: function (element) {
 
         this.element = element;
+        this.manipulationFlags = Object.create(null);
         this.preloadAttributes();
         this.readAttributes();
         this.observeAttributes();
@@ -62,19 +68,45 @@ ARIA.Element = ARIA.createClass({
 
     observeAttributes: function () {
 
-        var element = this.element;
+        var that = this;
+        var element = that.element;
         var observer = new MutationObserver(function (mutations) {
 
             mutations.forEach(function (mutation) {
 
-                var attribute = mutation.attributeName;
-                var suffix = (attribute || "").slice(5);
-
+                var attribute = mutation.attributeName || "";
+                var suffix = attribute.slice(5);
+                var value;
+                var old;
+console.log("mutation.type = %o, suffix = %o, factories = %o, flag = %o, getAttribute = %o, element = %o", mutation.type, suffix, ARIA.factories[suffix] ? "found": "NOT FOUND", that.manipulationFlags[suffix], element.getAttribute(attribute), element);
                 if (
                     mutation.type === "attributes"
                     && ARIA.factories[suffix]
+                    && !that.manipulationFlags[suffix]
                 ) {
-                    this[suffix] = element.getAttribute(attribute);
+
+                    that.manipulationFlags[suffix] = true;
+
+                    if (element.hasAttribute(attribute)) {
+
+                        value = ARIA.Property.interpret(
+                            element.getAttribute(attribute)
+                        );
+                        old = ARIA.Property.interpret(mutation.oldValue);
+
+console.log("attribute %o (%o) on %o changed from %o to %o", attribute, suffix, element, old, value);
+                        if (value !== old) {
+                            that[suffix].set(value);
+                        }
+
+                    } else {
+                        that[suffix].remove();
+                    }
+
+                    window.setTimeout(function () {
+                        delete that.manipulationFlags[suffix];
+                    }, 0);
+
                 }
 
             });
@@ -82,10 +114,11 @@ ARIA.Element = ARIA.createClass({
         });
 
         observer.observe(element, {
-            attributes: true
+            attributes: true,
+            attributeOldValue: true
         });
 
-        this.observer = observer;
+        that.observer = observer;
 
     },
 

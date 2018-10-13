@@ -6,15 +6,19 @@
 <title>ARIA.js Mocha Tests</title>
 <link rel="stylesheet" href="../node_modules/mocha/mocha.css" />
 <script>
-// Used for testing ARIA.noConflict()
-var previousARIA = {};
-var ARIA = previousARIA;
-
 // Generates a unique string - used for testing against IDs.
 function makeUniqueId() {
     return "id-" + Math.floor(Date.now() * Math.random());
 }
 </script>
+
+<script>
+// Polyfills for command-line Mocha and other older environments.
+if (!window.WeakMap) {
+    document.write("<scr" + "ipt src=\"../node_modules/weakmap-polyfill/weakmap-polyfill.min.js\"></scr" + "ipt>");
+}
+</script>
+
 <script src="../dist/aria.js"></script>
 
 </head>
@@ -29,7 +33,7 @@ if (window.initMochaPhantomJS) {
     window.initMochaPhantomJS();
 }
 
-window._TEST_MODE = true;
+// window._TEST_MODE = true;
 mocha.setup({
     ui: "bdd"
 });
@@ -43,6 +47,8 @@ mocha.setup({
 <script src="ARIA.Tristate.js"></script>
 <script src="ARIA.List.js"></script>
 <script src="ARIA.Reference.js"></script>
+<script src="ARIA.ReferenceList.js"></script>
+<script src="ARIA.Element.js"></script>
 
 <script>
 // Only tests run in real browser, injected script run if options.run == true

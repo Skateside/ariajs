@@ -1,5 +1,3 @@
-var previousAria = globalVariable.ARIA;
-
 /**
  * @namespace
  */
@@ -62,7 +60,7 @@ var identity = function (x) {
  */
 var arrayFrom = Array.from || function (arrayLike, map, context) {
 
-    if (typeof map === undefined) {
+    if (map === undefined) {
         map = identity;
     }
 
@@ -138,7 +136,7 @@ var noop = function () {
 
 var fnTest = (
     (/return/).test(noop)
-    ? (/[\.'"]\$super\b/)
+    ? (/[.'"]\$super\b/)
     : (/.*/)
 );
 
@@ -243,21 +241,6 @@ ARIA.createClass = function (Base, proto) {
     }
 
     return Class;
-
-};
-
-/**
- * Removes the {@link ARIA} namespace from the global object and restores
- * any previous value that may have been there.
- *
- * @return {Object}
- *         The {@link ARIA} namespace.
- */
-ARIA.noConflict = function () {
-
-    globalVariable.ARIA = previousAria;
-
-    return ARIA;
 
 };
 
@@ -413,4 +396,38 @@ ARIA.identify = function (element, prefix) {
  */
 ARIA.isNode = function (value) {
     return (value instanceof Node);
+};
+
+/**
+ * Allows an element to be focusable. Optionally, the tabindex can be defined.
+ * Be warned that passed a negative value to the tabindex will remove the
+ * element from the tab order.
+ *
+ * @param {Element} element
+ *        Element that should become focusable.
+ * @param {Number} [tabindex=0]
+ *        Optional value of the tabindex.
+ */
+ARIA.makeFocusable = function (element, tabindex) {
+    element.setAttribute("tabindex", parseInt(tabindex, 10) || 0);
+};
+
+/**
+ * Removes an element from the tab order.
+ *
+ * @param {Element} element
+ *        Element should be removed from the tab order.
+ */
+ARIA.makeUnfocusable = function (element) {
+    this.makeFocusable(element, -1);
+};
+
+/**
+ * Removes the tabindex from the element, setting their focusable state.
+ *
+ * @param {Element} element
+ *        Element whose tabindex should be removed.
+ */
+ARIA.resetFocusable = function (element) {
+    element.removeAttribute("tabindex");
 };

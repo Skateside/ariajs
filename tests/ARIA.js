@@ -23,39 +23,6 @@ describe("ARIA", function () {
 
     });
 
-    describe("noConflict", function () {
-
-        var myARIA = window.ARIA;
-
-        it("should remove ARIA from the global namespace", function () {
-
-            ARIA.noConflict();
-            chai.assert.notEqual(myARIA, window.ARIA);
-
-            window.ARIA = myARIA;
-
-        });
-
-        it("should return ARIA", function () {
-
-            var value = ARIA.noConflict();
-
-            chai.assert.equal(value, myARIA);
-            window.ARIA = myARIA;
-
-        });
-
-        it("should restore the previous value of ARIA", function () {
-
-            var value = ARIA.noConflict();
-
-            chai.assert.equal(window.previousARIA, window.ARIA);
-            window.ARIA = myARIA;
-
-        });
-
-    });
-
     describe("getById", function () {
 
         it("should find an element by ID", function () {
@@ -102,7 +69,7 @@ describe("ARIA", function () {
             var div = document.createElement("div");
             var newId = ARIA.identify(div, "id-");
 
-            chai.assert.isTrue(newId.startsWith("id-"));
+            chai.assert.isTrue((/^id\-/).test(newId));
 
         });
 
@@ -116,10 +83,10 @@ describe("ARIA", function () {
             var createdDefault = makeUniqueId();
 
             chai.assert.notEqual(prefix, createdDefault);
-            chai.assert.isTrue(ARIA.identify(divs[0]).startsWith(prefix));
+            chai.assert.equal(ARIA.identify(divs[0]).substr(0, prefix.length), prefix);
 
             ARIA.defaultIdentifyPrefix = createdDefault;
-            chai.assert.isTrue(ARIA.identify(divs[1]).startsWith(createdDefault));
+            chai.assert.equal(ARIA.identify(divs[1]).substr(0, createdDefault.length), createdDefault);
 
             ARIA.defaultIdentifyPrefix = prefix;
 
@@ -348,6 +315,57 @@ describe("ARIA", function () {
 
             chai.assert.isTrue(ARIA.isNode(document.createElement("div")));
             chai.assert.isFalse(ARIA.isNode({}));
+
+        });
+
+    });
+
+    describe("makeFocusable", function () {
+
+        it("should allow an element to become focusable", function () {
+
+            var div = document.createElement("div");
+
+            ARIA.makeFocusable(div);
+            chai.assert.equal(div.getAttribute("tabindex"), "0");
+
+        });
+
+        it("should allow allow the tabindex to be set", function () {
+
+            var div = document.createElement("div");
+            var tabindex = Math.floor(Math.random() * 10);
+
+            ARIA.makeFocusable(div, tabindex);
+            chai.assert.equal(div.getAttribute("tabindex"), String(tabindex));
+
+        });
+
+    });
+
+    describe("makeUnfocusable", function () {
+
+        it("should remove the element from the tab order", function () {
+
+            var div = document.createElement("div");
+
+            ARIA.makeUnfocusable(div);
+            chai.assert.equal(div.getAttribute("tabindex"), "-1");
+
+        });
+
+    });
+
+    describe("resetFocusable", function () {
+
+        it("should remove the tabindex from the element", function () {
+
+            var div = document.createElement("div");
+
+            ARIA.makeFocusable(div);
+            chai.assert.isTrue(div.hasAttribute("tabindex"));
+            ARIA.resetFocusable(div);
+            chai.assert.isFalse(div.hasAttribute("tabindex"));
 
         });
 

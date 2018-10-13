@@ -44,7 +44,7 @@ ARIA.State = ARIA.createClass(ARIA.Property, /** @lends ARIA.State.prototype */{
                 ? value === "true"
                 : ""
             )
-        )
+        );
 
     }
 

@@ -139,7 +139,7 @@ var factoryEntries = [
         "all",
         "removals",
         "text"
-    ]],
+    ]]
 ];
 
 factoryEntries.forEach(function (entry) {

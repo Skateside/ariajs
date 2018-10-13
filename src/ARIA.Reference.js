@@ -8,7 +8,7 @@ ARIA.Reference = ARIA.createClass(ARIA.Property, /** @lends ARIA.Reference.proto
 
     /**
      * Interprets the given value as a string. If the value is an element, the
-     * element's ID is returned, generating one if necessary = see
+     * element's ID is returned, generating one if necessary - see
      * {@link ARIA.identify}.
      *
      * @param  {?} value
@@ -17,13 +17,7 @@ ARIA.Reference = ARIA.createClass(ARIA.Property, /** @lends ARIA.Reference.proto
      *         The interpretted value.
      */
     interpret: function (value) {
-
-        return (
-            ARIA.isNode(value)
-            ? ARIA.identify(value)
-            : this.$super(value)
-        );
-
+        return ARIA.Reference.interpret(value);
     },
 
     /**
@@ -51,3 +45,24 @@ ARIA.Reference = ARIA.createClass(ARIA.Property, /** @lends ARIA.Reference.proto
     }
 
 });
+
+/**
+ * Interprets the given value as a string. If the value is an element, the
+ * element's ID is returned, generating one if necessary = see
+ * {@link ARIA.identify}. This powers {@link ARIA.Reference#interpret} while
+ * also allowing other functions and classes to use it.
+ *
+ * @param  {?} value
+ *         Value to interpret.
+ * @return {String}
+ *         The interpretted value.
+ */
+ARIA.Reference.interpret = function (value) {
+
+    return (
+        ARIA.isNode(value)
+        ? ARIA.identify(value)
+        : ARIA.Property.interpret(value)
+    );
+
+};

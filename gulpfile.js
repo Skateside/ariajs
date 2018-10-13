@@ -49,7 +49,7 @@ gulp.task("js", function () {
         .pipe(concat.header(
             `/*! ${pkgJson.name} - ` +
             `v${pkgJson.version} - ${pkgJson.license} license - ` +
-            `${getToday()} */\n` +
+            `${pkgJson.homepage} - ${getToday()} */\n` +
             `(function (globalVariable) {\n` +
             `    "use strict";\n\n`
 
@@ -78,7 +78,7 @@ gulp.task("test", function () {
 
     gulp.src("./tests/testrunner.html")
         .pipe(mochaPhantomJS({
-            globals: ["window", "ARIA"],
+            globals: ["window", "ARIA", "makeUniqueId"],
             reporter: "spec",
             phantomjs: {
                 useColors: true

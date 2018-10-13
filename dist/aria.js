@@ -1,8 +1,6 @@
-/*! ariajs - v1.0.0 - MIT license - 2018-10-11 */
+/*! ariajs - v1.0.0 - MIT license - https://github.com/Skateside/ariajs - 2018-10-13 */
 (function (globalVariable) {
     "use strict";
-
-var previousAria = globalVariable.ARIA;
 
 /**
  * @namespace
@@ -66,7 +64,7 @@ var identity = function (x) {
  */
 var arrayFrom = Array.from || function (arrayLike, map, context) {
 
-    if (typeof map === undefined) {
+    if (map === undefined) {
         map = identity;
     }
 
@@ -142,7 +140,7 @@ var noop = function () {
 
 var fnTest = (
     (/return/).test(noop)
-    ? (/[\.'"]\$super\b/)
+    ? (/[.'"]\$super\b/)
     : (/.*/)
 );
 
@@ -247,21 +245,6 @@ ARIA.createClass = function (Base, proto) {
     }
 
     return Class;
-
-};
-
-/**
- * Removes the {@link ARIA} namespace from the global object and restores
- * any previous value that may have been there.
- *
- * @return {Object}
- *         The {@link ARIA} namespace.
- */
-ARIA.noConflict = function () {
-
-    globalVariable.ARIA = previousAria;
-
-    return ARIA;
 
 };
 
@@ -420,6 +403,40 @@ ARIA.isNode = function (value) {
 };
 
 /**
+ * Allows an element to be focusable. Optionally, the tabindex can be defined.
+ * Be warned that passed a negative value to the tabindex will remove the
+ * element from the tab order.
+ *
+ * @param {Element} element
+ *        Element that should become focusable.
+ * @param {Number} [tabindex=0]
+ *        Optional value of the tabindex.
+ */
+ARIA.makeFocusable = function (element, tabindex) {
+    element.setAttribute("tabindex", parseInt(tabindex, 10) || 0);
+};
+
+/**
+ * Removes an element from the tab order.
+ *
+ * @param {Element} element
+ *        Element should be removed from the tab order.
+ */
+ARIA.makeUnfocusable = function (element) {
+    this.makeFocusable(element, -1);
+};
+
+/**
+ * Removes the tabindex from the element, setting their focusable state.
+ *
+ * @param {Element} element
+ *        Element whose tabindex should be removed.
+ */
+ARIA.resetFocusable = function (element) {
+    element.removeAttribute("tabindex");
+};
+
+/**
  * Handles basic WAI-ARIA properties.
  *
  * @class ARIA.Property
@@ -540,13 +557,7 @@ ARIA.Property = ARIA.createClass(/** @lends ARIA.Property.prototype */{
      *         String based on the value.
      */
     interpret: function (value) {
-
-        return (
-            (value === null || value === undefined)
-            ? ""
-            : String(value).trim()
-        );
-
+        return ARIA.Property.interpret(value);
     },
 
     /**
@@ -563,6 +574,8 @@ ARIA.Property = ARIA.createClass(/** @lends ARIA.Property.prototype */{
 // console.log("value = %o, token = %o, isValid = %o", value, token, this.isValidToken(token));
         if (token !== "" && this.isValidToken(token)) {
             this.setAttribute(token);
+        } else if (token === "") {
+            this.removeAttribute();
         }
 
     },
@@ -608,24 +621,10 @@ ARIA.Property = ARIA.createClass(/** @lends ARIA.Property.prototype */{
      */
     setAttribute: function (value) {
 
-        if (!this.isSetting) {
-
-            /**
-             * A flag set while the setting is taking place. Prevents infinite
-             * loops caused by MutationObservers.
-             * @type {Boolean}
-             */
-            this.isSetting = true;
-            value = String(value);
-
-            if (value !== "" || value !== undefined || value !== null) {
-                this.element.setAttribute(this.attribute, value);
-            } else {
-                this.removeAttribute();
-            }
-
-            this.isSetting = false;
-
+        if (ARIA.Property.interpret(value) !== "") {
+            this.element.setAttribute(this.attribute, value);
+        } else {
+            this.removeAttribute();
         }
 
     },
@@ -674,6 +673,26 @@ ARIA.Property = ARIA.createClass(/** @lends ARIA.Property.prototype */{
 });
 
 /**
+ * Interprets the given value so it can be set. This is used to power
+ * {@link ARIA.Property#interpret} while also being exposed so other functions
+ * and classes can use it.
+ *
+ * @param  {?} value
+ *         Value to interpret.
+ * @return {String}
+ *         String based on the value.
+ */
+ARIA.Property.interpret = function (value) {
+
+    return (
+        (value === null || value === undefined)
+        ? ""
+        : String(value).trim()
+    );
+
+};
+
+/**
  * Handles WAI-ARIA states.
  *
  * @class ARIA.State
@@ -719,7 +738,7 @@ ARIA.State = ARIA.createClass(ARIA.Property, /** @lends ARIA.State.prototype */{
                 ? value === "true"
                 : ""
             )
-        )
+        );
 
     }
 
@@ -848,7 +867,6 @@ var lists = new WeakMap();
 var makeIterator = function (instance, valueMaker) {
 
    var index = 0;
-   // var list = lists.get(instance) || [];
    var list = instance.get();
    var length = list.length;
 
@@ -913,7 +931,7 @@ ARIA.List = ARIA.createClass(ARIA.Property, /** ARIA.List.prototype */{
      */
     init: function (element, attribute) {
 
-        let that = this;
+        var that = this;
 
         lists.set(that, []);
 
@@ -1085,7 +1103,9 @@ ARIA.List = ARIA.createClass(ARIA.Property, /** ARIA.List.prototype */{
 
         if (arguments.length) {
 
-            arrayFrom(arguments, function (item) {
+            arrayFrom(arguments, function (argument) {
+
+                var item = this.interpret(argument)[0];
 
                 if (this.isValidToken(item) && list.indexOf(item) < 0) {
                     list.push(item);
@@ -1113,8 +1133,9 @@ ARIA.List = ARIA.createClass(ARIA.Property, /** ARIA.List.prototype */{
 
         if (arguments.length) {
 
-            arrayFrom(arguments, function (item) {
+            arrayFrom(arguments, function (argument) {
 
+                var item = this.interpret(argument)[0];
                 var index = this.isValidToken(item) && list.indexOf(item);
 
                 if (index > -1) {
@@ -1149,7 +1170,11 @@ ARIA.List = ARIA.createClass(ARIA.Property, /** ARIA.List.prototype */{
      *         true if the item is within the list, false otherwise.
      */
     contains: function (item) {
-        return this.isValidToken(item) && lists.get(this).indexOf(item) > -1;
+
+        var value = this.interpret(item)[0];
+
+        return this.isValidToken(value) && lists.get(this).indexOf(value) > -1;
+
     },
 
     /**
@@ -1181,15 +1206,17 @@ ARIA.List = ARIA.createClass(ARIA.Property, /** ARIA.List.prototype */{
         var isReplaced = false;
         var list;
         var index;
+        var oldItem = this.interpret(oldToken)[0];
+        var newItem = this.interpret(newToken)[0];
 
-        if (this.isValidToken(oldToken) && this.isValidToken(newToken)) {
+        if (this.isValidToken(oldItem) && this.isValidToken(newItem)) {
 
             list = lists.get(this);
-            index = list.indexOf(oldToken);
+            index = list.indexOf(oldItem);
 
             if (index > -1) {
 
-                list.splice(index, 1, newToken);
+                list.splice(index, 1, newItem);
                 isReplaced = true;
 
             }
@@ -1285,7 +1312,7 @@ ARIA.Reference = ARIA.createClass(ARIA.Property, /** @lends ARIA.Reference.proto
 
     /**
      * Interprets the given value as a string. If the value is an element, the
-     * element's ID is returned, generating one if necessary = see
+     * element's ID is returned, generating one if necessary - see
      * {@link ARIA.identify}.
      *
      * @param  {?} value
@@ -1294,13 +1321,7 @@ ARIA.Reference = ARIA.createClass(ARIA.Property, /** @lends ARIA.Reference.proto
      *         The interpretted value.
      */
     interpret: function (value) {
-
-        return (
-            ARIA.isNode(value)
-            ? ARIA.identify(value)
-            : this.$super(value)
-        );
-
+        return ARIA.Reference.interpret(value);
     },
 
     /**
@@ -1329,16 +1350,55 @@ ARIA.Reference = ARIA.createClass(ARIA.Property, /** @lends ARIA.Reference.proto
 
 });
 
+/**
+ * Interprets the given value as a string. If the value is an element, the
+ * element's ID is returned, generating one if necessary = see
+ * {@link ARIA.identify}. This powers {@link ARIA.Reference#interpret} while
+ * also allowing other functions and classes to use it.
+ *
+ * @param  {?} value
+ *         Value to interpret.
+ * @return {String}
+ *         The interpretted value.
+ */
+ARIA.Reference.interpret = function (value) {
+
+    return (
+        ARIA.isNode(value)
+        ? ARIA.identify(value)
+        : ARIA.Property.interpret(value)
+    );
+
+};
+
+/**
+ * Handles WAI-ARIA attributes that handle space-separated lists of IDs.
+ * @class ARIA.ReferenceList
+ * @extends ARIA.List
+ */
 ARIA.ReferenceList = ARIA.createClass(ARIA.List, {
 
+    /**
+     * Interprets an element, ID or array of elements or/and IDs as an array of
+     * element IDs.
+     *
+     * @param  {Array.<Element|String>|Element|String} value
+     *         Value(s) to interpret.
+     * @return {Array.<String>}
+     *         Collection of IDs.
+     */
     interpret: function (value) {
 
         var interpretted = [];
 
-        if (typeof value === "object" && typeof value.length === "number") {
-            interpretted = arrayFrom(value, this.$super, this);
+        if (
+            value
+            && typeof value === "object"
+            && typeof value.length === "number"
+        ) {
+            interpretted = arrayFrom(value, ARIA.Reference.interpret, this);
         } else if (typeof value === "string" || ARIA.isNode(value)) {
-            interpretted = [this.$super(value)];
+            interpretted = [ARIA.Reference.interpret(value)];
         }
 
         // Remove all falsy values such as "" or null.
@@ -1346,14 +1406,28 @@ ARIA.ReferenceList = ARIA.createClass(ARIA.List, {
 
     },
 
+    /**
+     * Gets an array of elements referenced by the attribute. If the element
+     * cannot be found, null will be in place of the element.
+     *
+     * @return {Array.<Element|null>}
+     *         Array of elements.
+     */
     get: function () {
         return this.toArray(ARIA.getById);
     },
 
-    contains: function (item) {
-        return this.$super(this.interpret(item)[0] || "");
-    },
-
+    /**
+     * Checks to see either if the attribute exists and all elements exist or,
+     * if a parameter is passed, whether or not that item appears within the
+     * list.
+     *
+     * @param  {Element|String} [item]
+     *         Optional item to check for.
+     * @return {Boolean}
+     *         true if the attribute exists and all elements exist or, if a
+     *         parameter is passed, true if the list contains the value.
+     */
     has: function (item) {
 
         return this.hasAttribute() && (
@@ -1366,11 +1440,17 @@ ARIA.ReferenceList = ARIA.createClass(ARIA.List, {
 
 });
 
+/**
+ * Handles the WAI-ARIA attributes on an element.
+ *
+ * @class ARIA.Element
+ */
 ARIA.Element = ARIA.createClass({
 
     init: function (element) {
 
         this.element = element;
+        this.manipulationFlags = Object.create(null);
         this.preloadAttributes();
         this.readAttributes();
         this.observeAttributes();
@@ -1430,19 +1510,45 @@ ARIA.Element = ARIA.createClass({
 
     observeAttributes: function () {
 
-        var element = this.element;
+        var that = this;
+        var element = that.element;
         var observer = new MutationObserver(function (mutations) {
 
             mutations.forEach(function (mutation) {
 
-                var attribute = mutation.attributeName;
-                var suffix = (attribute || "").slice(5);
-
+                var attribute = mutation.attributeName || "";
+                var suffix = attribute.slice(5);
+                var value;
+                var old;
+console.log("mutation.type = %o, suffix = %o, factories = %o, flag = %o, getAttribute = %o, element = %o", mutation.type, suffix, ARIA.factories[suffix] ? "found": "NOT FOUND", that.manipulationFlags[suffix], element.getAttribute(attribute), element);
                 if (
                     mutation.type === "attributes"
                     && ARIA.factories[suffix]
+                    && !that.manipulationFlags[suffix]
                 ) {
-                    this[suffix] = element.getAttribute(attribute);
+
+                    that.manipulationFlags[suffix] = true;
+
+                    if (element.hasAttribute(attribute)) {
+
+                        value = ARIA.Property.interpret(
+                            element.getAttribute(attribute)
+                        );
+                        old = ARIA.Property.interpret(mutation.oldValue);
+
+console.log("attribute %o (%o) on %o changed from %o to %o", attribute, suffix, element, old, value);
+                        if (value !== old) {
+                            that[suffix].set(value);
+                        }
+
+                    } else {
+                        that[suffix].remove();
+                    }
+
+                    window.setTimeout(function () {
+                        delete that.manipulationFlags[suffix];
+                    }, 0);
+
                 }
 
             });
@@ -1450,10 +1556,11 @@ ARIA.Element = ARIA.createClass({
         });
 
         observer.observe(element, {
-            attributes: true
+            attributes: true,
+            attributeOldValue: true
         });
 
-        this.observer = observer;
+        that.observer = observer;
 
     },
 
@@ -1604,7 +1711,7 @@ var factoryEntries = [
         "all",
         "removals",
         "text"
-    ]],
+    ]]
 ];
 
 factoryEntries.forEach(function (entry) {

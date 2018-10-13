@@ -54,6 +54,15 @@ describe("ARIA.Property", function () {
 
     });
 
+    it("should remove an attribute when setting it to an empty string", function () {
+
+        property.set("abc123");
+        chai.assert.isTrue(div.hasAttribute(ATTRIBUTE));
+        property.set("");
+        chai.assert.isFalse(div.hasAttribute(ATTRIBUTE));
+
+    });
+
     it("should automatically set the value if the attribute exists", function () {
 
         var value = "abc123";

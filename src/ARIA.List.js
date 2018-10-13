@@ -20,7 +20,6 @@ var lists = new WeakMap();
 var makeIterator = function (instance, valueMaker) {
 
    var index = 0;
-   // var list = lists.get(instance) || [];
    var list = instance.get();
    var length = list.length;
 
@@ -85,7 +84,7 @@ ARIA.List = ARIA.createClass(ARIA.Property, /** ARIA.List.prototype */{
      */
     init: function (element, attribute) {
 
-        let that = this;
+        var that = this;
 
         lists.set(that, []);
 
@@ -257,7 +256,9 @@ ARIA.List = ARIA.createClass(ARIA.Property, /** ARIA.List.prototype */{
 
         if (arguments.length) {
 
-            arrayFrom(arguments, function (item) {
+            arrayFrom(arguments, function (argument) {
+
+                var item = this.interpret(argument)[0];
 
                 if (this.isValidToken(item) && list.indexOf(item) < 0) {
                     list.push(item);
@@ -285,8 +286,9 @@ ARIA.List = ARIA.createClass(ARIA.Property, /** ARIA.List.prototype */{
 
         if (arguments.length) {
 
-            arrayFrom(arguments, function (item) {
+            arrayFrom(arguments, function (argument) {
 
+                var item = this.interpret(argument)[0];
                 var index = this.isValidToken(item) && list.indexOf(item);
 
                 if (index > -1) {
@@ -321,7 +323,11 @@ ARIA.List = ARIA.createClass(ARIA.Property, /** ARIA.List.prototype */{
      *         true if the item is within the list, false otherwise.
      */
     contains: function (item) {
-        return this.isValidToken(item) && lists.get(this).indexOf(item) > -1;
+
+        var value = this.interpret(item)[0];
+
+        return this.isValidToken(value) && lists.get(this).indexOf(value) > -1;
+
     },
 
     /**
@@ -353,15 +359,17 @@ ARIA.List = ARIA.createClass(ARIA.Property, /** ARIA.List.prototype */{
         var isReplaced = false;
         var list;
         var index;
+        var oldItem = this.interpret(oldToken)[0];
+        var newItem = this.interpret(newToken)[0];
 
-        if (this.isValidToken(oldToken) && this.isValidToken(newToken)) {
+        if (this.isValidToken(oldItem) && this.isValidToken(newItem)) {
 
             list = lists.get(this);
-            index = list.indexOf(oldToken);
+            index = list.indexOf(oldItem);
 
             if (index > -1) {
 
-                list.splice(index, 1, newToken);
+                list.splice(index, 1, newItem);
                 isReplaced = true;
 
             }

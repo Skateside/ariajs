@@ -119,13 +119,7 @@ ARIA.Property = ARIA.createClass(/** @lends ARIA.Property.prototype */{
      *         String based on the value.
      */
     interpret: function (value) {
-
-        return (
-            (value === null || value === undefined)
-            ? ""
-            : String(value).trim()
-        );
-
+        return ARIA.Property.interpret(value);
     },
 
     /**
@@ -142,6 +136,8 @@ ARIA.Property = ARIA.createClass(/** @lends ARIA.Property.prototype */{
 // console.log("value = %o, token = %o, isValid = %o", value, token, this.isValidToken(token));
         if (token !== "" && this.isValidToken(token)) {
             this.setAttribute(token);
+        } else if (token === "") {
+            this.removeAttribute();
         }
 
     },
@@ -187,24 +183,10 @@ ARIA.Property = ARIA.createClass(/** @lends ARIA.Property.prototype */{
      */
     setAttribute: function (value) {
 
-        if (!this.isSetting) {
-
-            /**
-             * A flag set while the setting is taking place. Prevents infinite
-             * loops caused by MutationObservers.
-             * @type {Boolean}
-             */
-            this.isSetting = true;
-            value = String(value);
-
-            if (value !== "" || value !== undefined || value !== null) {
-                this.element.setAttribute(this.attribute, value);
-            } else {
-                this.removeAttribute();
-            }
-
-            this.isSetting = false;
-
+        if (ARIA.Property.interpret(value) !== "") {
+            this.element.setAttribute(this.attribute, value);
+        } else {
+            this.removeAttribute();
         }
 
     },
@@ -251,3 +233,23 @@ ARIA.Property = ARIA.createClass(/** @lends ARIA.Property.prototype */{
     }
 
 });
+
+/**
+ * Interprets the given value so it can be set. This is used to power
+ * {@link ARIA.Property#interpret} while also being exposed so other functions
+ * and classes can use it.
+ *
+ * @param  {?} value
+ *         Value to interpret.
+ * @return {String}
+ *         String based on the value.
+ */
+ARIA.Property.interpret = function (value) {
+
+    return (
+        (value === null || value === undefined)
+        ? ""
+        : String(value).trim()
+    );
+
+};
