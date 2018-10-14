@@ -183,11 +183,18 @@ ARIA.List = ARIA.createClass(ARIA.Property, /** ARIA.List.prototype */{
     set: function (value) {
 
         var values = this.interpret(value);
-
-        this.remove.apply(this, this.toArray());
-
+        var unwanted = this
+            .toArray()
+            .filter(function (item) {
+                return values.indexOf(item) < 0;
+            });
+console.log("ARIA.List#set(%o) for attribute %o; values = %o; unwanted = %o", value, this.attribute, values, unwanted);
         if (values.length) {
             this.add.apply(this, values);
+        }
+
+        if (unwanted.length) {
+            this.remove.apply(this, unwanted);
         }
 
         this.setAttribute(this.toString());

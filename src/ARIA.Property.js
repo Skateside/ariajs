@@ -27,10 +27,10 @@ ARIA.Property = ARIA.createClass(/** @lends ARIA.Property.prototype */{
          * @type {String}
          */
         that.attribute = attribute;
-
-        if (that.has()) {
-            that.set(that.get());
-        }
+console.warn("Note to self: somewhere here, attributes are being lost :-(");
+        // if (that.has()) {
+        //     that.set(that.get());
+        // }
 
         /**
          * The value of the {@link ARIA.Property#attribute}.

@@ -36,8 +36,8 @@ describe("ARIA.Element", function () {
 
     it("should listen for external changes an update as necessary", function () {
 
-        div.setAttribute("aria-dropeffect", "copy");
-console.log("div %o attribute value is %o; dropeffect value is %o", div, div.getAttribute("aria-dropeffect"), element.dropeffect.value);
+        div.setAttribute("aria-dropeffect", "link");
+console.log("%cdiv %o attribute value is %o; dropeffect value is %o", "background-color:#cfc", div, div.getAttribute("aria-dropeffect"), element.dropeffect && element.dropeffect.value);
         // chai.assert.equal(element.dropeffect.length, 1);
         // div.setAttribute("aria-relevant", "additions text");
         // chai.assert.equal(element.relevant.length, 1);
