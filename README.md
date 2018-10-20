@@ -80,4 +80,4 @@ button.aria.controls.get(); // -> [<div id="anonymous-element-2">, <section id="
 
 ## State of this library
 
-This library is currently a **work in progress** and tests are still being written. Once that's finished, I'll write some more complete documentation.
+This library has been tested and should be production-ready. I'm in the process of writing some better documentation.
