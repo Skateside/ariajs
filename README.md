@@ -82,7 +82,7 @@ button.aria.controls.get(); // -> [<div id="anonymous-element-2">, <section id="
 
 This library is currently in **alpha** as unit tests are still being written.
 
-- [ ] Finish writing unit tests.
+- [x] Finish writing unit tests.
 - [ ] Browser test (IE11+).
 - [ ] Write documentation.
 - [ ] Release for beta testing.
