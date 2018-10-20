@@ -101,14 +101,14 @@ ARIA.Element = ARIA.createClass(/** @lends ARIA.ELement.prototype */{
         var that = this;
         var element = that.element;
         var observer = new MutationObserver(function (mutations) {
-console.log("%cSomething happened to %o - mutations = %o", "background-color:#fcc;font-weight:bold", element, mutations);
+
             mutations.forEach(function (mutation) {
 
                 var attribute = mutation.attributeName || "";
                 var suffix = attribute.slice(5);
                 var value;
                 var old;
-console.log("%cmutation.type = %o, suffix = %o, factories = %o, flag = %o, hasAttribute = %o, getAttribute = %o, element = %o", "background-color:#fcc", mutation.type, suffix, ARIA.factories[suffix] ? "found": "NOT FOUND", that.manipulationFlags[suffix], element.hasAttribute(attribute), element.getAttribute(attribute), element);
+
                 if (
                     mutation.type === "attributes"
                     && ARIA.factories[suffix]
@@ -124,13 +124,12 @@ console.log("%cmutation.type = %o, suffix = %o, factories = %o, flag = %o, hasAt
                         );
                         old = ARIA.Property.interpret(mutation.oldValue);
 
-console.log("%cattribute %o (%o) on %o changed from %o to %o", "background-color:#fcc", attribute, suffix, element, old, value);
                         if (value !== old) {
-                            // that[suffix].set(value);
+                            that[suffix].set(value);
                         }
 
                     } else {
-                        // that[suffix].remove();
+                        that[suffix].remove();
                     }
 
                     window.setTimeout(function () {

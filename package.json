@@ -6,16 +6,29 @@
     "author": "James \"Skateside\" Long",
     "license": "MIT",
     "homepage": "https://github.com/Skateside/ariajs",
+    "keywords": [
+        "WAI-ARIA",
+        "aria",
+        "accessibility",
+        "a11y"
+    ],
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/Skateside/ariajs.git"
+    },
+    "bugs": {
+        "url": "https://github.com/Skateside/ariajs/issues"
+    },
     "dependencies": {
-        "chai": "^4.2.0",
         "gulp": "^3.9.1",
         "gulp-concat-util": "^0.5.5",
         "gulp-minify": "^3.1.0",
-        "gulp-mocha-phantomjs": "^0.12.2",
-        "gulp-sourcemaps": "^2.6.4",
-        "mocha": "^5.2.0"
+        "gulp-sourcemaps": "^2.6.4"
     },
     "devDependencies": {
+        "chai": "^4.2.0",
+        "mocha": "^5.2.0",
+        "gulp-mocha-phantomjs": "^0.12.2",
         "weakmap-polyfill": "^2.0.0"
     }
 }

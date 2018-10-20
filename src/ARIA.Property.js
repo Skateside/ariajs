@@ -27,10 +27,14 @@ ARIA.Property = ARIA.createClass(/** @lends ARIA.Property.prototype */{
          * @type {String}
          */
         that.attribute = attribute;
-console.warn("Note to self: somewhere here, attributes are being lost :-(");
-        // if (that.has()) {
-        //     that.set(that.get());
-        // }
+
+        // Things like ARIA.List work with interpretted values rather than just
+        // the attribute value. If the attribute already exists, pass the value
+        // to the set method to allow for that. As a bonus, this can filter out
+        // invalid attribute values.
+        if (that.hasAttribute()) {
+            that.set(that.getAttribute());
+        }
 
         /**
          * The value of the {@link ARIA.Property#attribute}.
@@ -133,7 +137,7 @@ console.warn("Note to self: somewhere here, attributes are being lost :-(");
     set: function (value) {
 
         var token = this.interpret(value);
-// console.log("value = %o, token = %o, isValid = %o", value, token, this.isValidToken(token));
+
         if (token !== "" && this.isValidToken(token)) {
             this.setAttribute(token);
         } else if (token === "") {

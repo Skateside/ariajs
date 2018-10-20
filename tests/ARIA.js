@@ -320,13 +320,13 @@ describe("ARIA", function () {
 
     });
 
-    describe("makeFocusable", function () {
+    describe("addToTabOrder", function () {
 
         it("should allow an element to become focusable", function () {
 
             var div = document.createElement("div");
 
-            ARIA.makeFocusable(div);
+            ARIA.addToTabOrder(div);
             chai.assert.equal(div.getAttribute("tabindex"), "0");
 
         });
@@ -336,35 +336,35 @@ describe("ARIA", function () {
             var div = document.createElement("div");
             var tabindex = Math.floor(Math.random() * 10);
 
-            ARIA.makeFocusable(div, tabindex);
+            ARIA.addToTabOrder(div, tabindex);
             chai.assert.equal(div.getAttribute("tabindex"), String(tabindex));
 
         });
 
     });
 
-    describe("makeUnfocusable", function () {
+    describe("removeFromTabOrder", function () {
 
         it("should remove the element from the tab order", function () {
 
             var div = document.createElement("div");
 
-            ARIA.makeUnfocusable(div);
+            ARIA.removeFromTabOrder(div);
             chai.assert.equal(div.getAttribute("tabindex"), "-1");
 
         });
 
     });
 
-    describe("resetFocusable", function () {
+    describe("resetTabOrder", function () {
 
         it("should remove the tabindex from the element", function () {
 
             var div = document.createElement("div");
 
-            ARIA.makeFocusable(div);
+            ARIA.addToTabOrder(div);
             chai.assert.isTrue(div.hasAttribute("tabindex"));
-            ARIA.resetFocusable(div);
+            ARIA.resetTabOrder(div);
             chai.assert.isFalse(div.hasAttribute("tabindex"));
 
         });

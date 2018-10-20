@@ -24,7 +24,9 @@ ARIA.ReferenceList = ARIA.createClass(ARIA.List, {
             && typeof value.length === "number"
         ) {
             interpretted = arrayFrom(value, ARIA.Reference.interpret, this);
-        } else if (typeof value === "string" || ARIA.isNode(value)) {
+        } else if (typeof value === "string") {
+            interpretted = this.$super(value);
+        } else {
             interpretted = [ARIA.Reference.interpret(value)];
         }
 

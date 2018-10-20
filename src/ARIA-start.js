@@ -408,7 +408,7 @@ ARIA.isNode = function (value) {
  * @param {Number} [tabindex=0]
  *        Optional value of the tabindex.
  */
-ARIA.makeFocusable = function (element, tabindex) {
+ARIA.addToTabOrder = function (element, tabindex) {
     element.setAttribute("tabindex", parseInt(tabindex, 10) || 0);
 };
 
@@ -418,8 +418,8 @@ ARIA.makeFocusable = function (element, tabindex) {
  * @param {Element} element
  *        Element should be removed from the tab order.
  */
-ARIA.makeUnfocusable = function (element) {
-    this.makeFocusable(element, -1);
+ARIA.removeFromTabOrder = function (element) {
+    this.addToTabOrder(element, -1);
 };
 
 /**
@@ -428,6 +428,6 @@ ARIA.makeUnfocusable = function (element) {
  * @param {Element} element
  *        Element whose tabindex should be removed.
  */
-ARIA.resetFocusable = function (element) {
+ARIA.resetTabOrder = function (element) {
     element.removeAttribute("tabindex");
 };

@@ -37,10 +37,36 @@ describe("ARIA.Element", function () {
     it("should listen for external changes an update as necessary", function () {
 
         div.setAttribute("aria-dropeffect", "link");
-console.log("%cdiv %o attribute value is %o; dropeffect value is %o", "background-color:#cfc", div, div.getAttribute("aria-dropeffect"), element.dropeffect && element.dropeffect.value);
-        // chai.assert.equal(element.dropeffect.length, 1);
-        // div.setAttribute("aria-relevant", "additions text");
-        // chai.assert.equal(element.relevant.length, 1);
+        chai.assert.equal(element.dropeffect.length, 1);
+        div.setAttribute("aria-relevant", "additions text");
+        chai.assert.equal(element.relevant.length, 2);
+
+        var divs = [
+            document.createElement("div"),
+            document.createElement("div"),
+            document.createElement("div")
+        ];
+        divs.forEach(function (div) {
+            document.body.appendChild(div);
+        });
+        div.setAttribute("aria-controls", divs.map(function (div) {
+            return ARIA.identify(div);
+        }).join(" "));
+        chai.assert.equal(element.controls.length, 3);
+        divs.forEach(function (div) {
+            document.body.removeChild(div);
+        });
+
+    });
+
+    it("should be able to stop observing", function () {
+
+        div.setAttribute("aria-relevant", "additions text");
+        chai.assert.equal(element.relevant.length, 2);
+        element.disconnectAttributes();
+        div.setAttribute("aria-relevant", "additions");
+        chai.assert.equal(div.getAttribute("aria-relevant"), "additions");
+        chai.assert.equal(element.relevant.length, 2);
 
     });
 

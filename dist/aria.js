@@ -1,4 +1,4 @@
-/*! ariajs - v1.0.0 - MIT license - https://github.com/Skateside/ariajs - 2018-10-14 */
+/*! ariajs - v1.0.0 - MIT license - https://github.com/Skateside/ariajs - 2018-10-20 */
 (function (globalVariable) {
     "use strict";
 
@@ -412,7 +412,7 @@ ARIA.isNode = function (value) {
  * @param {Number} [tabindex=0]
  *        Optional value of the tabindex.
  */
-ARIA.makeFocusable = function (element, tabindex) {
+ARIA.addToTabOrder = function (element, tabindex) {
     element.setAttribute("tabindex", parseInt(tabindex, 10) || 0);
 };
 
@@ -422,8 +422,8 @@ ARIA.makeFocusable = function (element, tabindex) {
  * @param {Element} element
  *        Element should be removed from the tab order.
  */
-ARIA.makeUnfocusable = function (element) {
-    this.makeFocusable(element, -1);
+ARIA.removeFromTabOrder = function (element) {
+    this.addToTabOrder(element, -1);
 };
 
 /**
@@ -432,7 +432,7 @@ ARIA.makeUnfocusable = function (element) {
  * @param {Element} element
  *        Element whose tabindex should be removed.
  */
-ARIA.resetFocusable = function (element) {
+ARIA.resetTabOrder = function (element) {
     element.removeAttribute("tabindex");
 };
 
@@ -465,10 +465,14 @@ ARIA.Property = ARIA.createClass(/** @lends ARIA.Property.prototype */{
          * @type {String}
          */
         that.attribute = attribute;
-console.warn("Note to self: somewhere here, attributes are being lost :-(");
-        // if (that.has()) {
-        //     that.set(that.get());
-        // }
+
+        // Things like ARIA.List work with interpretted values rather than just
+        // the attribute value. If the attribute already exists, pass the value
+        // to the set method to allow for that. As a bonus, this can filter out
+        // invalid attribute values.
+        if (that.hasAttribute()) {
+            that.set(that.getAttribute());
+        }
 
         /**
          * The value of the {@link ARIA.Property#attribute}.
@@ -571,7 +575,7 @@ console.warn("Note to self: somewhere here, attributes are being lost :-(");
     set: function (value) {
 
         var token = this.interpret(value);
-// console.log("value = %o, token = %o, isValid = %o", value, token, this.isValidToken(token));
+
         if (token !== "" && this.isValidToken(token)) {
             this.setAttribute(token);
         } else if (token === "") {
@@ -1035,7 +1039,7 @@ ARIA.List = ARIA.createClass(ARIA.Property, /** ARIA.List.prototype */{
             .filter(function (item) {
                 return values.indexOf(item) < 0;
             });
-console.log("ARIA.List#set(%o) for attribute %o; values = %o; unwanted = %o", value, this.attribute, values, unwanted);
+
         if (values.length) {
             this.add.apply(this, values);
         }
@@ -1404,7 +1408,9 @@ ARIA.ReferenceList = ARIA.createClass(ARIA.List, {
             && typeof value.length === "number"
         ) {
             interpretted = arrayFrom(value, ARIA.Reference.interpret, this);
-        } else if (typeof value === "string" || ARIA.isNode(value)) {
+        } else if (typeof value === "string") {
+            interpretted = this.$super(value);
+        } else {
             interpretted = [ARIA.Reference.interpret(value)];
         }
 
@@ -1550,14 +1556,14 @@ ARIA.Element = ARIA.createClass(/** @lends ARIA.ELement.prototype */{
         var that = this;
         var element = that.element;
         var observer = new MutationObserver(function (mutations) {
-console.log("%cSomething happened to %o - mutations = %o", "background-color:#fcc;font-weight:bold", element, mutations);
+
             mutations.forEach(function (mutation) {
 
                 var attribute = mutation.attributeName || "";
                 var suffix = attribute.slice(5);
                 var value;
                 var old;
-console.log("%cmutation.type = %o, suffix = %o, factories = %o, flag = %o, hasAttribute = %o, getAttribute = %o, element = %o", "background-color:#fcc", mutation.type, suffix, ARIA.factories[suffix] ? "found": "NOT FOUND", that.manipulationFlags[suffix], element.hasAttribute(attribute), element.getAttribute(attribute), element);
+
                 if (
                     mutation.type === "attributes"
                     && ARIA.factories[suffix]
@@ -1573,13 +1579,12 @@ console.log("%cmutation.type = %o, suffix = %o, factories = %o, flag = %o, hasAt
                         );
                         old = ARIA.Property.interpret(mutation.oldValue);
 
-console.log("%cattribute %o (%o) on %o changed from %o to %o", "background-color:#fcc", attribute, suffix, element, old, value);
                         if (value !== old) {
-                            // that[suffix].set(value);
+                            that[suffix].set(value);
                         }
 
                     } else {
-                        // that[suffix].remove();
+                        that[suffix].remove();
                     }
 
                     window.setTimeout(function () {

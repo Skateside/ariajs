@@ -188,7 +188,7 @@ ARIA.List = ARIA.createClass(ARIA.Property, /** ARIA.List.prototype */{
             .filter(function (item) {
                 return values.indexOf(item) < 0;
             });
-console.log("ARIA.List#set(%o) for attribute %o; values = %o; unwanted = %o", value, this.attribute, values, unwanted);
+
         if (values.length) {
             this.add.apply(this, values);
         }
