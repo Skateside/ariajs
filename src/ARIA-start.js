@@ -327,6 +327,64 @@ ARIA.addAlias = function (source, aliases) {
 };
 
 /**
+ * A wrapper for setting an attribute on an element. This allows the method to
+ * be easily replaced for virtual DOMs.
+ *
+ * @param {Element} element
+ *        Element whose attribute should be set.
+ * @param {String} name
+ *        Name of the attribute to set.
+ * @param {String} value
+ *        Value of the attribute.
+ */
+ARIA.setAttribute = function (element, name, value) {
+    element.setAttribute(name, value);
+};
+
+/**
+ * A wrapper for getting an attribute of an element. THis allows the method to
+ * be easily replaced for virtual DOMs.
+ *
+ * @param  {Element} element
+ *         Element whose attribute should be retrieved.
+ * @param  {String} name
+ *         Name of the attribute to retrieve.
+ * @return {String|null}
+ *         The value of the attribute or null if that attribute does not exist.
+ */
+ARIA.getAttribute = function (element, name) {
+    return element.getAttribute(name);
+};
+
+/**
+ * A wrapper for checking for an attribute on an element. THis allows the method
+ * to be easily replaced for virtual DOMs.
+ *
+ * @param  {Element} element
+ *         Element whose attribute should be checked.
+ * @param  {String} name
+ *         Name of the attribute to check.
+ * @return {Boolean}
+ *         true if the element has the given attribute, false otherwise.
+ */
+ARIA.hasAttribute = function (element, name) {
+    return element.hasAttribute(name);
+};
+
+/**
+ * A wrapper for removing an attribute from an element. THis allows the method
+ * to be easily replaced for virtual DOMs.
+ *
+ * @param {Element} element
+ *        Element whose attribute should be removed.
+ * @param {String} name
+ *        Name of the attribute to remove.
+ */
+ARIA.removeAttribute = function (element, name) {
+    element.removeAttribute(name);
+};
+
+/**
  * Gets an element by the given ID. If the element cannot be found, null is
  * returned. This function is just a wrapper for document.getElementById to
  * allow the library to be easily modified in case a virtual DOM is being used.
@@ -363,7 +421,7 @@ ARIA.defaultIdentifyPrefix = "anonymous-element-";
  */
 ARIA.identify = function (element, prefix) {
 
-    var id = element.id;
+    var id = ARIA.getAttribute(element, "id");
 
     if (prefix === undefined) {
         prefix = ARIA.defaultIdentifyPrefix;
@@ -378,7 +436,7 @@ ARIA.identify = function (element, prefix) {
 
         } while (ARIA.getById(id));
 
-        element.id = id;
+        ARIA.setAttribute(element, "id", id);
 
     }
 
@@ -399,35 +457,56 @@ ARIA.isNode = function (value) {
 };
 
 /**
- * Allows an element to be focusable. Optionally, the tabindex can be defined.
- * Be warned that passed a negative value to the tabindex will remove the
- * element from the tab order.
+ * Sets the tabindex of an element to the given value. THe value is validated to
+ * ensure that it's valid - if it is not, no action is taken.
  *
  * @param {Element} element
- *        Element that should become focusable.
- * @param {Number} [tabindex=0]
- *        Optional value of the tabindex.
+ *        Element whose tabindex should be set.
+ * @param {Number} value
+ *        Value of the tab index to set.
  */
-ARIA.addToTabOrder = function (element, tabindex) {
-    element.setAttribute("tabindex", parseInt(tabindex, 10) || 0);
+ARIA.setTabindex = function (element, value) {
+
+    var tabindex = (
+        value === -1 || (value >= 0 && value < 32767)
+        ? Math.floor(value)
+        : undefined
+    );
+
+    if (tabindex !== undefined && !isNaN(tabindex)) {
+        ARIA.setAttribute(element, "tabindex", tabindex);
+    }
+
 };
 
 /**
- * Removes an element from the tab order.
- *
- * @param {Element} element
- *        Element should be removed from the tab order.
- */
-ARIA.removeFromTabOrder = function (element) {
-    this.addToTabOrder(element, -1);
-};
-
-/**
- * Removes the tabindex from the element, setting their focusable state.
+ * Helper function for removing the tabindex from an element.
  *
  * @param {Element} element
  *        Element whose tabindex should be removed.
  */
-ARIA.resetTabOrder = function (element) {
-    element.removeAttribute("tabindex");
+ARIA.removeTabindex = function (element) {
+    ARIA.removeAttribute(element, "tabindex");
+};
+
+/**
+ * Adds the given element to the tab order by setting its tabindex to 0. If you
+ * need more control over the value of the tab index, use
+ * {@link ARIA.setTabindex}.
+ *
+ * @param {Element} element
+ *        Element that should be added to the tab order.
+ */
+ARIA.addToTabOrder = function (element) {
+    ARIA.setTabindex(element, 0);
+};
+
+/**
+ * Removed the given element from the tab order by setting its tabindex to -1.
+ *
+ * @param {Element} element
+ *        Element that should be removed from the tab order.
+ */
+ARIA.removeFromTabOrder = function (element) {
+    ARIA.setTabindex(element, -1);
 };

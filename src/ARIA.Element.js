@@ -117,10 +117,10 @@ ARIA.Element = ARIA.createClass(/** @lends ARIA.ELement.prototype */{
 
                     that.manipulationFlags[suffix] = true;
 
-                    if (element.hasAttribute(attribute)) {
+                    if (ARIA.hasAttribute(element, attribute)) {
 
                         value = ARIA.Property.interpret(
-                            element.getAttribute(attribute)
+                            ARIA.getAttribute(element, attribute)
                         );
                         old = ARIA.Property.interpret(mutation.oldValue);
 

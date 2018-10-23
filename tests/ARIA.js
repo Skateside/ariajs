@@ -309,12 +309,137 @@ describe("ARIA", function () {
 
     });
 
+    describe("setAttribute", function () {
+
+        it("should set an attribute", function () {
+
+            var div = document.createElement("div");
+            var value = makeUniqueId();
+
+            ARIA.setAttribute(div, "data-test", value);
+            chai.assert.equal(div.getAttribute("data-test"), value);
+
+        });
+
+    });
+
+    describe("getAttribute", function () {
+
+        it("should get the value of an attribute", function () {
+
+            var div = document.createElement("div");
+            var value = makeUniqueId();
+
+            div.setAttribute("data-test", value);
+            chai.assert.equal(ARIA.getAttribute(div, "data-test"), value);
+
+        });
+
+        it("should return null if there is no attribute", function () {
+
+            chai.assert.isNull(
+                ARIA.getAttribute(document.createElement("div"), "data-test")
+            );
+
+        });
+
+    });
+
+    describe("hasAttribute", function () {
+
+        it("should check whether or not an element has an attribute", function () {
+
+            var div = document.createElement("div");
+
+            div.setAttribute("data-has", "true");
+            chai.assert.isTrue(ARIA.hasAttribute(div, "data-has"));
+            chai.assert.isFalse(ARIA.hasAttribute(div, "data-has-not"));
+
+        });
+
+    });
+
+    describe("removeAttribute", function () {
+
+        it("should remove an attribute", function () {
+
+            var div = document.createElement("div");
+
+            div.setAttribute("data-test", "true");
+            chai.assert.isTrue(div.hasAttribute("data-test"));
+            ARIA.removeAttribute(div, "data-test");
+            chai.assert.isFalse(div.hasAttribute("data-test"));
+
+        });
+
+        it("should not throw an error if there is no attribute", function () {
+
+            chai.assert.doesNotThrow(function () {
+                ARIA.removeAttribute(document.createElement("div"), makeUniqueId());
+            });
+
+        });
+
+    });
+
     describe("isNode", function () {
 
         it("should detect a Node", function () {
 
             chai.assert.isTrue(ARIA.isNode(document.createElement("div")));
             chai.assert.isFalse(ARIA.isNode({}));
+
+        });
+
+    });
+
+    describe("setTabindex", function () {
+
+        it("should set an element's tabindex", function () {
+
+            var div = document.createElement("div");
+            var value = Math.floor(Math.random() * 10);
+
+            ARIA.setTabindex(div, value);
+            chai.assert.equal(div.getAttribute("tabindex"), String(value));
+
+        });
+
+        it("should remove decimals from the value", function () {
+
+            var div = document.createElement("div");
+            var value = 5.2;
+
+            ARIA.setTabindex(div, value);
+            chai.assert.equal(div.getAttribute("tabindex"), String(Math.floor(value)));
+
+        });
+
+        it("should not set the tabindex if the value is invalid", function () {
+
+            var div = document.createElement("div");
+
+            ARIA.setTabindex(div, Date.now());
+            chai.assert.isFalse(div.hasAttribute("tabindex"));
+            ARIA.setTabindex(div, -10);
+            chai.assert.isFalse(div.hasAttribute("tabindex"));
+            ARIA.setTabindex(div, Infinity);
+            chai.assert.isFalse(div.hasAttribute("tabindex"));
+
+        });
+
+    });
+
+    describe("removeTabindex", function () {
+
+        it("should remove the tabindex", function () {
+
+            var div = document.createElement("div");
+
+            div.setAttribute("tabindex", 1);
+            chai.assert.equal(div.getAttribute("tabindex"), "1");
+            ARIA.removeTabindex(div);
+            chai.assert.isFalse(div.hasAttribute("tabindex"));
 
         });
 
@@ -331,16 +456,6 @@ describe("ARIA", function () {
 
         });
 
-        it("should allow allow the tabindex to be set", function () {
-
-            var div = document.createElement("div");
-            var tabindex = Math.floor(Math.random() * 10);
-
-            ARIA.addToTabOrder(div, tabindex);
-            chai.assert.equal(div.getAttribute("tabindex"), String(tabindex));
-
-        });
-
     });
 
     describe("removeFromTabOrder", function () {
@@ -351,21 +466,6 @@ describe("ARIA", function () {
 
             ARIA.removeFromTabOrder(div);
             chai.assert.equal(div.getAttribute("tabindex"), "-1");
-
-        });
-
-    });
-
-    describe("resetTabOrder", function () {
-
-        it("should remove the tabindex from the element", function () {
-
-            var div = document.createElement("div");
-
-            ARIA.addToTabOrder(div);
-            chai.assert.isTrue(div.hasAttribute("tabindex"));
-            ARIA.resetTabOrder(div);
-            chai.assert.isFalse(div.hasAttribute("tabindex"));
 
         });
 

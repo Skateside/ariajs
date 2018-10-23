@@ -59,6 +59,13 @@ describe("Element", function () {
 
         });
 
+        it("should reject unrecognised roles", function () {
+
+            div.role.set(makeUniqueId());
+            chai.assert.equal(div.role.length, 0);
+
+        });
+
     });
 
 });

@@ -1,4 +1,4 @@
-/*! ariajs - v1.0.0 - MIT license - https://github.com/Skateside/ariajs - 2018-10-20 */
+/*! ariajs - v0.1.0 - MIT license - https://github.com/Skateside/ariajs - 2018-10-23 */
 (function (globalVariable) {
     "use strict";
 
@@ -33,7 +33,7 @@ Object.defineProperty(ARIA, "VERSION", {
     configurable: false,
     enumerable: true,
     writable: false,
-    value: "1.0.0"
+    value: "0.1.0"
 });
 
 /**
@@ -331,6 +331,64 @@ ARIA.addAlias = function (source, aliases) {
 };
 
 /**
+ * A wrapper for setting an attribute on an element. This allows the method to
+ * be easily replaced for virtual DOMs.
+ *
+ * @param {Element} element
+ *        Element whose attribute should be set.
+ * @param {String} name
+ *        Name of the attribute to set.
+ * @param {String} value
+ *        Value of the attribute.
+ */
+ARIA.setAttribute = function (element, name, value) {
+    element.setAttribute(name, value);
+};
+
+/**
+ * A wrapper for getting an attribute of an element. THis allows the method to
+ * be easily replaced for virtual DOMs.
+ *
+ * @param  {Element} element
+ *         Element whose attribute should be retrieved.
+ * @param  {String} name
+ *         Name of the attribute to retrieve.
+ * @return {String|null}
+ *         The value of the attribute or null if that attribute does not exist.
+ */
+ARIA.getAttribute = function (element, name) {
+    return element.getAttribute(name);
+};
+
+/**
+ * A wrapper for checking for an attribute on an element. THis allows the method
+ * to be easily replaced for virtual DOMs.
+ *
+ * @param  {Element} element
+ *         Element whose attribute should be checked.
+ * @param  {String} name
+ *         Name of the attribute to check.
+ * @return {Boolean}
+ *         true if the element has the given attribute, false otherwise.
+ */
+ARIA.hasAttribute = function (element, name) {
+    return element.hasAttribute(name);
+};
+
+/**
+ * A wrapper for removing an attribute from an element. THis allows the method
+ * to be easily replaced for virtual DOMs.
+ *
+ * @param {Element} element
+ *        Element whose attribute should be removed.
+ * @param {String} name
+ *        Name of the attribute to remove.
+ */
+ARIA.removeAttribute = function (element, name) {
+    element.removeAttribute(name);
+};
+
+/**
  * Gets an element by the given ID. If the element cannot be found, null is
  * returned. This function is just a wrapper for document.getElementById to
  * allow the library to be easily modified in case a virtual DOM is being used.
@@ -367,7 +425,7 @@ ARIA.defaultIdentifyPrefix = "anonymous-element-";
  */
 ARIA.identify = function (element, prefix) {
 
-    var id = element.id;
+    var id = ARIA.getAttribute(element, "id");
 
     if (prefix === undefined) {
         prefix = ARIA.defaultIdentifyPrefix;
@@ -382,7 +440,7 @@ ARIA.identify = function (element, prefix) {
 
         } while (ARIA.getById(id));
 
-        element.id = id;
+        ARIA.setAttribute(element, "id", id);
 
     }
 
@@ -403,37 +461,58 @@ ARIA.isNode = function (value) {
 };
 
 /**
- * Allows an element to be focusable. Optionally, the tabindex can be defined.
- * Be warned that passed a negative value to the tabindex will remove the
- * element from the tab order.
+ * Sets the tabindex of an element to the given value. THe value is validated to
+ * ensure that it's valid - if it is not, no action is taken.
  *
  * @param {Element} element
- *        Element that should become focusable.
- * @param {Number} [tabindex=0]
- *        Optional value of the tabindex.
+ *        Element whose tabindex should be set.
+ * @param {Number} value
+ *        Value of the tab index to set.
  */
-ARIA.addToTabOrder = function (element, tabindex) {
-    element.setAttribute("tabindex", parseInt(tabindex, 10) || 0);
+ARIA.setTabindex = function (element, value) {
+
+    var tabindex = (
+        value === -1 || (value >= 0 && value < 32767)
+        ? Math.floor(value)
+        : undefined
+    );
+
+    if (tabindex !== undefined && !isNaN(tabindex)) {
+        ARIA.setAttribute(element, "tabindex", tabindex);
+    }
+
 };
 
 /**
- * Removes an element from the tab order.
- *
- * @param {Element} element
- *        Element should be removed from the tab order.
- */
-ARIA.removeFromTabOrder = function (element) {
-    this.addToTabOrder(element, -1);
-};
-
-/**
- * Removes the tabindex from the element, setting their focusable state.
+ * Helper function for removing the tabindex from an element.
  *
  * @param {Element} element
  *        Element whose tabindex should be removed.
  */
-ARIA.resetTabOrder = function (element) {
-    element.removeAttribute("tabindex");
+ARIA.removeTabindex = function (element) {
+    ARIA.removeAttribute(element, "tabindex");
+};
+
+/**
+ * Adds the given element to the tab order by setting its tabindex to 0. If you
+ * need more control over the value of the tab index, use
+ * {@link ARIA.setTabindex}.
+ *
+ * @param {Element} element
+ *        Element that should be added to the tab order.
+ */
+ARIA.addToTabOrder = function (element) {
+    ARIA.setTabindex(element, 0);
+};
+
+/**
+ * Removed the given element from the tab order by setting its tabindex to -1.
+ *
+ * @param {Element} element
+ *        Element that should be removed from the tab order.
+ */
+ARIA.removeFromTabOrder = function (element) {
+    ARIA.setTabindex(element, -1);
 };
 
 /**
@@ -626,7 +705,7 @@ ARIA.Property = ARIA.createClass(/** @lends ARIA.Property.prototype */{
     setAttribute: function (value) {
 
         if (ARIA.Property.interpret(value) !== "") {
-            this.element.setAttribute(this.attribute, value);
+            ARIA.setAttribute(this.element, this.attribute, value);
         } else {
             this.removeAttribute();
         }
@@ -641,7 +720,7 @@ ARIA.Property = ARIA.createClass(/** @lends ARIA.Property.prototype */{
      *         Value of the attribute or null if the attribute is not set.
      */
     getAttribute: function () {
-        return this.element.getAttribute(this.attribute);
+        return ARIA.getAttribute(this.element, this.attribute);
     },
 
     /**
@@ -652,7 +731,7 @@ ARIA.Property = ARIA.createClass(/** @lends ARIA.Property.prototype */{
      *         true if the attribute is set, false otherwise.
      */
     hasAttribute: function () {
-        return this.element.hasAttribute(this.attribute);
+        return ARIA.hasAttribute(this.element, this.attribute);
     },
 
     /**
@@ -660,7 +739,7 @@ ARIA.Property = ARIA.createClass(/** @lends ARIA.Property.prototype */{
      * {@link ARIA.Property#element}.
      */
     removeAttribute: function () {
-        this.element.removeAttribute(this.attribute);
+        ARIA.removeAttribute(this.element, this.attribute);
     },
 
     /**
@@ -695,6 +774,88 @@ ARIA.Property.interpret = function (value) {
     );
 
 };
+
+/**
+ * Handles integer values.
+ *
+ * @class ARIA.Integer
+ * @extends ARIA.Property
+ */
+ARIA.Integer = ARIA.createClass(ARIA.Property, {
+
+    /**
+     * @inheritDoc
+     */
+    init: function (element, attribute) {
+
+        this.$super(element, attribute);
+        this.setPattern(/^\d+$/);
+
+    },
+
+    /**
+     * Interprets the value as an integer, discarding the decimal place. If the
+     * value can't be converted into a number, NaN is returned.
+     *
+     * @param  {?} value
+     *         Value to interpret.
+     * @return {Number}
+     *         Integer value.
+     */
+    interpret: function (value) {
+
+        var interpretted = this.$super(value);
+
+        return (
+            interpretted === ""
+            ? NaN
+            : Math.floor(interpretted)
+        );
+
+    }
+
+});
+
+/**
+ * Handles number values.
+ *
+ * @class ARIA.Integer
+ * @extends ARIA.Property
+ */
+ARIA.Number = ARIA.createClass(ARIA.Property, {
+
+    /**
+     * @inheritDoc
+     */
+    init: function (element, attribute) {
+
+        this.$super(element, attribute);
+        this.setPattern(/^(\d+(\.\d+)?)|\.\d+$/);
+
+    },
+
+    /**
+     * Interprets the value as a number. If the value can't be converted into a
+     * number, NaN is returned.
+     *
+     * @param  {?} value
+     *         Value to interpret.
+     * @return {Number}
+     *         Number value.
+     */
+    interpret: function (value) {
+
+        var interpretted = this.$super(value);
+
+        return (
+            interpretted === ""
+            ? NaN
+            : parseFloat(interpretted)
+        );
+
+    }
+
+});
 
 /**
  * Handles WAI-ARIA states.
@@ -1572,10 +1733,10 @@ ARIA.Element = ARIA.createClass(/** @lends ARIA.ELement.prototype */{
 
                     that.manipulationFlags[suffix] = true;
 
-                    if (element.hasAttribute(attribute)) {
+                    if (ARIA.hasAttribute(element, attribute)) {
 
                         value = ARIA.Property.interpret(
-                            element.getAttribute(attribute)
+                            ARIA.getAttribute(element, attribute)
                         );
                         old = ARIA.Property.interpret(mutation.oldValue);
 
@@ -1619,7 +1780,18 @@ ARIA.Element = ARIA.createClass(/** @lends ARIA.ELement.prototype */{
 
 });
 
-var makeFactory = function (Constructor, tokens, pattern) {
+/**
+ * Helper function for creating the factories.
+ *
+ * @private
+ * @param   {Function} Constructor
+ *          Constructor function for creating the element.
+ * @param   {Array} [tokens]
+ *          Optional tokens for the attribute.
+ * @return  {Function}
+ *          Function that will create the Constructor.
+ */
+var makeFactory = function (Constructor, tokens) {
 
     return function (element, attribute) {
 
@@ -1627,10 +1799,6 @@ var makeFactory = function (Constructor, tokens, pattern) {
 
         if (tokens && tokens.length) {
             property.setTokens(tokens);
-        }
-
-        if (pattern) {
-            property.setPattern(pattern);
         }
 
         return property;
@@ -1649,9 +1817,6 @@ var factoryEntries = [
         "roledescription",
         "valuetext"
     ]],
-    // [AriaList, [
-    //     "role"
-    // ]],
     [ARIA.Reference, [
         "activedescendant",
         "details",
@@ -1684,7 +1849,7 @@ var factoryEntries = [
         "hidden",
         "selected"
     ]],
-    [AriaProperty, [
+    [ARIA.Integer, [
         "colcount",
         "colindex",
         "colspan",
@@ -1694,12 +1859,12 @@ var factoryEntries = [
         "rowindex",
         "rowspan",
         "setsize"
-    ], undefined, /^\d+$/],
-    [AriaProperty, [
+    ]],
+    [ARIA.Number, [
         "valuemax",
         "valuemin",
         "valuenow"
-    ], undefined, /^(\d+(\.\d+)?)|\.\d+$/],
+    ]],
     [AriaProperty, ["autocomplete"], [
         "none",
         "inline",
@@ -1766,7 +1931,7 @@ var factoryEntries = [
 factoryEntries.forEach(function (entry) {
 
     entry[1].forEach(function (property) {
-        ARIA.factories[property] = makeFactory(entry[0], entry[2], entry[3]);
+        ARIA.factories[property] = makeFactory(entry[0], entry[2]);
     });
 
 });
@@ -1806,8 +1971,100 @@ addNodeProperty("aria", function (context) {
     return new ARIA.Element(context);
 });
 
+// Authors MUST NOT use abstract roles in content.
+// https://www.w3.org/TR/wai-aria-1.1/#abstract_roles
+var roles = [
+    "alert",
+    "alertdialog",
+    "application",
+    "article",
+    "banner",
+    "button",
+    "cell",
+    "checkbox",
+    "columnheader",
+    "complementary",
+    "combobox",
+    // "command", // (abstract)
+    // "composite", // (abstract)
+    "contentinfo",
+    "definition",
+    "dialog",
+    "directory",
+    "document",
+    "feed",
+    "figure",
+    "form",
+    "grid",
+    "gridcell",
+    "group",
+    "heading",
+    "img",
+    // "input", // (abstract)
+    // "landmark", // (abstract)
+    "link",
+    "list",
+    "listbox",
+    "listitem",
+    "log",
+    "main",
+    "marquee",
+    "math",
+    "menu",
+    "menubar",
+    "menuitem",
+    "menuitemcheckbox",
+    "menuitemradio",
+    "navigation",
+    "none",
+    "note",
+    "option",
+    "presentation",
+    "progressbar",
+    "radio",
+    "radiogroup",
+    // "range", // (abstract)
+    "region",
+    // "roletype", // (abstract)
+    "row",
+    "rowgroup",
+    "rowheader",
+    "scrollbar",
+    "search",
+    "searchbox",
+    // "section", // (abstract)
+    // "sectionhead", // (abstract)
+    // "select", // (abstract)
+    "separator",
+    "slider",
+    "spinbutton",
+    "status",
+    // "structure", // (abstract)
+    "switch",
+    "tab",
+    "table",
+    "tablist",
+    "tabpanel",
+    "term",
+    "textbox",
+    "timer",
+    "toolbar",
+    "tooltip",
+    "tree",
+    "treegrid",
+    "treeitem",
+    // "widget", // (abstract)
+    // "window", // (abstract)
+];
+
 addNodeProperty("role", function (context) {
-    return new AriaList(context, "role");
+
+    var list = new AriaList(context, "role");
+
+    list.setTokens(roles);
+
+    return list;
+
 });
 
 globalVariable.ARIA = ARIA;

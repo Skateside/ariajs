@@ -1,4 +1,15 @@
-var makeFactory = function (Constructor, tokens, pattern) {
+/**
+ * Helper function for creating the factories.
+ *
+ * @private
+ * @param   {Function} Constructor
+ *          Constructor function for creating the element.
+ * @param   {Array} [tokens]
+ *          Optional tokens for the attribute.
+ * @return  {Function}
+ *          Function that will create the Constructor.
+ */
+var makeFactory = function (Constructor, tokens) {
 
     return function (element, attribute) {
 
@@ -6,10 +17,6 @@ var makeFactory = function (Constructor, tokens, pattern) {
 
         if (tokens && tokens.length) {
             property.setTokens(tokens);
-        }
-
-        if (pattern) {
-            property.setPattern(pattern);
         }
 
         return property;
@@ -28,9 +35,6 @@ var factoryEntries = [
         "roledescription",
         "valuetext"
     ]],
-    // [AriaList, [
-    //     "role"
-    // ]],
     [ARIA.Reference, [
         "activedescendant",
         "details",
@@ -63,7 +67,7 @@ var factoryEntries = [
         "hidden",
         "selected"
     ]],
-    [AriaProperty, [
+    [ARIA.Integer, [
         "colcount",
         "colindex",
         "colspan",
@@ -73,12 +77,12 @@ var factoryEntries = [
         "rowindex",
         "rowspan",
         "setsize"
-    ], undefined, /^\d+$/],
-    [AriaProperty, [
+    ]],
+    [ARIA.Number, [
         "valuemax",
         "valuemin",
         "valuenow"
-    ], undefined, /^(\d+(\.\d+)?)|\.\d+$/],
+    ]],
     [AriaProperty, ["autocomplete"], [
         "none",
         "inline",
@@ -145,7 +149,7 @@ var factoryEntries = [
 factoryEntries.forEach(function (entry) {
 
     entry[1].forEach(function (property) {
-        ARIA.factories[property] = makeFactory(entry[0], entry[2], entry[3]);
+        ARIA.factories[property] = makeFactory(entry[0], entry[2]);
     });
 
 });
@@ -185,8 +189,100 @@ addNodeProperty("aria", function (context) {
     return new ARIA.Element(context);
 });
 
+// Authors MUST NOT use abstract roles in content.
+// https://www.w3.org/TR/wai-aria-1.1/#abstract_roles
+var roles = [
+    "alert",
+    "alertdialog",
+    "application",
+    "article",
+    "banner",
+    "button",
+    "cell",
+    "checkbox",
+    "columnheader",
+    "complementary",
+    "combobox",
+    // "command", // (abstract)
+    // "composite", // (abstract)
+    "contentinfo",
+    "definition",
+    "dialog",
+    "directory",
+    "document",
+    "feed",
+    "figure",
+    "form",
+    "grid",
+    "gridcell",
+    "group",
+    "heading",
+    "img",
+    // "input", // (abstract)
+    // "landmark", // (abstract)
+    "link",
+    "list",
+    "listbox",
+    "listitem",
+    "log",
+    "main",
+    "marquee",
+    "math",
+    "menu",
+    "menubar",
+    "menuitem",
+    "menuitemcheckbox",
+    "menuitemradio",
+    "navigation",
+    "none",
+    "note",
+    "option",
+    "presentation",
+    "progressbar",
+    "radio",
+    "radiogroup",
+    // "range", // (abstract)
+    "region",
+    // "roletype", // (abstract)
+    "row",
+    "rowgroup",
+    "rowheader",
+    "scrollbar",
+    "search",
+    "searchbox",
+    // "section", // (abstract)
+    // "sectionhead", // (abstract)
+    // "select", // (abstract)
+    "separator",
+    "slider",
+    "spinbutton",
+    "status",
+    // "structure", // (abstract)
+    "switch",
+    "tab",
+    "table",
+    "tablist",
+    "tabpanel",
+    "term",
+    "textbox",
+    "timer",
+    "toolbar",
+    "tooltip",
+    "tree",
+    "treegrid",
+    "treeitem",
+    // "widget", // (abstract)
+    // "window", // (abstract)
+];
+
 addNodeProperty("role", function (context) {
-    return new AriaList(context, "role");
+
+    var list = new AriaList(context, "role");
+
+    list.setTokens(roles);
+
+    return list;
+
 });
 
 globalVariable.ARIA = ARIA;

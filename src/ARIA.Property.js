@@ -188,7 +188,7 @@ ARIA.Property = ARIA.createClass(/** @lends ARIA.Property.prototype */{
     setAttribute: function (value) {
 
         if (ARIA.Property.interpret(value) !== "") {
-            this.element.setAttribute(this.attribute, value);
+            ARIA.setAttribute(this.element, this.attribute, value);
         } else {
             this.removeAttribute();
         }
@@ -203,7 +203,7 @@ ARIA.Property = ARIA.createClass(/** @lends ARIA.Property.prototype */{
      *         Value of the attribute or null if the attribute is not set.
      */
     getAttribute: function () {
-        return this.element.getAttribute(this.attribute);
+        return ARIA.getAttribute(this.element, this.attribute);
     },
 
     /**
@@ -214,7 +214,7 @@ ARIA.Property = ARIA.createClass(/** @lends ARIA.Property.prototype */{
      *         true if the attribute is set, false otherwise.
      */
     hasAttribute: function () {
-        return this.element.hasAttribute(this.attribute);
+        return ARIA.hasAttribute(this.element, this.attribute);
     },
 
     /**
@@ -222,7 +222,7 @@ ARIA.Property = ARIA.createClass(/** @lends ARIA.Property.prototype */{
      * {@link ARIA.Property#element}.
      */
     removeAttribute: function () {
-        this.element.removeAttribute(this.attribute);
+        ARIA.removeAttribute(this.element, this.attribute);
     },
 
     /**
