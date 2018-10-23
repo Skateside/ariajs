@@ -270,7 +270,7 @@ var roles = [
     "tooltip",
     "tree",
     "treegrid",
-    "treeitem",
+    "treeitem"
     // "widget", // (abstract)
     // "window", // (abstract)
 ];

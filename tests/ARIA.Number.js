@@ -61,6 +61,7 @@ describe("ARIA.Number", function () {
 
         number.set(value);
         chai.assert.equal(number.get(), parseInt(value, 10));
+        chai.assert.isNumber(number.get());
 
     });
 
