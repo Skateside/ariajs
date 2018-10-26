@@ -1,4 +1,4 @@
-/*! ariajs - v0.1.0 - MIT license - https://github.com/Skateside/ariajs - 2018-10-23 */
+/*! ariajs - v0.1.0 - MIT license - https://github.com/Skateside/ariajs - 2018-10-26 */
 (function (globalVariable) {
     "use strict";
 
@@ -1939,9 +1939,9 @@ factoryEntries.forEach(function (entry) {
 ARIA.addAlias("labelledby", "labeledby");
 
 // https://github.com/LeaVerou/bliss/issues/49
-function addNodeProperty(name, valueMaker) {
+function addNodeProperty(name, valueMaker, settings) {
 
-    Object.defineProperty(Node.prototype, name, {
+    var descriptor = {
 
         configurable: true,
 
@@ -1963,7 +1963,17 @@ function addNodeProperty(name, valueMaker) {
 
         }
 
-    });
+    };
+
+    if (settings) {
+
+        Object.keys(settings).forEach(function (key) {
+            descriptor[key] = settings[key];
+        });
+
+    }
+
+    Object.defineProperty(Node.prototype, name, descriptor);
 
 }
 
@@ -1971,7 +1981,7 @@ addNodeProperty("aria", function (context) {
     return new ARIA.Element(context);
 });
 
-// Authors MUST NOT use abstract roles in content.
+// "Authors MUST NOT use abstract roles in content."
 // https://www.w3.org/TR/wai-aria-1.1/#abstract_roles
 var roles = [
     "alert",
@@ -2052,7 +2062,7 @@ var roles = [
     "tooltip",
     "tree",
     "treegrid",
-    "treeitem",
+    "treeitem"
     // "widget", // (abstract)
     // "window", // (abstract)
 ];
@@ -2064,6 +2074,12 @@ addNodeProperty("role", function (context) {
     list.setTokens(roles);
 
     return list;
+
+}, {
+
+    set: function (value) {
+        this.role.set(value);
+    }
 
 });
 

@@ -66,6 +66,15 @@ describe("Element", function () {
 
         });
 
+        it("should allow the value to be set by passing a string", function () {
+
+            var roles = ["menuitem", "group"];
+            div.role = roles.join(" ");
+
+            chai.assert.deepEqual(div.role.get(), roles);
+
+        });
+
     });
 
 });
