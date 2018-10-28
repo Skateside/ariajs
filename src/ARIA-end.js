@@ -157,7 +157,7 @@ factoryEntries.forEach(function (entry) {
 ARIA.addAlias("labelledby", "labeledby");
 
 // https://github.com/LeaVerou/bliss/issues/49
-function addNodeProperty(name, valueMaker, settings) {
+function addNodeProperty(name, valueMaker, valueGetter, settings) {
 
     var descriptor = {
 
@@ -177,7 +177,11 @@ function addNodeProperty(name, valueMaker, settings) {
                 get: getter
             });
 
-            return this[name];
+            return (
+                typeof valueGetter === "function"
+                ? valueGetter(this)
+                : this[name]
+            );
 
         }
 
@@ -285,20 +289,64 @@ var roles = [
     // "window", // (abstract)
 ];
 
-addNodeProperty("role", function (context) {
+var roleInstances = new WeakMap();
 
-    var list = new AriaList(context, "role");
+function getRoleInstance(element) {
 
-    list.setTokens(roles);
+    var list = roleInstances.get(element);
+
+    if (!list) {
+
+        list = new ARIA.List(element, "role");
+        list.setTokens(roles);
+        roleInstances.set(element, list);
+
+    }
 
     return list;
 
-}, {
+}
+
+//*
+Object.defineProperty(Node.prototype, "role", {
+
+    configurable: true,
+
+    get: function getter() {
+
+        Object.defineProperty(Node.prototype, "role", {
+            get: undefined
+        });
+
+        Object.defineProperty(this, "role", {
+            value: getRoleInstance(this).get()
+        });
+
+        Object.defineProperty(Node.prototype, "role", {
+            get: getter
+        });
+
+        return getRoleInstance(this).get();
+
+    },
 
     set: function (value) {
-        this.role.set(value);
+        getRoleInstance(this).set(value);
     }
 
 });
+/*/
+function roleGetter(element) {
+    return getRoleInstance(element).get();
+}
+
+addNodeProperty("role", roleGetter, roleGetter, {
+
+    set: function (value) {
+        getRoleInstance(element).set(value);
+    }
+
+});
+//*/
 
 globalVariable.ARIA = ARIA;

@@ -40,28 +40,31 @@ ARIA.Element = ARIA.createClass(/** @lends ARIA.ELement.prototype */{
 
         Object.keys(ARIA.factories).forEach(function (attribute) {
 
-            var value;
+            var instance;
+            var element = this.element;
+
+            function createValue() {
+
+                instance = ARIA.runFactory(
+                    attribute,
+                    element,
+                    ARIA.normalise(attribute)
+                );
+
+                instances.get(element)[attribute] = instance;
+
+                return instance;
+
+            }
 
             Object.defineProperty(this, attribute, {
 
                 get: function () {
-
-                    if (!value) {
-
-                        value = ARIA.runFactory(
-                            attribute,
-                            this.element,
-                            ARIA.normalise(attribute)
-                        );
-
-                    }
-
-                    return value;
-
+                    return (instance || createValue()).get();
                 },
 
                 set: function (value) {
-                    this[attribute].set(value);
+                    return (instance || createValue()).set(value);
                 }
 
             });
@@ -125,11 +128,11 @@ ARIA.Element = ARIA.createClass(/** @lends ARIA.ELement.prototype */{
                         old = ARIA.Property.interpret(mutation.oldValue);
 
                         if (value !== old) {
-                            that[suffix].set(value);
+                            that[suffix] = value;
                         }
 
                     } else {
-                        that[suffix].remove();
+                        that[suffix] = "";
                     }
 
                     window.setTimeout(function () {

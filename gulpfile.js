@@ -19,8 +19,8 @@ gulp.task("js", function () {
     gulp.src([
             "src/ARIA-start.js",
             "src/ARIA.Property.js",
-            "src/ARIA.Integer.js",
             "src/ARIA.Number.js",
+            "src/ARIA.Integer.js",
             "src/ARIA.State.js",
             "src/ARIA.UndefinedState.js",
             "src/ARIA.Tristate.js",
