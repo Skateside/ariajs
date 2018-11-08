@@ -67,34 +67,32 @@ The `aria-controls` attribute can handle an ID reference list. Want a button tha
 
 ```html
 <button type="button">Button!</button>
-<div>Element 1</div>
-<div>Element 2</div>
-<section id="abc">Element 3</section>
+<div id="my-div" class="control-me">Element 1</div>
+<div class="control-me">Element 2</div>
 ```
 
 With **aria.ja** you can simply pass one or more elements to the property and the attribute value will be a space-separated list of the element IDs. If any of the elements are missing an ID, a unique one is automatically generated and assigned.
 
-As a developer, you just need to write a a single line of code.
+As a developer, you just need to write a a single line of code (once you have the element references).
 
 ```js
 var button = document.querySelector("button");
-var divs = document.querySelectorAll("div");
+var divs = document.querySelectorAll(".control-me");
 button.aria.controls = divs;
 ```
 
-**aria.js** will get the element IDs (generating them first in this case) and populate the attribute for you.
+**aria.js** will get the element IDs (generating one for the second `<div>` first in this case) and populate the attribute for you.
 
 ```html
-<button type="button" aria-controls="anonymous-element-1 anonymous-element-2">Button!</button>
-<div id="anonymous-element-1">Element 1</div>
-<div id="anonymous-element-2">Element 2</div>
-<section id="abc">Element 3</section>
+<button type="button" aria-controls="my-div anonymous-element-1">Button!</button>
+<div id="my-div" class="control-me">Element 1</div>
+<div class="control-me" id="anonymous-element-1">Element 2</div>
 ```
 
 Since the attribute is a reference list, **aria.js** will return an array of elements.
 
 ```js
-button.aria.controls; // -> [<div id="anonymous-element-1">, <div id="anonymous-element-2">]
+button.aria.controls; // -> [<div id="my-div" class="control-me">, <div class="control-me" id="anonymous-element-1">]
 ```
 
 ### Want to remove an attribute?
