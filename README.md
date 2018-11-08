@@ -1,6 +1,6 @@
 # ARIA.js
 
-A helper library for working with WAI-ARIA attributes.
+A helper library for working with WAI-ARIA attributes, designed to make working with WAI-ARIA attributes as simple as working with any other JavaScript object.
 
 ## How it works
 
@@ -8,40 +8,62 @@ This library adds a new property to all elements: `aria`. The `aria` properties 
 
 ### Let's see some code
 
-Got an error message and need to link it to the element?
+Got a checkbox you'd like to improve with WAI-ARIA attributes?
 
 ```html
-<label for="my-name">Please enter something</label>
-<input name="my-name" id="my-name">
-<span class="error">Please enter a swankier something.</span>
+<span class="checkbox">
+    <input type="checkbox" class="checkbox__input" checked>
+    <span class="checkbox__render"></span>
+</span>
 ```
 
-**aria.js** allows you to simply link those elements.
+**aria.js** allows you to simply work with the element.
 
 ```js
-var input = document.getElementById("my-name");
-var error = document.querySelector(".error");
-input.aria.errormessage = error;
+var checkbox = document.querySelector(".checkbox__input");
+var render = document.querySelector(".checkbox__render");
+render.aria.checked = checkbox.checked;
 ```
 
 The library updates the markup like this:
 
 ```html
-<label for="my-name">Please enter something</label>
-<input name="my-name" id="my-name" aria-errormessage="anonymous-element-0">
-<span class="error" id="anonymous-element-0">Please enter a swankier something.</span>
+<span class="checkbox">
+    <input type="checkbox" class="checkbox__input" checked>
+    <span class="checkbox__render" aria-checked="true"></span>
+</span>
 ```
 
-You can easily access information about the WAI-ARIA attribute.
+**aria.js** will return the type of variable you're expecting. In this case, the boolean value `true`.
 
 ```js
-input.aria.errormessage.get(); // -> <span class="error" id="anonymous-element-0">
-input.aria.errormessage.getAttribute(); // -> "anonymous-element-0"
+render.aria.checked; // -> true
 ```
 
-### More complicated attributes
+Perhaps you need to flag that the checkbox is indeterminate?
 
-The `aria-controls` attribute can handle an ID reference list. Want a button that controls 2 elements? No problem.
+```js
+render.aria.checked = "mixed";
+```
+
+The markup would now look like this:
+
+```html
+<span class="checkbox">
+    <input type="checkbox" class="checkbox__input" checked>
+    <span class="checkbox__render" aria-checked="mixed"></span>
+</span>
+```
+
+... and the property still gives a useful value.
+
+```js
+render.aria.checked; // -> "mixed"
+```
+
+### What about working with element references?
+
+The `aria-controls` attribute can handle an ID reference list. Want a button that controls 2 elements? No problem!
 
 ```html
 <button type="button">Button!</button>
@@ -50,13 +72,17 @@ The `aria-controls` attribute can handle an ID reference list. Want a button tha
 <section id="abc">Element 3</section>
 ```
 
-**aria.js** has you covered:
+With **aria.ja** you can simply pass one or more elements to the property and the attribute value will be a space-separated list of the element IDs. If any of the elements are missing an ID, a unique one is automatically generated and assigned.
+
+As a developer, you just need to write a a single line of code.
 
 ```js
 var button = document.querySelector("button");
 var divs = document.querySelectorAll("div");
 button.aria.controls = divs;
 ```
+
+**aria.js** will get the element IDs (generating them first in this case) and populate the attribute for you.
 
 ```html
 <button type="button" aria-controls="anonymous-element-1 anonymous-element-2">Button!</button>
@@ -65,24 +91,38 @@ button.aria.controls = divs;
 <section id="abc">Element 3</section>
 ```
 
-From there you can check the length, get the elements or even manage the attribute value by ID value or just the element itself.
+Since the attribute is a reference list, **aria.js** will return an array of elements.
 
 ```js
-button.aria.controls.length; // -> 2
-button.aria.controls.get(); // -> [<div id="anonymous-element-1">, <div id="anonymous-element-2">]
-button.aria.controls.remove(document.querySelector("div"));
-button.aria.controls.length; // -> 1
-button.aria.controls.get(); // -> [<div id="anonymous-element-2">]
-button.aria.controls.add("abc123");
-button.aria.controls.length; // -> 2
-button.aria.controls.get(); // -> [<div id="anonymous-element-2">, <section id="abc123">]
+button.aria.controls; // -> [<div id="anonymous-element-1">, <div id="anonymous-element-2">]
 ```
+
+### Want to remove an attribute?
+
+If you have an element with a WAI-ARIA attribute you don't need, just `delete` it.
+
+```html
+<p id="text" aria-label="Some text">Some text</p>
+```
+
+```js
+var text = document.getElementById("text");
+delete text.aria.label;
+```
+
+```html
+<p id="text">Some text</p>
+```
+
+**aria.js** uses the ES6 function [Proxy](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy) to listen for developers using `delete` and contains a fallback for older browsers (such as IE11).
 
 ## State of this library
 
 This library is currently in **alpha** as unit tests are still being written.
 
+- [x] Browser test (IE11+).
+- [ ] Get the `aria` property working.
+- [ ] Get the `role` property working.
 - [x] Finish writing unit tests.
-- [ ] Browser test (IE11+).
 - [ ] Write documentation.
 - [ ] Release for beta testing.

@@ -103,20 +103,6 @@ var fnTest = (
 var ARIA = {
 
     /**
-     * Collection of factories for creating WAI-ARIA libraries. The attribute
-     * key should be the attribute suffixes (e.g. "label" for "aria-label" etc.)
-     * @type {Object}
-     */
-    factories: Object.create(null),
-
-    /**
-     * Map of all mis-spellings and aliases. The attribute key should be the
-     * normalised value - see {@link ARIA.normalise}.
-     * @type {Object}
-     */
-    translate: Object.create(null),
-
-    /**
      * Collection of all valid tokens for any given attribute. The attribute
      * key should be the normalised value - see {@link ARIA.normalise}.
      * @type {[type]}
@@ -287,88 +273,6 @@ Object.defineProperty(ARIA, "VERSION", {
     value: "0.2.0"
 });
 
-/**
- * Gets the factory from {@link ARIA.factories} that matches either the given
- * attribute or the normalised version (see {@link ARIA.normalise}).
- *
- * @param  {String} attribute
- *         Attribute whose factory should be returned.
- * @return {Function}
- *         Factory for creating the attribute.
- */
-ARIA.getFactory = function (attribute) {
-
-    return (
-        ARIA.factories[attribute]
-        || ARIA.factories[ARIA.normalise(attribute)]
-    );
-
-};
-
-/**
- * Executes the factory for the given attribute, passing in given parameters.
- * See {@link ARIA.getFactory}.
- *
- * @param  {String} attribute
- *         Attribute whose factory should be executed.
- * @param  {...?} [arguments]
- *         Optional parameters to pass to the factory.
- * @return {?}
- *         Result of executing the factory.
- * @throws {ReferenceError}
- *         There must be a factory for the given attribute.
- */
-ARIA.runFactory = function (attribute) {
-
-    var factory = ARIA.getFactory(attribute);
-
-    if (!factory) {
-        throw new ReferenceError(attribute + " is not a recognised factory");
-    }
-
-    return factory.apply(undefined, slice(arguments, 1));
-
-};
-
-/**
- * Creates an alias of WAI-ARIA attributes.
- *
- * @param  {String} source
- *         Source attribute for the alias.
- * @param  {Array.<String>|String} aliases
- *         Either a single alias or an array of aliases.
- * @throws {ReferenceError}
- *         The source attribute must have a related factory.
- */
-ARIA.addAlias = function (source, aliases) {
-
-    var normalSource = ARIA.normalise(source).slice(5);
-
-    if (!Array.isArray(aliases)) {
-        aliases = [aliases];
-    }
-
-    if (!ARIA.getFactory(normalSource)) {
-
-        throw new ReferenceError(
-            "ARIA.factories."
-            + normalSource
-            + " does not exist"
-        );
-
-    }
-
-    aliases.forEach(function (alias) {
-
-        var normalAlias = ARIA.normalise(alias).slice(5);
-
-        ARIA.translate[normalAlias] = normalSource;
-        ARIA.factories[normalAlias] = ARIA.factories[normalSource];
-
-    });
-
-};
-
 globalVariable.ARIA = ARIA;
 
 /**
@@ -427,6 +331,38 @@ Object.defineProperties(ARIA, {
     normalize: normaliseDescriptor
 
 });
+
+/**
+ * A map of all conversions for {@link ARIA.getSuffix}. As well as acting like a
+ * cache for frequent conversions, this also allows plugins to use un-expected
+ * attribute names since the conversion can be added here.
+ * @type {Object}
+ */
+ARIA.suffixMap = Object.create(null);
+
+/**
+ * Converts the attribute into the WAI-ARIA suffic (e.g. "aria-label" becomes
+ * "label" etc.).
+ *
+ * @param  {String} attribute
+ *         Attribute whose stemp should be returned.
+ * @return {String}
+ *         Stem of the attribute.
+ */
+ARIA.getSuffix = function (attribute) {
+
+    var mapped = ARIA.suffixMap[attribute];
+
+    if (!mapped) {
+
+        mapped = attribute.replace(/^aria\-/, "");
+        ARIA.suffixMap[attribute] = mapped;
+
+    }
+
+    return mapped;
+
+};
 
 /**
  * Adds one or more methods to the class.
@@ -1454,57 +1390,43 @@ ARIA.Element = ARIA.createClass(/** @lends ARIA.ELement.prototype */{
          */
         this.manipulationFlags = Object.create(null);
 
-        this.preloadAttributes();
+        /**
+         * Instances of {@link ARIA.Property} (or sub-classes) that are used to
+         * check get and set values.
+         * @type {Object}
+         */
+        this.instances = Object.create(null);
+
+        // this.preloadAttributes();
         this.readAttributes();
         this.observeAttributes();
+
+        return this.activateTraps();
 
     },
 
     /**
-     * Creates placeholders for all the WAI-ARIA attributes that are in
-     * {@link ARIA.factories}. The factories are lazy-loaded so they're only
-     * instantiated as needed.
+     * Gets the instance from {@link ARIA.Element#instances} for the given
+     * attribute. If the instance does not exist but a factory exists, the
+     * instance is created and stored before being returned.
+     *
+     * @param  {String} attribute
+     *         Attribute whose instance should be found.
+     * @return {ARIA.Property}
+     *         Instance of {@link ARIA.Property} (or sub-class).
      */
-    preloadAttributes: function () {
+    getInstance: function (attribute) {
 
-        Object.keys(ARIA.factories).forEach(function (attribute) {
+        var instance = this.instances[attribute];
 
-            var instance;
-            var element = this.element;
+        if (!instance && ARIA.getFactory(attribute)) {
 
-            function createValue() {
+            instance = ARIA.runFactory(attribute, this.element);
+            this.instances[attribute] = instance;
 
-                instance = ARIA.runFactory(attribute, element);
-                // instance.get(element)[attribute] = instance;
+        }
 
-                return instance;
-
-            }
-
-            Object.defineProperty(this, attribute, {
-
-                configurable: true,
-
-                get: function () {
-
-                    var inst = instance || createValue();
-
-                    return inst.get();
-
-                },
-
-                set: function (value) {
-
-                    var inst = instance || createValue();
-
-                    return inst.set(value);
-
-                }
-
-            });
-
-        }, this);
-
+        return instance;
 
     },
 
@@ -1514,14 +1436,17 @@ ARIA.Element = ARIA.createClass(/** @lends ARIA.ELement.prototype */{
      */
     readAttributes: function () {
 
-        var hasOwnProperty = Object.prototype.hasOwnProperty;
-
         arrayFrom(this.element.attributes, function (attribute) {
 
-            var name = attribute.name.replace(/^aria\-/, "");
+            var value = attribute.value;
+            var instance = (
+                value
+                ? this.getInstance(attribute)
+                : undefined
+            );
 
-            if (hasOwnProperty.call(this, name)) {
-                this[name] = attribute.value;
+            if (instance) {
+                instance.set(value);
             }
 
         }, this);
@@ -1597,30 +1522,193 @@ ARIA.Element = ARIA.createClass(/** @lends ARIA.ELement.prototype */{
      */
     disconnectAttributes: function () {
         this.observer.disconnect();
+    },
+
+    /**
+     * Activates the get, set and delete traps for the instance which enables
+     * the interface.
+     *
+     * @return {Proxy}
+     *         Proxy of the instance (if the browser supports it).
+     */
+    activateTraps: function () {
+
+        return new Proxy(this, {
+
+            get: function (target, name) {
+
+                var value = target[name];
+                var instance = target.getInstance(name);
+
+                if (instance) {
+                    value = instance.get();
+                }
+
+                return value;
+
+            },
+
+            set: function (target, name, value) {
+
+                var instance = target.getInstance(name);
+
+                if (instance) {
+                    instance.set(value);
+                } else {
+                    target[name] = value;
+                }
+
+                return true;
+
+            },
+
+            deleteProperty: function (target, name) {
+
+                var instance = target.getInstance(name);
+                var isDeleted = false;
+
+                if (instance) {
+
+                    instance.set("");
+                    isDeleted = true;
+
+                } else {
+                    isDeleted = delete target[name];
+                }
+
+                return isDeleted;
+
+            }
+
+        });
+
     }
 
 });
 
-/*
-ARIA.Element.prototype.init = function (element) {
-    this.element = element;
+// Create a fall-back for browsers that don't understand Proxy.
+// Object.defineProperty can be used for get and set, but delete will have to
+// rely on polling.
+if (!globalVariable.Proxy) {
+
+    ARIA.Element.prototype.activateTraps = function () {
+
+        var that = this;
+        var owns = Object.prototype.hasOwnProperty.bind(that);
+        var delay = 1000 / 60; // 60 fps
+
+        Object.keys(ARIA.factories).forEach(function setProperty(attribute) {
+
+            var isPolling = false;
+
+            Object.defineProperty(that, attribute, {
+
+                configurable: true,
+
+                get: function () {
+                    return that.getInstance(attribute).get();
+                },
+
+                set: function (value) {
+
+                    var instance = that.getInstance(attribute);
+
+                    if (value === "") {
+                        isPolling = false;
+                    } else if (value !== "" && !isPolling) {
+
+                        globalVariable.setTimeout(function poll() {
+
+                            if (isPolling) {
+
+                                if (owns(attribute)) {
+
+                                    globalVariable.setTimeout(poll, delay);
+                                    isPolling = true;
+
+                                } else {
+
+                                    isPolling = false;
+                                    instance.set("");
+                                    setProperty(attribute);
+
+                                }
+
+                            }
+
+                        }, delay);
+                        isPolling = true;
+
+                    }
+
+                    return instance.set(value);
+
+                }
+
+            });
+
+        });
+
+    };
+
+}
+
+/**
+ * Collection of factories for creating WAI-ARIA libraries. The attribute key
+ * should be the attribute suffixes (e.g. "label" for "aria-label" etc.)
+ * @type {Object}
+ */
+ARIA.factories = Object.create(null);
+
+/**
+ * Map of all mis-spellings and aliases. The attribute key should be the
+ * normalised value - see {@link ARIA.normalise}.
+ * @type {Object}
+ */
+ARIA.translate = Object.create(null);
+
+/**
+ * Gets the factory from {@link ARIA.factories} that matches either the given
+ * attribute or the normalised version (see {@link ARIA.normalise}).
+ *
+ * @param  {String} attribute
+ *         Attribute whose factory should be returned.
+ * @return {Function}
+ *         Factory for creating the attribute.
+ */
+ARIA.getFactory = function (attribute) {
+
+    return (
+        ARIA.factories[attribute]
+        || ARIA.factories[ARIA.getSuffix(ARIA.normalise(attribute))]
+    );
+
 };
 
-ARIA.Element.prototype.preloadAttributes = function () {};
+/**
+ * Executes the factory for the given attribute, passing in given parameters.
+ * See {@link ARIA.getFactory}.
+ *
+ * @param  {String} attribute
+ *         Attribute whose factory should be executed.
+ * @param  {...?} [arguments]
+ *         Optional parameters to pass to the factory.
+ * @return {?}
+ *         Result of executing the factory.
+ * @throws {ReferenceError}
+ *         There must be a factory for the given attribute.
+ */
+ARIA.runFactory = function (attribute) {
 
-ARIA.ELement.prototype = new Proxy(ARIA.Element.prototype, {
+    var factory = ARIA.getFactory(attribute);
 
-    get: function (target, name) {
-    },
-
-    set: function (target, name, value) {
-    },
-
-    deleteProperty: function (target, name) {
+    if (!factory) {
+        throw new ReferenceError(attribute + " is not a recognised factory");
     }
 
-});
-*/
+    return factory.apply(undefined, slice(arguments, 1));
+
+};
 
 var factoryEntries = [
     [ARIA.Property, [
@@ -1718,6 +1806,45 @@ factoryEntries.forEach(function (entry) {
     });
 
 });
+
+/**
+ * Creates an alias of WAI-ARIA attributes.
+ *
+ * @param  {String} source
+ *         Source attribute for the alias.
+ * @param  {Array.<String>|String} aliases
+ *         Either a single alias or an array of aliases.
+ * @throws {ReferenceError}
+ *         The source attribute must have a related factory.
+ */
+ARIA.addAlias = function (source, aliases) {
+
+    var normalSource = ARIA.normalise(source).slice(5);
+
+    if (!Array.isArray(aliases)) {
+        aliases = [aliases];
+    }
+
+    if (!ARIA.getFactory(normalSource)) {
+
+        throw new ReferenceError(
+            "ARIA.factories."
+            + normalSource
+            + " does not exist"
+        );
+
+    }
+
+    aliases.forEach(function (alias) {
+
+        var normalAlias = ARIA.normalise(alias).slice(5);
+
+        ARIA.translate[normalAlias] = normalSource;
+        ARIA.factories[normalAlias] = ARIA.factories[normalSource];
+
+    });
+
+};
 
 ARIA.addAlias("labelledby", "labeledby");
 }(window));

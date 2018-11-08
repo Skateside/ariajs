@@ -25,57 +25,43 @@ ARIA.Element = ARIA.createClass(/** @lends ARIA.ELement.prototype */{
          */
         this.manipulationFlags = Object.create(null);
 
-        this.preloadAttributes();
+        /**
+         * Instances of {@link ARIA.Property} (or sub-classes) that are used to
+         * check get and set values.
+         * @type {Object}
+         */
+        this.instances = Object.create(null);
+
+        // this.preloadAttributes();
         this.readAttributes();
         this.observeAttributes();
+
+        return this.activateTraps();
 
     },
 
     /**
-     * Creates placeholders for all the WAI-ARIA attributes that are in
-     * {@link ARIA.factories}. The factories are lazy-loaded so they're only
-     * instantiated as needed.
+     * Gets the instance from {@link ARIA.Element#instances} for the given
+     * attribute. If the instance does not exist but a factory exists, the
+     * instance is created and stored before being returned.
+     *
+     * @param  {String} attribute
+     *         Attribute whose instance should be found.
+     * @return {ARIA.Property}
+     *         Instance of {@link ARIA.Property} (or sub-class).
      */
-    preloadAttributes: function () {
+    getInstance: function (attribute) {
 
-        Object.keys(ARIA.factories).forEach(function (attribute) {
+        var instance = this.instances[attribute];
 
-            var instance;
-            var element = this.element;
+        if (!instance && ARIA.getFactory(attribute)) {
 
-            function createValue() {
+            instance = ARIA.runFactory(attribute, this.element);
+            this.instances[attribute] = instance;
 
-                instance = ARIA.runFactory(attribute, element);
-                // instance.get(element)[attribute] = instance;
+        }
 
-                return instance;
-
-            }
-
-            Object.defineProperty(this, attribute, {
-
-                configurable: true,
-
-                get: function () {
-
-                    var inst = instance || createValue();
-
-                    return inst.get();
-
-                },
-
-                set: function (value) {
-
-                    var inst = instance || createValue();
-
-                    return inst.set(value);
-
-                }
-
-            });
-
-        }, this);
-
+        return instance;
 
     },
 
@@ -85,14 +71,17 @@ ARIA.Element = ARIA.createClass(/** @lends ARIA.ELement.prototype */{
      */
     readAttributes: function () {
 
-        var hasOwnProperty = Object.prototype.hasOwnProperty;
-
         arrayFrom(this.element.attributes, function (attribute) {
 
-            var name = attribute.name.replace(/^aria\-/, "");
+            var value = attribute.value;
+            var instance = (
+                value
+                ? this.getInstance(attribute)
+                : undefined
+            );
 
-            if (hasOwnProperty.call(this, name)) {
-                this[name] = attribute.value;
+            if (instance) {
+                instance.set(value);
             }
 
         }, this);
@@ -168,27 +157,133 @@ ARIA.Element = ARIA.createClass(/** @lends ARIA.ELement.prototype */{
      */
     disconnectAttributes: function () {
         this.observer.disconnect();
+    },
+
+    /**
+     * Activates the get, set and delete traps for the instance which enables
+     * the interface.
+     *
+     * @return {Proxy}
+     *         Proxy of the instance (if the browser supports it).
+     */
+    activateTraps: function () {
+
+        return new Proxy(this, {
+
+            get: function (target, name) {
+
+                var value = target[name];
+                var instance = target.getInstance(name);
+
+                if (instance) {
+                    value = instance.get();
+                }
+
+                return value;
+
+            },
+
+            set: function (target, name, value) {
+
+                var instance = target.getInstance(name);
+
+                if (instance) {
+                    instance.set(value);
+                } else {
+                    target[name] = value;
+                }
+
+                return true;
+
+            },
+
+            deleteProperty: function (target, name) {
+
+                var instance = target.getInstance(name);
+                var isDeleted = false;
+
+                if (instance) {
+
+                    instance.set("");
+                    isDeleted = true;
+
+                } else {
+                    isDeleted = delete target[name];
+                }
+
+                return isDeleted;
+
+            }
+
+        });
+
     }
 
 });
 
-/*
-ARIA.Element.prototype.init = function (element) {
-    this.element = element;
-};
+// Create a fall-back for browsers that don't understand Proxy.
+// Object.defineProperty can be used for get and set, but delete will have to
+// rely on polling.
+if (!globalVariable.Proxy) {
 
-ARIA.Element.prototype.preloadAttributes = function () {};
+    ARIA.Element.prototype.activateTraps = function () {
 
-ARIA.ELement.prototype = new Proxy(ARIA.Element.prototype, {
+        var that = this;
+        var owns = Object.prototype.hasOwnProperty.bind(that);
+        var delay = 1000 / 60; // 60 fps
 
-    get: function (target, name) {
-    },
+        Object.keys(ARIA.factories).forEach(function setProperty(attribute) {
 
-    set: function (target, name, value) {
-    },
+            var isPolling = false;
 
-    deleteProperty: function (target, name) {
-    }
+            Object.defineProperty(that, attribute, {
 
-});
-*/
+                configurable: true,
+
+                get: function () {
+                    return that.getInstance(attribute).get();
+                },
+
+                set: function (value) {
+
+                    var instance = that.getInstance(attribute);
+
+                    if (value === "") {
+                        isPolling = false;
+                    } else if (value !== "" && !isPolling) {
+
+                        globalVariable.setTimeout(function poll() {
+
+                            if (isPolling) {
+
+                                if (owns(attribute)) {
+
+                                    globalVariable.setTimeout(poll, delay);
+                                    isPolling = true;
+
+                                } else {
+
+                                    isPolling = false;
+                                    instance.set("");
+                                    setProperty(attribute);
+
+                                }
+
+                            }
+
+                        }, delay);
+                        isPolling = true;
+
+                    }
+
+                    return instance.set(value);
+
+                }
+
+            });
+
+        });
+
+    };
+
+}

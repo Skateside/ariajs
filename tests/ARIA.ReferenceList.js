@@ -80,6 +80,9 @@ describe("ARIA.ReferenceList", function () {
         referenceList.set(divs);
         chai.assert.deepEqual(referenceList.get(), divs);
 
+        referenceList.set(divs[0]);
+        chai.assert.deepEqual(referenceList.get(), divs.slice(0, 1));
+
     });
 
     it("should return null for an element that can't be found", function () {
