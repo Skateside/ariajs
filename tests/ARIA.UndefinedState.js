@@ -32,7 +32,6 @@ describe("ARIA.UndefinedState", function () {
         chai.assert.equal(undefinedState.interpret(undefined), "undefined");
         chai.assert.equal(undefinedState.interpret("undefined"), "undefined");
         chai.assert.equal(undefinedState.interpret(), "undefined");
-        chai.assert.equal(undefinedState.interpret("UNRECOGNISED VALUE"), "");
 
     });
 
@@ -44,8 +43,6 @@ describe("ARIA.UndefinedState", function () {
         chai.assert.isFalse(undefinedState.get());
         undefinedState.set(undefined);
         chai.assert.isUndefined(undefinedState.get());
-        undefinedState.remove();
-        chai.assert.equal(undefinedState.get(), "");
 
     });
 

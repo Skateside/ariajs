@@ -48,14 +48,4 @@ describe("ARIA.Reference", function () {
 
     });
 
-    it("should check to see if the element exists", function () {
-
-        chai.assert.isFalse(reference.has());
-        reference.set(makeUniqueId());
-        chai.assert.isFalse(reference.has());
-        reference.set(otherDiv);
-        chai.assert.isTrue(reference.has());
-
-    });
-
 });

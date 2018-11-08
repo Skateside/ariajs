@@ -17,7 +17,14 @@ const getToday = function () {
 gulp.task("js", function () {
 
     gulp.src([
-            "src/ARIA-start.js",
+            // "src/ARIA-start.js",
+            "src/util.js",
+            "src/ARIA.js",
+            "src/ARIA.normalise.js",
+            "src/ARIA.createClass.js",
+            "src/ARIA-dom.js",
+            "src/ARIA-focus.js",
+            "src/ARIA.warn.js",
             "src/ARIA.Property.js",
             "src/ARIA.Number.js",
             "src/ARIA.Integer.js",
@@ -28,7 +35,8 @@ gulp.task("js", function () {
             "src/ARIA.Reference.js",
             "src/ARIA.ReferenceList.js",
             "src/ARIA.Element.js",
-            "src/ARIA-end.js"
+            // "src/ARIA-end.js"
+            "src/ARIA-factories.js"
         ])
         .pipe(concat("aria.js", {
             process: function (source) {
@@ -76,6 +84,10 @@ gulp.task("js", function () {
 
 });
 
+gulp.task("js:watch", function () {
+    gulp.watch(["./src/**/*.js"], ["js"]);
+});
+
 gulp.task("test", function () {
 
     gulp.src("./tests/testrunner.html")
@@ -89,9 +101,11 @@ gulp.task("test", function () {
 
 });
 
-gulp.task("watch", function () {
-
-    // gulp.watch(["./tests/**/*.js"], ["test"]);
-    gulp.watch(["./src/**/*.js"], ["js"]);
-
+gulp.task("test:watch", function () {
+    gulp.watch(["./tests/**/*.js"], ["test"]);
 });
+
+// gulp.task("watch", function () {
+//
+//
+// });

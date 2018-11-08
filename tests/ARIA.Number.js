@@ -14,10 +14,6 @@ describe("ARIA.Number", function () {
         chai.assert.isTrue(number instanceof ARIA.Property);
     });
 
-    it("should already have a pattern set", function () {
-        chai.assert.isTrue(number.pattern instanceof RegExp);
-    });
-
     it("should interpret values as numbers", function () {
 
         var values = [10, "10"];

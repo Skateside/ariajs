@@ -37,8 +37,6 @@ describe("ARIA.State", function () {
         chai.assert.isFalse(div.hasAttribute(ATTRIBUTE));
         state.set("");
         chai.assert.isFalse(div.hasAttribute(ATTRIBUTE));
-        state.set(new Boolean());
-        chai.assert.isFalse(div.hasAttribute(ATTRIBUTE));
 
     });
 

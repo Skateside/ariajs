@@ -28,29 +28,7 @@ describe("ARIA.Property", function () {
 
         property.set(value);
         chai.assert.equal(div.getAttribute(ATTRIBUTE), value);
-        chai.assert.equal(property.getAttribute(), value);
         chai.assert.equal(property.get(), value);
-
-    });
-
-    it("should allow an attribute to be checked", function () {
-
-        chai.assert.isFalse(div.hasAttribute(ATTRIBUTE));
-        chai.assert.isFalse(property.hasAttribute());
-        chai.assert.isFalse(property.has());
-        property.set("abc123");
-        chai.assert.isTrue(div.hasAttribute(ATTRIBUTE));
-        chai.assert.isTrue(property.hasAttribute());
-        chai.assert.isTrue(property.has());
-
-    });
-
-    it("should allow an attribute to be removed", function () {
-
-        property.set("abc123");
-        chai.assert.isTrue(div.hasAttribute(ATTRIBUTE));
-        property.remove();
-        chai.assert.isFalse(div.hasAttribute(ATTRIBUTE));
 
     });
 
@@ -63,16 +41,18 @@ describe("ARIA.Property", function () {
 
     });
 
-    it("should automatically set the value if the attribute exists", function () {
-
-        var value = "abc123";
-        var div = document.createElement("div");
-        div.setAttribute(ATTRIBUTE, value);
-        var property = new ARIA.Property(div, ATTRIBUTE);
-
-        chai.assert.isTrue(property.has());
-
-    });
+    // Yes, it should do this, but since we don't store the value, there's no
+    // way of confirming this occured at this level.
+    // it("should automatically set the value if the attribute exists", function () {
+    //
+    //     var value = "abc123";
+    //     var div = document.createElement("div");
+    //     div.setAttribute(ATTRIBUTE, value);
+    //     var property = new ARIA.Property(div, ATTRIBUTE);
+    //
+    //     chai.assert.isTrue(property.has());
+    //
+    // });
 
     it("should interpret null and undefined as empty strings", function () {
 
@@ -97,59 +77,22 @@ describe("ARIA.Property", function () {
         var yes = "yes";
         var no = "no";
 
-        chai.assert.isTrue(property.isValidToken(yes));
-        chai.assert.isTrue(property.isValidToken(no));
-        property.setTokens([yes]);
+        property = new ARIA.Property(div, ATTRIBUTE, [yes]);
+
         chai.assert.isTrue(property.isValidToken(yes));
         chai.assert.isFalse(property.isValidToken(no));
-        property.set(no);
-        chai.assert.isFalse(property.has());
+
         property.set(yes);
-        chai.assert.isTrue(property.has());
+        chai.assert.equal(property.get(), yes);
+        property.set(no);
         chai.assert.equal(property.get(), yes);
 
     });
 
-    it("should allow a pattern to be set", function () {
+    it("should return null if the attribute is not set", function () {
 
-        var letters = "abc";
-        var numbers = "123";
-        var pattern = /^\d+$/;
-
-        chai.assert.isFalse(pattern.test(letters));
-        chai.assert.isTrue(pattern.test(numbers));
-        chai.assert.isTrue(property.isValidToken(letters));
-        chai.assert.isTrue(property.isValidToken(numbers));
-        property.setPattern(pattern);
-        chai.assert.isFalse(property.isValidToken(letters));
-        chai.assert.isTrue(property.isValidToken(numbers));
-        property.set(letters);
-        chai.assert.isFalse(property.has());
-        property.set(numbers);
-        chai.assert.isTrue(property.has());
-        chai.assert.equal(property.get(), numbers);
-
-    });
-
-    it("should prefer tokens to a pattern", function () {
-
-        var letters = "abc";
-        var pattern = /^\d+$/;
-
-        property.setTokens([letters]);
-        property.setPattern(pattern);
-        chai.assert.isFalse(pattern.test(letters));
-        chai.assert.isTrue(property.isValidToken(letters));
-
-    });
-
-    it("should have a value property returning the current value", function () {
-
-        var value = "abc123";
-
-        chai.assert.equal(property.value, "");
-        property.set(value);
-        chai.assert.equal(property.value, value);
+        div.removeAttribute(ATTRIBUTE);
+        chai.assert.isNull(property.get());
 
     });
 

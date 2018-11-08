@@ -6,9 +6,36 @@
 <title>ARIA.js Mocha Tests</title>
 <link rel="stylesheet" href="../node_modules/mocha/mocha.css" />
 <script>
+// Generates a random number.
+function rnd(start, end) {
+
+    if (end === undefined) {
+
+        end = start;
+        start = 0;
+
+    }
+
+    return Math.floor(Math.random() * end) + start;
+
+}
+
 // Generates a unique string - used for testing against IDs.
 function makeUniqueId() {
-    return "id-" + Math.floor(Date.now() * Math.random());
+    return "id-" + rnd(Date.now());
+}
+
+// Gets a string snap-shot of an element.
+function stringifyElement(element) {
+
+    var string = "<" + element.nodeName.toLowerCase();
+
+    Array.prototype.forEach.call(element.attributes, function (attr) {
+        string += " " + attr.name + "=\"" + attr.value + "\"";
+    });
+
+    return string + ">";
+
 }
 </script>
 
@@ -42,8 +69,8 @@ mocha.setup({
 <!-- Private -->
 <script src="ARIA.js"></script>
 <script src="ARIA.Property.js"></script>
-<script src="ARIA.Integer.js"></script>
 <script src="ARIA.Number.js"></script>
+<script src="ARIA.Integer.js"></script>
 <script src="ARIA.State.js"></script>
 <script src="ARIA.UndefinedState.js"></script>
 <script src="ARIA.Tristate.js"></script>

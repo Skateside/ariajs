@@ -10,12 +10,8 @@ describe("ARIA.Integer", function () {
 
     });
 
-    it("should inherit from ARIA.Property", function () {
-        chai.assert.isTrue(integer instanceof ARIA.Property);
-    });
-
-    it("should already have a pattern set", function () {
-        chai.assert.isTrue(integer.pattern instanceof RegExp);
+    it("should inherit from ARIA.Number", function () {
+        chai.assert.isTrue(integer instanceof ARIA.Number);
     });
 
     it("should interpret values as integers", function () {

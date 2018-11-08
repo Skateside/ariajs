@@ -51,32 +51,27 @@ describe("ARIA.ReferenceList", function () {
 
     });
 
+    it("should be able to interpret a string, element or array", function () {
+
+        var ids = divs.map(function (div) {
+            return ARIA.identify(div);
+        });
+
+        chai.assert.deepEqual(referenceList.interpret(ids.join(" ")), ids);
+        chai.assert.deepEqual(referenceList.interpret(ids), ids);
+        chai.assert.deepEqual(referenceList.interpret(divs), ids);
+
+        var mixed = ids.concat();
+        mixed[0] = divs[0];
+        chai.assert.deepEqual(referenceList.interpret(mixed), ids);
+
+    });
+
     it("shouldn't include empty values after interpretting", function () {
 
         chai.assert.deepEqual(referenceList.interpret(null), []);
         chai.assert.deepEqual(referenceList.interpret(), []);
         chai.assert.deepEqual(referenceList.interpret(""), []);
-
-    });
-
-    it("should return true only if all elements exist", function () {
-
-        referenceList.set(divs);
-        chai.assert.isTrue(referenceList.has());
-        document.body.removeChild(divs[0]);
-        chai.assert.isFalse(referenceList.has());
-
-    });
-
-    it("should be able to check for an element or ID", function () {
-
-        referenceList.set(divs);
-        chai.assert.isTrue(divs.every(function (otherDiv) {
-            return referenceList.has(otherDiv);
-        }));
-        chai.assert.isTrue(divs.every(function (otherDiv) {
-            return referenceList.has(otherDiv.id);
-        }));
 
     });
 
@@ -89,64 +84,9 @@ describe("ARIA.ReferenceList", function () {
 
     it("should return null for an element that can't be found", function () {
 
-        referenceList.set(divs);
-        referenceList.add(document.createElement("div"));
+        referenceList.set(divs.concat(document.createElement("div")));
         chai.assert.isNull(referenceList.get()[divs.length]);
 
     });
-
-    it("should be able to remove an element", function () {
-
-        referenceList.set(divs);
-        referenceList.remove(divs[0]);
-        chai.assert.isTrue(referenceList.hasAttribute());
-        chai.assert.deepEqual(referenceList.get(), divs.slice(1));
-
-    });
-
-    it("should be able to see if the list contains an element", function () {
-
-        referenceList.set(divs);
-        chai.assert.isTrue(divs.every(function (otherDiv) {
-            return referenceList.contains(otherDiv);
-        }));
-
-    });
-
-    // it("should interpret strings and elements", function () {
-    //
-    //     var divId = makeUniqueId();
-    //     div.id = divId;
-    //
-    //     chai.assert.equal(reference.interpret(divId), divId);
-    //     chai.assert.equal(reference.interpret(div), divId);
-    //     chai.assert.equal(reference.interpret(otherDiv), otherDiv.id);
-    //
-    // });
-    //
-    // it("should get the element rather than the value", function () {
-    //
-    //     reference.set(otherDiv);
-    //     chai.assert.equal(reference.get(), otherDiv);
-    //
-    // });
-    //
-    // it("should return null if the element isn't found or set", function () {
-    //
-    //     chai.assert.isNull(reference.get());
-    //     reference.set(makeUniqueId());
-    //     chai.assert.isNull(reference.get());
-    //
-    // });
-    //
-    // it("should check to see if the element exists", function () {
-    //
-    //     chai.assert.isFalse(reference.has());
-    //     reference.set(makeUniqueId());
-    //     chai.assert.isFalse(reference.has());
-    //     reference.set(otherDiv);
-    //     chai.assert.isTrue(reference.has());
-    //
-    // });
 
 });

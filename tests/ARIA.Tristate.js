@@ -26,7 +26,6 @@ describe("ARIA.Tristate", function () {
         chai.assert.isFalse(tristate.interpret(false));
         chai.assert.isFalse(tristate.interpret("false"));
         chai.assert.equal(tristate.interpret("mixed"), "mixed");
-        chai.assert.equal(tristate.interpret("UNRECOGNISED VALUE"), "");
 
     });
 
@@ -38,8 +37,6 @@ describe("ARIA.Tristate", function () {
         chai.assert.isFalse(tristate.get());
         tristate.set("mixed");
         chai.assert.equal(tristate.get(), "mixed");
-        tristate.remove();
-        chai.assert.equal(tristate.get(), "");
 
     });
 

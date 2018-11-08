@@ -29,7 +29,7 @@ describe("ARIA.Element", function () {
         document.body.appendChild(div2);
         var element = new ARIA.Element(div);
 
-        chai.assert.deepEqual(element.controls.get(), [div2]);
+        chai.assert.deepEqual(element.controls, [div2]);
         document.body.removeChild(div2);
 
     });
@@ -52,7 +52,7 @@ describe("ARIA.Element", function () {
         div.setAttribute("aria-controls", divs.map(function (div) {
             return ARIA.identify(div);
         }).join(" "));
-        chai.assert.equal(element.controls.length, 3);
+        chai.assert.equal(element.controls.length, divs.length);
         divs.forEach(function (div) {
             document.body.removeChild(div);
         });

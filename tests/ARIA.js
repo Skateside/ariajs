@@ -194,7 +194,7 @@ describe("ARIA", function () {
 
             });
             var name = makeUniqueId();
-            var age = Math.floor(Math.random() * 100);
+            var age = rnd(100);
             var child = new Child(name, age);
 
             chai.assert.equal(child.name, name);
@@ -230,7 +230,7 @@ describe("ARIA", function () {
                 }
             });
             var name = "abcdef" + makeUniqueId();
-            var age = Math.floor(Math.random() * 100);
+            var age = rnd(100);
             var child = new Child(name, age);
 
             chai.assert.equal(child.name, name);
@@ -247,23 +247,18 @@ describe("ARIA", function () {
 
             var attr = makeUniqueId();
             var Thing = ARIA.createClass({
-
-                init: function (name, age) {
+                init: function (name) {
                     this.name = name;
-                    this.age = age;
                 }
-
             });
             var name = makeUniqueId();
-            var age = Math.floor(Math.random() * 100);
 
-            ARIA.factories[attr] = function (name, age) {
-                return new Thing(name, age);
+            ARIA.factories[attr] = function (name) {
+                return new Thing(name);
             };
 
-            var instance = ARIA.runFactory(attr, name, age);
+            var instance = ARIA.runFactory(attr, name);
             chai.assert.equal(instance.name, name);
-            chai.assert.equal(instance.age, age);
 
             delete ARIA.factories[attr];
 
@@ -382,6 +377,23 @@ describe("ARIA", function () {
 
     });
 
+    describe("is", function () {
+
+        it("should be able to check an element against a selector", function () {
+
+            var nodeName = "div";
+            var element = document.createElement(nodeName);
+            var className = "class-" + makeUniqueId();
+
+            element.className = className;
+
+            chai.assert.isTrue(ARIA.is(element, nodeName));
+            chai.assert.isTrue(ARIA.is(element, "." + className));
+
+        });
+
+    });
+
     describe("isNode", function () {
 
         it("should detect a Node", function () {
@@ -393,79 +405,72 @@ describe("ARIA", function () {
 
     });
 
-    describe("setTabindex", function () {
+    describe("makeFocusable", function () {
 
-        it("should set an element's tabindex", function () {
+        it("should add a tabindex to an element", function () {
 
             var div = document.createElement("div");
-            var value = Math.floor(Math.random() * 10);
 
-            ARIA.setTabindex(div, value);
-            chai.assert.equal(div.getAttribute("tabindex"), String(value));
+            chai.assert.isFalse(div.hasAttribute("tabindex"));
+            ARIA.makeFocusable(div);
+            chai.assert.isTrue(div.hasAttribute("tabindex"));
 
         });
 
-        it("should remove decimals from the value", function () {
+        it("should allow the tabindex to be set", function () {
 
             var div = document.createElement("div");
-            var value = 5.2;
+            var index = rnd(10);
 
-            ARIA.setTabindex(div, value);
-            chai.assert.equal(div.getAttribute("tabindex"), String(Math.floor(value)));
+            ARIA.makeFocusable(div, index);
+            chai.assert.equal(Number(div.getAttribute("tabindex")), index);
 
         });
 
-        it("should not set the tabindex if the value is invalid", function () {
+        it("should normalise the tabindex", function () {
 
+            var decimal = rnd(100) + (rnd(1, 100) / 100);
             var div = document.createElement("div");
 
-            ARIA.setTabindex(div, Date.now());
-            chai.assert.isFalse(div.hasAttribute("tabindex"));
-            ARIA.setTabindex(div, -10);
-            chai.assert.isFalse(div.hasAttribute("tabindex"));
-            ARIA.setTabindex(div, Infinity);
-            chai.assert.isFalse(div.hasAttribute("tabindex"));
+            ARIA.makeFocusable(div, decimal);
+            chai.assert.equal(Number(div.getAttribute("tabindex")), Math.floor(decimal));
+
+        });
+
+        it("should do nothing for focusable elements", function () {
+
+            var button = document.createElement("button");
+
+            chai.assert.isTrue(ARIA.is(button, ARIA.FOCUSABLE));
+            chai.assert.isFalse(button.hasAttribute("tabindex"));
+            ARIA.makeFocusable(button);
+            chai.assert.isFalse(button.hasAttribute("tabindex"));
+
+        });
+
+        it("should allow a tabindex to be forced onto a focusable element", function () {
+
+            var button = document.createElement("button");
+
+            chai.assert.isTrue(ARIA.is(button, ARIA.FOCUSABLE));
+            chai.assert.isFalse(button.hasAttribute("tabindex"));
+            ARIA.makeFocusable(button, 1, true);
+            chai.assert.isTrue(button.hasAttribute("tabindex"));
 
         });
 
     });
 
-    describe("removeTabindex", function () {
+    describe("resetFocusable", function () {
 
-        it("should remove the tabindex", function () {
+        it("should remove the tabindex from the element", function () {
 
             var div = document.createElement("div");
 
-            div.setAttribute("tabindex", 1);
-            chai.assert.equal(div.getAttribute("tabindex"), "1");
-            ARIA.removeTabindex(div);
+            ARIA.makeFocusable(div);
+            chai.assert.isTrue(div.hasAttribute("tabindex"));
+            ARIA.resetFocusable(div);
             chai.assert.isFalse(div.hasAttribute("tabindex"));
-
-        });
-
-    });
-
-    describe("addToTabOrder", function () {
-
-        it("should allow an element to become focusable", function () {
-
-            var div = document.createElement("div");
-
-            ARIA.addToTabOrder(div);
-            chai.assert.equal(div.getAttribute("tabindex"), "0");
-
-        });
-
-    });
-
-    describe("removeFromTabOrder", function () {
-
-        it("should remove the element from the tab order", function () {
-
-            var div = document.createElement("div");
-
-            ARIA.removeFromTabOrder(div);
-            chai.assert.equal(div.getAttribute("tabindex"), "-1");
 
         });
 

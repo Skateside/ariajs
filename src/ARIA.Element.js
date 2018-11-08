@@ -45,13 +45,8 @@ ARIA.Element = ARIA.createClass(/** @lends ARIA.ELement.prototype */{
 
             function createValue() {
 
-                instance = ARIA.runFactory(
-                    attribute,
-                    element,
-                    ARIA.normalise(attribute)
-                );
-
-                instances.get(element)[attribute] = instance;
+                instance = ARIA.runFactory(attribute, element);
+                // instance.get(element)[attribute] = instance;
 
                 return instance;
 
@@ -59,12 +54,22 @@ ARIA.Element = ARIA.createClass(/** @lends ARIA.ELement.prototype */{
 
             Object.defineProperty(this, attribute, {
 
+                configurable: true,
+
                 get: function () {
-                    return (instance || createValue()).get();
+
+                    var inst = instance || createValue();
+
+                    return inst.get();
+
                 },
 
                 set: function (value) {
-                    return (instance || createValue()).set(value);
+
+                    var inst = instance || createValue();
+
+                    return inst.set(value);
+
                 }
 
             });
@@ -75,7 +80,7 @@ ARIA.Element = ARIA.createClass(/** @lends ARIA.ELement.prototype */{
     },
 
     /**
-     * Reads all teh WAI-ARIA attributes on {@link ARIA.Element#element} and
+     * Reads all the WAI-ARIA attributes on {@link ARIA.Element#element} and
      * sets the {@link ARIA.Property} values.
      */
     readAttributes: function () {
@@ -87,7 +92,7 @@ ARIA.Element = ARIA.createClass(/** @lends ARIA.ELement.prototype */{
             var name = attribute.name.replace(/^aria\-/, "");
 
             if (hasOwnProperty.call(this, name)) {
-                this[name].set(attribute.value);
+                this[name] = attribute.value;
             }
 
         }, this);
@@ -166,3 +171,24 @@ ARIA.Element = ARIA.createClass(/** @lends ARIA.ELement.prototype */{
     }
 
 });
+
+/*
+ARIA.Element.prototype.init = function (element) {
+    this.element = element;
+};
+
+ARIA.Element.prototype.preloadAttributes = function () {};
+
+ARIA.ELement.prototype = new Proxy(ARIA.Element.prototype, {
+
+    get: function (target, name) {
+    },
+
+    set: function (target, name, value) {
+    },
+
+    deleteProperty: function (target, name) {
+    }
+
+});
+*/

@@ -1,5 +1,19 @@
-ARIA.ReferenceList = ARIA.createClass(ARIA.List, {
+/**
+ * Handles WAI-ARIA attributes that handle space-separated lists of IDs.
+ * @class ARIA.ReferenceList
+ * @extends ARIA.List
+ */
+ARIA.ReferenceList = ARIA.createClass(ARIA.List, /** @lends ARIA.ReferenceList.prototype */{
 
+    /**
+     * Interprets an element, ID or array of elements or/and IDs as an array of
+     * element IDs.
+     *
+     * @param  {Array.<Element|String>|Element|String} value
+     *         Value(s) to interpret.
+     * @return {Array.<String>}
+     *         Collection of IDs.
+     */
     interpret: function (value) {
 
         var interpretted = [];
@@ -21,6 +35,13 @@ ARIA.ReferenceList = ARIA.createClass(ARIA.List, {
 
     },
 
+    /**
+     * Gets an array of elements referenced by the attribute. If the element
+     * cannot be found, null will be in place of the element.
+     *
+     * @return {Array.<Element|null>}
+     *         Array of elements.
+     */
     get: function () {
         return this.$super().map(ARIA.getById);
     }
