@@ -67,9 +67,9 @@ The library optionally adds a new property to all elements: `aria`, containing p
   // <div id="div-10">
   ```
 
-  <small>(**aria.js** uses the ES6 [Proxy](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy) function to listen for the `delete` operator and adds a `setTimeout`-based fallback for browsers that don't understand `Proxy`. As a result, older browsers will asynchronously remove properties with the `delete` operator. In all browsers, setting the property to an empty string (`""`) will remove the attribute instantly.)</small>
+  **aria.js** uses the ES6 [Proxy](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy) function to listen for the `delete` operator and adds a `setTimeout`-based fallback for browsers that don't understand `Proxy`. As a result, older browsers will asynchronously remove properties with the `delete` operator. In all browsers, setting the property to an empty string (`""`) will remove the attribute instantly.
 
-- Get and set roles with ease.
+- Get, set and remove roles with ease.
 
   ```js
   // <div id="div-11">
@@ -77,6 +77,8 @@ The library optionally adds a new property to all elements: `aria`, containing p
   // <div id="div-11" role="button">
   document.getElementById("div-11").role;
   // -> ["button"]
+  delete document.getElementById("div-11").role;
+  // <div id="div-11">
   ```
 
 - Enjoy some utility functions added to a global `ARIA` variable.
@@ -89,7 +91,7 @@ The library optionally adds a new property to all elements: `aria`, containing p
   // <div id="div-13">
   // <div class="div-14">
   ARIA.identify(document.getElementById("div-13"));
-  // -> "div-12"
+  // -> "div-13"
   ARIA.identify(document.querySelector(".div-14"));
   // -> "anonymous-element-0"
   // <div class="div-14" id="anonymous-element-0">
@@ -100,7 +102,7 @@ The library optionally adds a new property to all elements: `aria`, containing p
   // -> "aria-haspopup"
   ```
 
-  <small>(`ARIA.normalise` has the alias `ARIA.normalize` to assist developers who know/prefer American English. The two methods are completely interchangeable - updating one will automatically change the other.)</small>
+  `ARIA.normalise` has the alias `ARIA.normalize` to assist developers who know/prefer American English. The two methods are completely interchangeable - updating one will automatically change the other.
 
 - Work without the `aria` property by using an alternative interface - perfect for third-party libraries which don't control the environment.
 
