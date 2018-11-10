@@ -2,11 +2,12 @@ describe("ARIA.Integer", function () {
 
     var div;
     var integer;
+    var ATTRIBUTE = "data-integer";
 
     beforeEach(function () {
 
         div = document.createElement("div");
-        integer = new ARIA.Integer(div, "data-integer");
+        integer = new ARIA.Integer(div, ATTRIBUTE);
 
     });
 

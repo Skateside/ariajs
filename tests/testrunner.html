@@ -46,7 +46,12 @@ if (!window.WeakMap) {
 }
 </script>
 
-<script src="../dist/aria.js"></script>
+<script>
+// Used for testing getPrevious and restorePrevious
+var ARIA = {};
+var previousARIA = ARIA;
+</script>
+<script src="../dist/aria.min.js"></script>
 
 </head>
 <body>

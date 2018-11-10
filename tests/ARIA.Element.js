@@ -70,4 +70,32 @@ describe("ARIA.Element", function () {
 
     });
 
+    it("should be update the attribute if the property is deleted", function (done) {
+
+        var label = makeUniqueId();
+        var divCopy = div;
+        var elementCopy = element;
+
+        elementCopy.label = label;
+        chai.assert.equal(elementCopy.label, label);
+        chai.assert.isTrue(divCopy.hasAttribute("aria-label"));
+
+        delete elementCopy.label;
+
+        if (!divCopy.hasAttribute("aria-label")) {
+            done();
+        } else {
+
+            window.setTimeout(function () {
+// console.log(elementCopy);
+// console.log(divCopy);
+                chai.assert.isFalse(divCopy.hasAttribute("aria-label"));
+                done();
+
+            }, 1000);
+
+        }
+
+    });
+
 });

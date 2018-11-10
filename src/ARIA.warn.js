@@ -2,7 +2,7 @@
  * A warning message for invalid tokens.
  * @type {String}
  */
-ARIA.WARNING_INVALID_TOKEN = "'{0}' is not a valid token for the '{1}' attribtue";
+ARIA.WARNING_INVALID_TOKEN = "'{0}' is not a valid token for the '{1}' attribute";
 
 /**
  * Replaces the placeholders in the string parameter with information from the

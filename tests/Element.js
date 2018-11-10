@@ -18,7 +18,7 @@ describe("Element", function () {
 
             div.aria.label = label;
             chai.assert.equal(div.getAttribute("aria-label"), label);
-            chai.assert.equal(div.aria.label.value, label);
+            chai.assert.equal(div.aria.label, label);
 
         });
 
@@ -27,17 +27,7 @@ describe("Element", function () {
             var label = makeUniqueId();
 
             div.setAttribute("aria-label", label);
-            chai.assert.equal(div.aria.label.value, label);
-
-        });
-
-        it("should have placeholders for every WAI-ARIA attribute", function () {
-
-            chai.assert.isTrue(
-                Object.keys(ARIA.factories).every(function (property) {
-                    return div.aria[property] instanceof ARIA.Property;
-                })
-            );
+            chai.assert.equal(div.aria.label, label);
 
         });
 
@@ -45,23 +35,19 @@ describe("Element", function () {
 
     describe("#role", function () {
 
-        it("should be an instance of ARIA.List", function () {
-            chai.assert.isTrue(div.role instanceof ARIA.List);
-        });
-
         it("should be pre-loaded with existing values", function () {
 
             var roles = ["button", "heading"];
 
             div.setAttribute("role", roles.join(" "));
             chai.assert.equal(div.role.length, roles.length);
-            chai.assert.deepEqual(div.role.get(), roles);
+            chai.assert.deepEqual(div.role, roles);
 
         });
 
         it("should reject unrecognised roles", function () {
 
-            div.role.set(makeUniqueId());
+            div.role = makeUniqueId();
             chai.assert.equal(div.role.length, 0);
 
         });
@@ -71,7 +57,19 @@ describe("Element", function () {
             var roles = ["menuitem", "group"];
             div.role = roles.join(" ");
 
-            chai.assert.deepEqual(div.role.get(), roles);
+            chai.assert.deepEqual(div.role, roles);
+
+        });
+
+        it("should allow role to be deleted", function () {
+
+            var roles = ["menuitem", "group"];
+
+            div.role = roles.join(" ");
+            chai.assert.deepEqual(div.role, roles);
+
+            delete div.role;
+            chai.assert.isFalse(div.hasAttribute("role"));
 
         });
 

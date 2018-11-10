@@ -2,11 +2,12 @@ describe("ARIA.Number", function () {
 
     var div;
     var number;
+    var ATTRIBUTE = "data-number";
 
     beforeEach(function () {
 
         div = document.createElement("div");
-        number = new ARIA.Number(div, "data-number");
+        number = new ARIA.Number(div, ATTRIBUTE);
 
     });
 

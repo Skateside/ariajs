@@ -29,7 +29,9 @@ ARIA.Property = ARIA.createClass(/** @lends ARIA.Property.prototype */{
         this.attribute = attribute;
 
         /**
-         * White-list of valid tokens.
+         * White-list of valid tokens. This is a reference to a property of
+         * {@link ARIA.tokens} so updating that property will update all these
+         * instances.
          * @type {Array.<String>}
          */
         this.tokens = (

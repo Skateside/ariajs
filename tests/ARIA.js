@@ -387,8 +387,10 @@ describe("ARIA", function () {
 
             element.className = className;
 
+            document.body.appendChild(element);
             chai.assert.isTrue(ARIA.is(element, nodeName));
             chai.assert.isTrue(ARIA.is(element, "." + className));
+            document.body.removeChild(element);
 
         });
 
@@ -441,10 +443,12 @@ describe("ARIA", function () {
 
             var button = document.createElement("button");
 
+            document.body.appendChild(button);
             chai.assert.isTrue(ARIA.is(button, ARIA.FOCUSABLE));
             chai.assert.isFalse(button.hasAttribute("tabindex"));
             ARIA.makeFocusable(button);
             chai.assert.isFalse(button.hasAttribute("tabindex"));
+            document.body.removeChild(button);
 
         });
 
@@ -452,10 +456,12 @@ describe("ARIA", function () {
 
             var button = document.createElement("button");
 
+            document.body.appendChild(button);
             chai.assert.isTrue(ARIA.is(button, ARIA.FOCUSABLE));
             chai.assert.isFalse(button.hasAttribute("tabindex"));
             ARIA.makeFocusable(button, 1, true);
             chai.assert.isTrue(button.hasAttribute("tabindex"));
+            document.body.removeChild(button);
 
         });
 
@@ -475,5 +481,55 @@ describe("ARIA", function () {
         });
 
     });
+
+    describe("getPrevious", function () {
+
+        var myARIA = window.ARIA;
+        var previousARIA = window.previousARIA;
+
+        it("should return the previous version of ARIA", function () {
+
+            var previous = ARIA.getPrevious();
+
+            chai.assert.notEqual(myARIA, previous);
+            chai.assert.equal(previousARIA, previous);
+
+        });
+
+    });
+
+    describe("restorePrevious", function () {
+
+        var myARIA = window.ARIA;
+        var previousARIA = window.previousARIA;
+
+        it("should remove the current version from the global namespace", function () {
+
+            ARIA.restorePrevious();
+            chai.assert.notEqual(myARIA, window.ARIA);
+            window.ARIA = myARIA;
+
+        });
+
+        it("should return ARIA", function () {
+
+            var value = ARIA.restorePrevious();
+
+            chai.assert.equal(value, myARIA);
+            window.ARIA = myARIA;
+
+        });
+
+        it("should restore the previous value of ARIA", function () {
+
+            ARIA.restorePrevious();
+
+            chai.assert.equal(window.previousARIA, window.ARIA);
+            window.ARIA = myARIA;
+
+        });
+
+    });
+
 
 });

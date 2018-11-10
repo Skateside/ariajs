@@ -1,126 +1,127 @@
 # ARIA.js
 
-A helper library for working with WAI-ARIA attributes, designed to make working with WAI-ARIA attributes as simple as working with any other JavaScript object.
+A helper library for working with WAI-ARIA attributes, designed to make manipulating them as simple as possible.
 
-## How it works
+## How to use the library
 
-This library adds a new property to all elements: `aria`. The `aria` properties contains placeholders for all the current WAI-ARIA attributes (and future attributes can be easily added).
+The library optionally adds a new property to all elements: `aria`, containing properties for all WAI-ARIA attributes.
 
-### Let's see some code
+- Set attributes quickly and logically.
 
-Got a checkbox you'd like to improve with WAI-ARIA attributes?
+  ```js
+  // <div id="div-1">
+  document.getElementById("div-1").aria.label = "Just testing";
+  // <div id="div-1" aria-label="Just testing">
 
-```html
-<span class="checkbox">
-    <input type="checkbox" class="checkbox__input" checked>
-    <span class="checkbox__render"></span>
-</span>
-```
+  // <div id="div-2">
+  document.getElementById("div-2").aria.checked = true;
+  // <div id="div-2" aria-checked="true">
 
-**aria.js** allows you to simply work with the element.
+  // <div id="div-3-1">
+  // <div id="div-3-2">
+  document.getElementById("div-3-1").aria.controls = document.getElementById("div-3-2");
+  // <div id="div-3-1" aria-controls="div-3-2">
+  // <div id="div-3-2">
+  ```
 
-```js
-var checkbox = document.querySelector(".checkbox__input");
-var render = document.querySelector(".checkbox__render");
-render.aria.checked = checkbox.checked;
-```
+- White-list valid tokens and see warnings when trying to set different values (warnings can be disabled by setting a property on the global `ARIA` variable).
 
-The library updates the markup like this:
+  ```js
+  // <div id="div-4">
+  document.getElementById("div-4").aria.live = "probably";
+  // <div id="div-4">
+  // warns: "aria.js: 'probably' is not a valid token for the 'aria-live' attribute"
+  ```
 
-```html
-<span class="checkbox">
-    <input type="checkbox" class="checkbox__input" checked>
-    <span class="checkbox__render" aria-checked="true"></span>
-</span>
-```
+- Get sensible values from the properties.
 
-**aria.js** will return the type of variable you're expecting. In this case, the boolean value `true`.
+  ```js
+  // <div id="div-5" aria-placeholder="Hello world">
+  document.getElementById("div-5").aria.placeholder;
+  // -> "Hello world"
 
-```js
-render.aria.checked; // -> true
-```
+  // <div id="div-6" aria-busy="true">
+  document.getElementById("div-6").aria.busy;
+  // -> true
 
-Perhaps you need to flag that the checkbox is indeterminate?
+  // <div id="div-7-1">
+  // <div id="div-7-2" aria-activedescendant="div-7-1">
+  document.getElementById("div-7-2").aria.activedescendant;
+  // -> <div id="div-7-1">
 
-```js
-render.aria.checked = "mixed";
-```
+  // <div id="div-8-1" aria-flowto="div-8-2">
+  // <div id="div-8-2">
+  document.getElementById("div-8-1").aria.flowto;
+  // -> [<div id="div-8-2">]
+  ```
 
-The markup would now look like this:
+- Remove the attributes easily.
 
-```html
-<span class="checkbox">
-    <input type="checkbox" class="checkbox__input" checked>
-    <span class="checkbox__render" aria-checked="mixed"></span>
-</span>
-```
+  ```js
+  // <div id="div-9" aria-modal="true">
+  document.getElementById("div-9").aria.modal = "";
+  // <div id="div-9">
 
-... and the property still gives a useful value.
+  // <div id="div-10" aria-pressed="mixed">
+  delete document.getElementById("div-10").aria.pressed;
+  // <div id="div-10">
+  ```
 
-```js
-render.aria.checked; // -> "mixed"
-```
+  <small>(**aria.js** uses the ES6 [Proxy](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy) function to listen for the `delete` operator and adds a `setTimeout`-based fallback for browsers that don't understand `Proxy`. As a result, older browsers will asynchronously remove properties with the `delete` operator. In all browsers, setting the property to an empty string (`""`) will remove the attribute instantly.)</small>
 
-### What about working with element references?
+- Get and set roles with ease.
 
-The `aria-controls` attribute can handle an ID reference list. Want a button that controls 2 elements? No problem!
+  ```js
+  // <div id="div-11">
+  document.getElementById("div-11").role = "button";
+  // <div id="div-11" role="button">
+  document.getElementById("div-11").role;
+  // -> ["button"]
+  ```
 
-```html
-<button type="button">Button!</button>
-<div id="my-div" class="control-me">Element 1</div>
-<div class="control-me">Element 2</div>
-```
+- Enjoy some utility functions added to a global `ARIA` variable.
 
-With **aria.ja** you can simply pass one or more elements to the property and the attribute value will be a space-separated list of the element IDs. If any of the elements are missing an ID, a unique one is automatically generated and assigned.
+  ```js
+  // <div id="div-12">
+  ARIA.makeFocusable(document.getElementById("div-12"));
+  // <div id="div-12" tabindex="-1">
 
-As a developer, you just need to write a a single line of code (once you have the element references).
+  // <div id="div-13">
+  // <div class="div-14">
+  ARIA.identify(document.getElementById("div-13"));
+  // -> "div-12"
+  ARIA.identify(document.querySelector(".div-14"));
+  // -> "anonymous-element-0"
+  // <div class="div-14" id="anonymous-element-0">
 
-```js
-var button = document.querySelector("button");
-var divs = document.querySelectorAll(".control-me");
-button.aria.controls = divs;
-```
+  ARIA.normalise("selected");
+  // -> "aria-selected"
+  ARIA.normalise("aria-haspopup");
+  // -> "aria-haspopup"
+  ```
 
-**aria.js** will get the element IDs (generating one for the second `<div>` first in this case) and populate the attribute for you.
+  <small>(`ARIA.normalise` has the alias `ARIA.normalize` to assist developers who know/prefer American English. The two methods are completely interchangeable - updating one will automatically change the other.)</small>
 
-```html
-<button type="button" aria-controls="my-div anonymous-element-1">Button!</button>
-<div id="my-div" class="control-me">Element 1</div>
-<div class="control-me" id="anonymous-element-1">Element 2</div>
-```
+- Work without the `aria` property by using an alternative interface - perfect for third-party libraries which don't control the environment.
 
-Since the attribute is a reference list, **aria.js** will return an array of elements.
-
-```js
-button.aria.controls; // -> [<div id="my-div" class="control-me">, <div class="control-me" id="anonymous-element-1">]
-```
-
-### Want to remove an attribute?
-
-If you have an element with a WAI-ARIA attribute you don't need, just `delete` it.
-
-```html
-<p id="text" aria-label="Some text">Some text</p>
-```
-
-```js
-var text = document.getElementById("text");
-delete text.aria.label;
-```
-
-```html
-<p id="text">Some text</p>
-```
-
-**aria.js** uses the ES6 function [Proxy](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy) to listen for developers using `delete` and contains a fallback for older browsers (such as IE11).
+  ```js
+  // <div id="div-15" aria-valuenow="10">
+  var element = new ARIA.Element(document.getElementById("div-15"));
+  element.valuenow;
+  // -> 10
+  element.required = true;
+  // <div id="div-15" aria-valuenow="10" aria-required="true">
+  ```
 
 ## State of this library
 
-This library is currently in **alpha** as unit tests are still being written.
+This library is currently in **alpha** as I'm still working out the finer details. Here's my to-do list:
 
 - [x] Browser test (IE11+).
-- [ ] Get the `aria` property working.
-- [ ] Get the `role` property working.
+- [x] Get the `aria` property working.
+- [ ] Get the `role` property fully working (~~get~~, ~~set~~, delete).
 - [x] Finish writing unit tests.
-- [ ] Write documentation.
+- [ ] Write documentation in the WIKI.
+- [ ] Write some plugins for proprietary attributes and extended roles.
 - [ ] Release for beta testing.
+- [ ] Write some widgets using this library to test feasibility?

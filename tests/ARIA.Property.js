@@ -89,6 +89,38 @@ describe("ARIA.Property", function () {
 
     });
 
+    it("should warn if invalid tokens are set", function () {
+
+        var warn = console.warn;
+        var isWarned = false;
+        console.warn = function () {
+            isWarned = true;
+        };
+
+        property = new ARIA.Property(div, ATTRIBUTE, [makeUniqueId()]);
+        property.set(makeUniqueId());
+        chai.assert.isTrue(isWarned);
+        console.warn = warn;
+
+    });
+
+    it("should not warn if ARIA.enableWarnings is false", function () {
+
+        var warn = console.warn;
+        var isWarned = false;
+        console.warn = function () {
+            isWarned = true;
+        };
+
+        ARIA.enableWarnings = false;
+        property = new ARIA.Property(div, ATTRIBUTE, [makeUniqueId()]);
+        property.set(makeUniqueId());
+        chai.assert.isFalse(isWarned);
+        console.warn = warn;
+        ARIA.enableWarnings = true;
+
+    });
+
     it("should return null if the attribute is not set", function () {
 
         div.removeAttribute(ATTRIBUTE);

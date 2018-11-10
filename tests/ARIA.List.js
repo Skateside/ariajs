@@ -68,6 +68,19 @@ describe("ARIA.List", function () {
 
         });
 
+        // This is actually a feature of ARIA.Property but there's no way of
+        // testing the functionality at that level. We use this as a proxy test
+        // of that functionality.
+        it("should already have a list created from existing values", function () {
+
+            var values = ["alpha", "bravo", "charlie"];
+
+            div.setAttribute(ATTRIBUTE, values.join(" "));
+            list = new ARIA.List(div, ATTRIBUTE);
+            chai.assert.deepEqual(list.get(), values);
+
+        });
+
     });
 
     describe("set", function () {

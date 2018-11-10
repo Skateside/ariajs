@@ -53,7 +53,7 @@ var ARIA = {
             "polite"
         ],
         "aria-orientation": [
-            undefined,
+            // undefined,
             "undefined",
             "horizontal",
             "vertical"
@@ -174,4 +174,53 @@ Object.defineProperty(ARIA, "VERSION", {
     value: "<%= version %>"
 });
 
+var previousAria = globalVariable.ARIA;
 globalVariable.ARIA = ARIA;
+
+/**
+ * Returns the previous value of the global ARIA variable.
+ *
+ * @return {?}
+ *         Previous ARIA value.
+ */
+ARIA.getPrevious = function () {
+    return previousAria;
+};
+
+/**
+ * Removes the value of {@link ARIA} from the global variable and sets it back
+ * to the previous value. This version of {@link ARIA} is returned.
+ *
+ * @return {Object}
+ *         Current version of {@link ARIA}.
+ */
+ARIA.restorePrevious = function () {
+
+    globalVariable.ARIA = previousAria;
+
+    return ARIA;
+
+};
+
+/**
+ * Properties for the DOM extension. If these properties are not a string then
+ * the DOM extension will no occur.
+ *
+ * @type {Object}
+ */
+ARIA.extendDOM = {
+
+    /**
+     * Name of the property for the {@link ARIA.Element} instance on DOM nodes.
+     * @type {String}
+     */
+    aria: "aria",
+
+    /**
+     * Name of the property for the {@link ARIA.List} instance that handles the
+     * role attribute on DOM nodes.
+     * @type {String}
+     */
+    role: "role"
+
+};

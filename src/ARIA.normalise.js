@@ -4,6 +4,7 @@
  * changing one will update the other.
  *
  * @memberof ARIA
+ * @name     normalise
  * @param    {String} attribute
  *           Attribute to normalise.
  * @return   {String}

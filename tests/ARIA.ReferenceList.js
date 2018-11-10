@@ -1,6 +1,5 @@
 describe("ARIA.ReferenceList", function () {
 
-    // var ARIA = window.ARIA;
     var div;
     var divs;
     var referenceList;
