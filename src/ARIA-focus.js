@@ -4,16 +4,21 @@
  * {@link ARIA.makeFocusable} and no action is taken on any element that matches
  * this selector.
  * @type {String}
+ * @see https://www.w3.org/TR/html5/editing.html#the-tabindex-attribute
  */
 ARIA.focusable = (
     "a[href]," +
+    "audio[controls]," +
     "button," +
     "iframe," +
-    "input," +
+    "input:not([type=\"hidden\"])," +
+    "link[href]," +
     "select," +
     "textarea," +
-    "[tabindex]," +
-    "[contentEditable=\"true\"]"
+    "video[controls]," +
+    "[contentEditable=\"true\"]," +
+    "[draggable]," +
+    "[tabindex]"
 );
 
 /**
