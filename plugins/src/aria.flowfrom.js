@@ -14,7 +14,7 @@
     if (ARIA && ARIA.VERSION) {
 
         // Add a placeholder white-list for the factory.
-        ARIA.tokens[stem] = [];
+        ARIA.tokens[normalised] = [];
 
         // Add the suffix map to allow the attribute to generate the correct
         // suffix.
@@ -22,7 +22,13 @@
 
         // Create the factory.
         ARIA.factories[stem] = function (element) {
-            return new ARIA.Reference(element, normalised, ARIA.tokens[stem]);
+
+            return new ARIA.Reference(
+                element,
+                normalised,
+                ARIA.tokens[normalised]
+            );
+
         };
 
     }
