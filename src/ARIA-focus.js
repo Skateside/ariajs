@@ -19,7 +19,7 @@ ARIA.focusable = (
 /**
  * Makes an element focusable. This is done by added a tabindex to the element
  * which can be optionally defined. If defined, the tabindex must be an integer
- * of -1 or at least 0 and less than 32767. If the given element would normally
+ * of -1 or at least 0 and at most 32767. If the given element would normally
  * be focusable (it matches {@link ARIA.focusable}) then no action is taken
  * unless the forceTabindex flag is passed.
  *
@@ -45,7 +45,7 @@ ARIA.makeFocusable = function (element, tabindex, forceTabindex) {
         if (tabindex === undefined) {
             tabindex = -1;
         } else if (tabindex !== -1 && tabindex !== "-1") {
-            tabindex = Math.floor(Math.max(0, Math.min(32766, tabindex)));
+            tabindex = Math.floor(Math.max(0, Math.min(32767, tabindex)));
         }
 
         if (!isNaN(tabindex)) {
