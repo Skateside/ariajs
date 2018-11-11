@@ -17,21 +17,11 @@
         // suffix.
         ARIA.suffixMap[normalised] = stem;
 
+        // Allow ARIA.normalise to return the correct value.
+        ARIA.translate["aria-" + stem] = normalised;
+
         // Create the factory.
-        ARIA.factories[stem] = function (element) {
-
-            // Add a placeholder white-list for the factory.
-            if (!ARIA.tokens[normalised]) {
-                ARIA.tokens[normalised] = [];
-            }
-
-            return new ARIA.Reference(
-                element,
-                normalised,
-                ARIA.tokens[normalised]
-            );
-
-        };
+        ARIA.factories[stem] = ARIA.makeFactory(normalised, ARIA.Reference);
 
     }
 

@@ -32,7 +32,6 @@ gulp.task("js", function () {
         "./src/ARIA.normalise.js",
         "./src/ARIA.createClass.js",
         "./src/ARIA-dom.js",
-        "./src/ARIA-focus.js",
         "./src/ARIA.warn.js",
         "./src/ARIA.Property.js",
         "./src/ARIA.Number.js",
@@ -53,7 +52,6 @@ gulp.task("js", function () {
     function createAriaJS(src, fileName) {
 
         return gulp.src(src)
-            .pipe(sourcemaps.init())
             .pipe(concat(fileName, {
                 process: function (source) {
 
@@ -82,6 +80,7 @@ gulp.task("js", function () {
             ))
             .pipe(concat.footer('}(window));'))
             .pipe(gulp.dest("./dist/"))
+            .pipe(sourcemaps.init())
             .pipe(minify({
                 ext: {
                     min: ".min.js"
@@ -129,6 +128,10 @@ gulp.task("plugins", function () {
 
 });
 
+gulp.task("plugins:watch", function () {
+    gulp.watch(["./plugins/src/*.js"], ["plugins"]);
+});
+
 gulp.task("test", function () {
 
     gulp.src("./tests/testrunner.html")
@@ -145,3 +148,9 @@ gulp.task("test", function () {
 gulp.task("test:watch", function () {
     gulp.watch(["./tests/**/*.js"], ["test"]);
 });
+
+gulp.task("watch", [
+    "js:watch",
+    "plugins:watch",
+    // "test:watch"
+]);

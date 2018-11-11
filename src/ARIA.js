@@ -53,7 +53,7 @@ var ARIA = {
             "polite"
         ],
         "aria-orientation": [
-            // undefined,
+            undefined,
             "undefined",
             "horizontal",
             "vertical"
@@ -203,24 +203,7 @@ ARIA.restorePrevious = function () {
 };
 
 /**
- * Properties for the DOM extension. If these properties are not a string then
- * the DOM extension will no occur.
- *
- * @type {Object}
+ * Name of the property for the {@link ARIA.Element} instance on DOM nodes.
+ * @type {String}
  */
-ARIA.extendDOM = {
-
-    /**
-     * Name of the property for the {@link ARIA.Element} instance on DOM nodes.
-     * @type {String}
-     */
-    aria: "aria",
-
-    /**
-     * Name of the property for the {@link ARIA.List} instance that handles the
-     * role attribute on DOM nodes.
-     * @type {String}
-     */
-    role: "role"
-
-};
+ARIA.extendDOM = "aria";

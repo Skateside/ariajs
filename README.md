@@ -9,90 +9,92 @@ The library optionally adds a new property to all elements: `aria`, containing p
 - Set attributes quickly and logically.
 
   ```js
-  // <div id="div-1">
-  document.getElementById("div-1").aria.label = "Just testing";
-  // <div id="div-1" aria-label="Just testing">
+  // <div id="set-1">
+  document.getElementById("set-1").aria.label = "Just testing";
+  // <div id="set-1" aria-label="Just testing">
 
-  // <div id="div-2">
-  document.getElementById("div-2").aria.checked = true;
-  // <div id="div-2" aria-checked="true">
+  // <div id="set-2">
+  document.getElementById("set-2").aria.checked = true;
+  // <div id="set-2" aria-checked="true">
 
-  // <div id="div-3-1">
-  // <div id="div-3-2">
-  document.getElementById("div-3-1").aria.controls = document.getElementById("div-3-2");
-  // <div id="div-3-1" aria-controls="div-3-2">
-  // <div id="div-3-2">
+  // <div id="set-3-1">
+  // <div id="set-3-2">
+  document.getElementById("set-3-1").aria.controls = document.getElementById("set-3-2");
+  // <div id="set-3-1" aria-controls="set-3-2">
+  // <div id="set-3-2">
   ```
 
 - White-list valid tokens and see warnings when trying to set different values (warnings can be disabled by setting a property on the global `ARIA` variable).
 
   ```js
-  // <div id="div-4">
-  document.getElementById("div-4").aria.live = "probably";
-  // <div id="div-4">
+  // <div id="white-list-1">
+  document.getElementById("white-list-1").aria.live = "probably";
+  // <div id="white-list-1">
   // warns: "aria.js: 'probably' is not a valid token for the 'aria-live' attribute"
   ```
 
 - Get sensible values from the properties.
 
   ```js
-  // <div id="div-5" aria-placeholder="Hello world">
-  document.getElementById("div-5").aria.placeholder;
+  // <div id="get-1" aria-placeholder="Hello world">
+  document.getElementById("get-1").aria.placeholder;
   // -> "Hello world"
 
-  // <div id="div-6" aria-busy="true">
-  document.getElementById("div-6").aria.busy;
+  // <div id="get-2" aria-busy="true">
+  document.getElementById("get-2").aria.busy;
   // -> true
 
-  // <div id="div-7-1">
-  // <div id="div-7-2" aria-activedescendant="div-7-1">
-  document.getElementById("div-7-2").aria.activedescendant;
-  // -> <div id="div-7-1">
+  // <div id="get-3">
+  // <div id="get-4" aria-activedescendant="get-3">
+  document.getElementById("get-4").aria.activedescendant;
+  // -> <div id="get-3">
 
-  // <div id="div-8-1" aria-flowto="div-8-2">
-  // <div id="div-8-2">
-  document.getElementById("div-8-1").aria.flowto;
-  // -> [<div id="div-8-2">]
+  // <div id="get-5" aria-flowto="get-6">
+  // <div id="get-6">
+  document.getElementById("get-5").aria.flowto;
+  // -> [<div id="get-6">]
   ```
 
 - Remove the attributes easily.
 
   ```js
-  // <div id="div-9" aria-modal="true">
-  document.getElementById("div-9").aria.modal = "";
-  // <div id="div-9">
+  // <div id="remove-1" aria-modal="true">
+  document.getElementById("remove-1").aria.modal = "";
+  // <div id="remove-1">
 
-  // <div id="div-10" aria-pressed="mixed">
-  delete document.getElementById("div-10").aria.pressed;
-  // <div id="div-10">
+  // <div id="remove-2" aria-pressed="mixed">
+  delete document.getElementById("remove-2").aria.pressed;
+  // <div id="remove-2">
   ```
 
   **aria.js** uses the ES6 [Proxy](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy) function to listen for the `delete` operator and adds a `setTimeout`-based fallback for browsers that don't understand `Proxy`. As a result, older browsers will asynchronously remove properties with the `delete` operator. In all browsers, setting the property to an empty string (`""`) will remove the attribute instantly.
 
-- Get and set roles with ease, a bit like a DOM Level 1 attribute (e.g. `id` or `className`).
+- Get and set roles and tab indices with ease, with validation included.
 
   ```js
-  // <div id="div-11">
-  document.getElementById("div-11").role = "button";
-  // <div id="div-11" role="button">
-  document.getElementById("div-11").role;
+  // <div id="role-1">
+  document.getElementById("role-1").aria.role = "button";
+  // <div id="role-1" role="button">
+  document.getElementById("role-1").aria.role;
   // -> ["button"]
+
+  // <div id="tabindex-1">
+  document.getElementById("tabindex-1").aria.tabindex = 123;
+  // <div id="tabindex-1" tabindex="123">
+  document.getElementById("tabindex-1").aria.tabindex;
+  // -> 123
   ```
 
 - Enjoy some utility functions added to a global `ARIA` variable.
 
   ```js
-  // <div id="div-12">
-  ARIA.makeFocusable(document.getElementById("div-12"));
-  // <div id="div-12" tabindex="-1">
-
-  // <div id="div-13">
-  // <div class="div-14">
-  ARIA.identify(document.getElementById("div-13"));
-  // -> "div-13"
-  ARIA.identify(document.querySelector(".div-14"));
+  // <div id="util-1">
+  // <div class="util-2">
+  ARIA.identify(document.getElementById("util-1"));
+  // -> "util-1"
+  ARIA.identify(document.querySelector(".util-2"));
   // -> "anonymous-element-0"
-  // <div class="div-14" id="anonymous-element-0">
+  // <div class="util-2" id="anonymous-element-0">
 
   ARIA.normalise("selected");
   // -> "aria-selected"
@@ -105,12 +107,12 @@ The library optionally adds a new property to all elements: `aria`, containing p
 - Work without the `aria` property by using an alternative interface - perfect for third-party libraries which don't control the environment.
 
   ```js
-  // <div id="div-15" aria-valuenow="10">
-  var element = new ARIA.Element(document.getElementById("div-15"));
+  // <div id="interface-1" aria-valuenow="10">
+  var element = new ARIA.Element(document.getElementById("interface-1"));
   element.valuenow;
   // -> 10
   element.required = true;
-  // <div id="div-15" aria-valuenow="10" aria-required="true">
+  // <div id="interface-1" aria-valuenow="10" aria-required="true">
   ```
 
 ## State of this library
@@ -119,8 +121,7 @@ This library is currently in **alpha** as I'm still working out the finer detail
 
 - [x] Browser test (IE11+).
 - [x] Get the `aria` property working.
-- [x] Get the `role` property working.
-- [ ] Finish writing unit tests.
+- [ ] Finish writing unit tests (even for non-`Proxy` fall-back).
 - [ ] Write documentation in the WIKI.
 - [x] Write some plugins for proprietary attributes and extended roles.
 - [ ] Release for beta testing.

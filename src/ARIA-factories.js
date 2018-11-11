@@ -6,13 +6,6 @@
 ARIA.factories = Object.create(null);
 
 /**
- * Map of all mis-spellings and aliases. The attribute key should be the
- * normalised value - see {@link ARIA.normalise}.
- * @type {Object}
- */
-ARIA.translate = Object.create(null);
-
-/**
  * Gets the factory from {@link ARIA.factories} that matches either the given
  * attribute or the normalised version (see {@link ARIA.normalise}).
  *
@@ -36,14 +29,15 @@ ARIA.getFactory = function (attribute) {
  *
  * @param  {String} attribute
  *         Attribute whose factory should be executed.
- * @param  {...?} [arguments]
- *         Optional parameters to pass to the factory.
- * @return {?}
- *         Result of executing the factory.
+ * @param  {Element} element
+ *         Element that should be passed to the factory.
+ * @return {ARIA.Property}
+ *         Instance of {@link ARIA.Property} (or sub-class) created by the
+ *         factory.
  * @throws {ReferenceError}
  *         There must be a factory for the given attribute.
  */
-ARIA.runFactory = function (attribute) {
+ARIA.runFactory = function (attribute, element) {
 
     var factory = ARIA.getFactory(attribute);
 
@@ -51,7 +45,47 @@ ARIA.runFactory = function (attribute) {
         throw new ReferenceError(attribute + " is not a recognised factory");
     }
 
-    return factory.apply(undefined, slice(arguments, 1));
+    return factory(element);
+
+};
+
+/**
+ * Creates a factory that creates an aria property.
+ *
+ * @param  {String} attribute
+ *         Normalised name of the attribute whose factory is created.
+ * @param  {Function} Constructor
+ *         Constructor for {@link ARIA.Property} (or sub-class) that will create
+ *         the property.
+ * @param  {Function} [modify]
+ *         Optional function for modifying the {@link ARIA.Property} instance
+ *         before it's returned.
+ * @return {Function}
+ *         A factory function that takes the element and returns the instance.
+ */
+ARIA.makeFactory = function (attribute, Constructor, modify) {
+
+    return function (element) {
+
+        var instance;
+        var tokens = ARIA.tokens[attribute];
+
+        if (!tokens) {
+
+            tokens = [];
+            ARIA.tokens[attribute] = tokens;
+
+        }
+
+        instance = new Constructor(element, attribute, tokens);
+
+        if (typeof modify === "function") {
+            modify(instance);
+        }
+
+        return instance;
+
+    };
 
 };
 
@@ -113,6 +147,16 @@ var factoryEntries = [
         "rowspan",
         "setsize"
     ]],
+    [ARIA.Integer, [
+        "tabindex"
+    ], function (instance) {
+
+        var uInt16 = Math.pow(2, 16);
+
+        instance.setMin(uInt16 / -2);
+        instance.setMax((uInt16 / 2) - 1);
+
+    }],
     [ARIA.Number, [
         "valuemax",
         "valuemin",
@@ -120,7 +164,8 @@ var factoryEntries = [
     ]],
     [ARIA.List, [
         "dropeffect",
-        "relevant"
+        "relevant",
+        "role"
     ]]
 ];
 
@@ -128,25 +173,11 @@ factoryEntries.forEach(function (entry) {
 
     entry[1].forEach(function (attribute) {
 
-        var normal = ARIA.normalise(attribute);
-
-        ARIA.factories[attribute] = function (element) {
-
-            var instance;
-            var tokens = ARIA.tokens[normal];
-
-            if (!tokens) {
-
-                tokens = [];
-                ARIA.tokens[normal] = tokens;
-
-            }
-
-            instance = new entry[0](element, normal, tokens);
-
-            return instance;
-
-        };
+        ARIA.factories[attribute] = ARIA.makeFactory(
+            ARIA.normalise(attribute),
+            entry[0],
+            entry[2]
+        );
 
     });
 

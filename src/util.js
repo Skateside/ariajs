@@ -87,8 +87,43 @@ var noop = function () {
     return;
 };
 
+/**
+ * The regular expression used to test functions for whether or not they include
+ * the "$super" magic property.
+ * @private
+ * @type    {RegExp}
+ */
 var fnTest = (
     (/return/).test(noop)
     ? (/[.'"]\$super\b/)
     : (/.*/)
+);
+
+/**
+ * A basic fallback for the isNaN function.
+ *
+ * @private
+ * @function
+ * @param    {?} value
+ *           Value to test.
+ * @return   {Boolean}
+ *           true if the value is NaN, false otherwise.
+ */
+var isNotANumber = Number.isNaN || globalVariable.isNaN;
+
+/**
+ * A reference (and possible fallback) for requestAnimationFrame.
+ *
+ * @private
+ * @function
+ * @param    {Function} callback
+ *           Function to execute when the animation frame ticks over.
+ */
+var requestAnimationFrame = (
+    globalVariable.requestAnimationFrame
+    || globalVariable.webkitRequestAnimationFrame
+    || globalVariable.mozRequestAnimationFrame
+    || function (callback) {
+        globalVariable.setTimeout(callback, 1000 / 60);
+    }
 );

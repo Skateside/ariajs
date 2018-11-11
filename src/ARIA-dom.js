@@ -14,7 +14,7 @@ ARIA.setAttribute = function (element, name, value) {
 };
 
 /**
- * A wrapper for getting an attribute of an element. THis allows the method to
+ * A wrapper for getting an attribute of an element. This allows the method to
  * be easily replaced for virtual DOMs.
  *
  * @param  {Element} element
@@ -29,7 +29,7 @@ ARIA.getAttribute = function (element, name) {
 };
 
 /**
- * A wrapper for checking for an attribute on an element. THis allows the method
+ * A wrapper for checking for an attribute on an element. This allows the method
  * to be easily replaced for virtual DOMs.
  *
  * @param  {Element} element
@@ -44,7 +44,7 @@ ARIA.hasAttribute = function (element, name) {
 };
 
 /**
- * A wrapper for removing an attribute from an element. THis allows the method
+ * A wrapper for removing an attribute from an element. This allows the method
  * to be easily replaced for virtual DOMs.
  *
  * @param {Element} element
@@ -55,53 +55,6 @@ ARIA.hasAttribute = function (element, name) {
 ARIA.removeAttribute = function (element, name) {
     element.removeAttribute(name);
 };
-
-/**
- * Checks to see if the given element matches the given selector, returning
- * true if it does.
- *
- * @function
- * @param    {Element} element
- *           Element to test.
- * @param    {String} selector
- *           CSS selector to check against.
- * @return   {Boolean}
- *           true if the element matches the given selector, false otherwise.
- */
-ARIA.is = (
-    Element.prototype.matches
-    ? function (element, selector) {
-        return element.matches(selector);
-    }
-    : (
-        Element.prototype.msMatchesSelector
-        ? function (element, selector) {
-            return element.msMatchesSelector(selector);
-        }
-        : function (element, selector) {
-
-            var elements = document.querySelectorAll(selector);
-            var length = elements.length;
-            var isMatch = false;
-
-            while (length) {
-
-                length -= 1;
-
-                if (elements[length] === element) {
-
-                    isMatch = true;
-                    break;
-
-                }
-
-            }
-
-            return isMatch;
-
-        }
-    )
-);
 
 /**
  * Gets an element by the given ID. If the element cannot be found, null is
@@ -127,7 +80,7 @@ ARIA.defaultIdentifyPrefix = "anonymous-element-";
 
 /**
  * Returns the ID of the given element. If the element does not have an ID, a
- * unique one is generated. THe Generated ID is the given prefix and an
+ * unique one is generated. The generated ID is the given prefix and an
  * incrementing counter.
  * Pro tip: The HTML specs state that element IDs should start with a letter.
  *

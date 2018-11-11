@@ -1,4 +1,14 @@
 /**
+ * Map of all mis-spellings and aliases. The attribute key should be the
+ * normalised value - see {@link ARIA.normalise}.
+ * @type {Object}
+ */
+ARIA.translate = objectAssign(Object.create(null), {
+    "aria-role": "role",
+    "aria-tabindex": "tabindex"
+});
+
+/**
  * Normalises an attribute name so that it is in lowercase and always starts
  * with "aria-". This function has the alias of {@link ARIA.normalize} and
  * changing one will update the other.

@@ -23,7 +23,7 @@ ARIA.Element = ARIA.createClass(/** @lends ARIA.ELement.prototype */{
          * infinitely loops being caused in the MutationObserver.
          * @type {Object}
          */
-        this.manipulationFlags = Object.create(null);
+        // this.manipulationFlags = Object.create(null);
 
         /**
          * Instances of {@link ARIA.Property} (or sub-classes) that are used to
@@ -96,59 +96,23 @@ ARIA.Element = ARIA.createClass(/** @lends ARIA.ELement.prototype */{
     observeAttributes: function () {
 
         var that = this;
-        var element = that.element;
-        var observer = new MutationObserver(function (mutations) {
-
-            mutations.forEach(function (mutation) {
-
-                var attribute = mutation.attributeName || "";
-                var suffix = attribute.slice(5);
-                var value;
-                var old;
-
-                if (
-                    mutation.type === "attributes"
-                    && ARIA.factories[suffix]
-                    && !that.manipulationFlags[suffix]
-                ) {
-
-                    that.manipulationFlags[suffix] = true;
-
-                    if (ARIA.hasAttribute(element, attribute)) {
-
-                        value = ARIA.Property.interpret(
-                            ARIA.getAttribute(element, attribute)
-                        );
-                        old = ARIA.Property.interpret(mutation.oldValue);
-
-                        if (value !== old) {
-                            that[suffix] = value;
-                        }
-
-                    } else {
-                        that[suffix] = "";
-                    }
-
-                    window.setTimeout(function () {
-                        delete that.manipulationFlags[suffix];
-                    }, 0);
-
-                }
-
-            });
-
-        });
-
-        observer.observe(element, {
-            attributes: true,
-            attributeOldValue: true
-        });
 
         /**
          * The observer.
          * @type {MutationObserver}
          */
-        that.observer = observer;
+        that.observer = ARIA.Element.makeObserver(
+            that.element,
+            function (data) {
+                return Boolean(ARIA.factories[data.suffix]);
+            },
+            function (data) {
+                that[data.suffix] = data.value;
+            },
+            function (data) {
+                that[data.suffix] = "";
+            }
+        );
 
     },
 
@@ -200,18 +164,14 @@ ARIA.Element = ARIA.createClass(/** @lends ARIA.ELement.prototype */{
             deleteProperty: function (target, name) {
 
                 var instance = target.getInstance(name);
-                var isDeleted = false;
 
                 if (instance) {
-
                     instance.set("");
-                    isDeleted = true;
-
                 } else {
-                    isDeleted = delete target[name];
+                    delete target[name];
                 }
 
-                return isDeleted;
+                return true;
 
             }
 
@@ -221,21 +181,82 @@ ARIA.Element = ARIA.createClass(/** @lends ARIA.ELement.prototype */{
 
 });
 
+/**
+ * Creates an observer to listen for attribute changes.
+ *
+ * @param  {Element} element
+ *         Element whose attribute changes should be observed.
+ * @param  {Function} checker
+ *         Function to execute when checking whether the attribute change should
+ *         be observed. Accepts an object with "attribute" and "suffix"
+ *         properties, returns a boolean.
+ * @param  {Function} setter
+ *         Function to execute when an attribute change has been detected.
+ *         Accepts an object and "attribute", "suffix", "value" and "old"
+ *         properties.
+ * @param  {Function} unsetter
+ *         Function to execute when an attribute has been removed. Accepts an
+ *         object with "attribute" and "suffix" properties.
+ * @return {MutationObserver}
+ *         MutationObserver that observes the attribute changes.
+ */
+ARIA.Element.makeObserver = function (element, checker, setter, unsetter) {
+
+    var manipulationFlags = Object.create(null);
+    var observer = new MutationObserver(function (mutations) {
+
+        mutations.forEach(function (mutation) {
+
+            var attribute = mutation.attributeName || "";
+            var suffix = ARIA.getSuffix(attribute);
+            var data = {
+                attribute: attribute,
+                suffix: suffix
+            };
+
+            if (
+                mutation.type === "attributes"
+                && !manipulationFlags[suffix]
+                && checker(data)
+            ) {
+
+                manipulationFlags[suffix] = true;
+
+                if (ARIA.hasAttribute(element, attribute)) {
+
+                    data.value = ARIA.Property.interpret(
+                        ARIA.getAttribute(element, attribute)
+                    );
+                    data.old = ARIA.Property.interpret(mutation.oldValue);
+                    setter(data);
+
+                } else {
+                    unsetter(data);
+                }
+
+                requestAnimationFrame(function () {
+                    delete manipulationFlags[suffix];
+                });
+
+            }
+
+        });
+
+    });
+
+    observer.observe(element, {
+        attributes: true,
+        attributeOldValue: true
+    });
+
+    return observer;
+
+};
+
 // Create a fall-back for browsers that don't understand Proxy.
 // Object.defineProperty can be used for get and set, but delete will have to
 // rely on polling.
 if (!globalVariable.Proxy) {
-
-    // Use requestAnimationFrame instead of setTimeout if possible. This has the
-    // advantage of pausing execution when the window loses focus.
-    var raf = (
-        globalVariable.requestAnimationFrame
-        || globalVariable.webkitRequestAnimationFrame
-        || globalVariable.mozRequestAnimationFrame
-        || function (callback) {
-            globalVariable.setTimeout(callback, 1000 / 60);
-        }
-    );
 
     ARIA.Element.prototype.activateTraps = function () {
 
@@ -262,13 +283,13 @@ if (!globalVariable.Proxy) {
                         isPolling = false;
                     } else if (value !== "" && !isPolling) {
 
-                        raf(function poll() {
+                        requestAnimationFrame(function poll() {
 
                             if (isPolling) {
 
                                 if (owns(attribute)) {
 
-                                    raf(poll);
+                                    requestAnimationFrame(poll);
                                     isPolling = true;
 
                                 } else {

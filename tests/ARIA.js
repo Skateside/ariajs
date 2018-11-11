@@ -377,106 +377,12 @@ describe("ARIA", function () {
 
     });
 
-    describe("is", function () {
-
-        it("should be able to check an element against a selector", function () {
-
-            var nodeName = "div";
-            var element = document.createElement(nodeName);
-            var className = "class-" + makeUniqueId();
-
-            element.className = className;
-
-            document.body.appendChild(element);
-            chai.assert.isTrue(ARIA.is(element, nodeName));
-            chai.assert.isTrue(ARIA.is(element, "." + className));
-            document.body.removeChild(element);
-
-        });
-
-    });
-
     describe("isNode", function () {
 
         it("should detect a Node", function () {
 
             chai.assert.isTrue(ARIA.isNode(document.createElement("div")));
             chai.assert.isFalse(ARIA.isNode({}));
-
-        });
-
-    });
-
-    describe("makeFocusable", function () {
-
-        it("should add a tabindex to an element", function () {
-
-            var div = document.createElement("div");
-
-            chai.assert.isFalse(div.hasAttribute("tabindex"));
-            ARIA.makeFocusable(div);
-            chai.assert.isTrue(div.hasAttribute("tabindex"));
-
-        });
-
-        it("should allow the tabindex to be set", function () {
-
-            var div = document.createElement("div");
-            var index = rnd(10);
-
-            ARIA.makeFocusable(div, index);
-            chai.assert.equal(Number(div.getAttribute("tabindex")), index);
-
-        });
-
-        it("should normalise the tabindex", function () {
-
-            var decimal = rnd(100) + (rnd(1, 100) / 100);
-            var div = document.createElement("div");
-
-            ARIA.makeFocusable(div, decimal);
-            chai.assert.equal(Number(div.getAttribute("tabindex")), Math.floor(decimal));
-
-        });
-
-        it("should do nothing for focusable elements", function () {
-
-            var button = document.createElement("button");
-
-            document.body.appendChild(button);
-            chai.assert.isTrue(ARIA.is(button, ARIA.focusable));
-            chai.assert.isFalse(button.hasAttribute("tabindex"));
-            ARIA.makeFocusable(button);
-            chai.assert.isFalse(button.hasAttribute("tabindex"));
-            document.body.removeChild(button);
-
-        });
-
-        it("should allow a tabindex to be forced onto a focusable element", function () {
-
-            var button = document.createElement("button");
-
-            document.body.appendChild(button);
-            chai.assert.isTrue(ARIA.is(button, ARIA.focusable));
-            chai.assert.isFalse(button.hasAttribute("tabindex"));
-            ARIA.makeFocusable(button, 1, true);
-            chai.assert.isTrue(button.hasAttribute("tabindex"));
-            document.body.removeChild(button);
-
-        });
-
-    });
-
-    describe("resetFocusable", function () {
-
-        it("should remove the tabindex from the element", function () {
-
-            var div = document.createElement("div");
-
-            ARIA.makeFocusable(div);
-            chai.assert.isTrue(div.hasAttribute("tabindex"));
-            ARIA.resetFocusable(div);
-            chai.assert.isFalse(div.hasAttribute("tabindex"));
 
         });
 

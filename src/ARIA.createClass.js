@@ -56,6 +56,7 @@ function addClassMethods(name, method) {
 /**
  * Creates a Class.
  *
+ * @see    https://johnresig.com/blog/simple-javascript-inheritance/
  * @param  {Class} [Base]
  *         Optional parent class.
  * @param  {Object} proto
