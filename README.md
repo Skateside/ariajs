@@ -120,8 +120,8 @@ This library is currently in **alpha** as I'm still working out the finer detail
 - [x] Browser test (IE11+).
 - [x] Get the `aria` property working.
 - [x] Get the `role` property working.
-- [x] Finish writing unit tests.
+- [ ] Finish writing unit tests.
 - [ ] Write documentation in the WIKI.
-- [ ] Write some plugins for proprietary attributes and extended roles.
+- [x] Write some plugins for proprietary attributes and extended roles.
 - [ ] Release for beta testing.
 - [ ] Write some widgets using this library to test feasibility?
