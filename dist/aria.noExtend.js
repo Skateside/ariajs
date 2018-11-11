@@ -1698,7 +1698,7 @@ if (!globalVariable.Proxy) {
 
                             }
 
-                        }, delay);
+                        });
                         isPolling = true;
 
                     }
