@@ -1,4 +1,4 @@
-/*! ariajs - v0.2.0 - MIT license - https://github.com/Skateside/ariajs - 2018-11-10 */
+/*! ariajs - v0.2.0 - MIT license - https://github.com/Skateside/ariajs - 2018-11-11 */
 (function (globalVariable) {
     "use strict";
 
@@ -703,7 +703,7 @@ ARIA.isNode = function (value) {
  * this selector.
  * @type {String}
  */
-ARIA.FOCUSABLE = (
+ARIA.focusable = (
     "a[href]," +
     "button," +
     "iframe," +
@@ -718,7 +718,7 @@ ARIA.FOCUSABLE = (
  * Makes an element focusable. This is done by added a tabindex to the element
  * which can be optionally defined. If defined, the tabindex must be an integer
  * of -1 or at least 0 and less than 32767. If the given element would normally
- * be focusable (it matches {@link ARIA.FOCUSABLE}) then no action is taken
+ * be focusable (it matches {@link ARIA.focusable}) then no action is taken
  * unless the forceTabindex flag is passed.
  *
  * Be aware that this function doesn't check to see if other factors would
@@ -734,11 +734,11 @@ ARIA.FOCUSABLE = (
  *        focusable but not part of the tab order.
  * @param {Boolean} [forceTabindex=false]
  *        If set to true then the element will gain the tabindex attribute even
- *        if it matches {@link ARIA.FOCUSABLE}.
+ *        if it matches {@link ARIA.focusable}.
  */
 ARIA.makeFocusable = function (element, tabindex, forceTabindex) {
 
-    if (!ARIA.is(element, ARIA.FOCUSABLE) || forceTabindex) {
+    if (!ARIA.is(element, ARIA.focusable) || forceTabindex) {
 
         if (tabindex === undefined) {
             tabindex = -1;
@@ -1493,7 +1493,7 @@ ARIA.Element = ARIA.createClass(/** @lends ARIA.ELement.prototype */{
             var value = attribute.value;
             var instance = (
                 value
-                ? this.getInstance(attribute)
+                ? this.getInstance(attribute.name)
                 : undefined
             );
 
@@ -1610,7 +1610,7 @@ ARIA.Element = ARIA.createClass(/** @lends ARIA.ELement.prototype */{
                     target[name] = value;
                 }
 
-                return true;
+                return value;
 
             },
 
@@ -1643,11 +1643,21 @@ ARIA.Element = ARIA.createClass(/** @lends ARIA.ELement.prototype */{
 // rely on polling.
 if (!globalVariable.Proxy) {
 
+    // Use requestAnimationFrame instead of setTimeout if possible. This has the
+    // advantage of pausing execution when the window loses focus.
+    var raf = (
+        globalVariable.requestAnimationFrame
+        || globalVariable.webkitRequestAnimationFrame
+        || globalVariable.mozRequestAnimationFrame
+        || function (callback) {
+            globalVariable.setTimeout(callback, 1000 / 60);
+        }
+    );
+
     ARIA.Element.prototype.activateTraps = function () {
 
         var that = this;
         var owns = Object.prototype.hasOwnProperty.bind(that);
-        var delay = 1000 / 60; // 60 fps
 
         Object.keys(ARIA.factories).forEach(function setProperty(attribute) {
 
@@ -1669,13 +1679,13 @@ if (!globalVariable.Proxy) {
                         isPolling = false;
                     } else if (value !== "" && !isPolling) {
 
-                        globalVariable.setTimeout(function poll() {
+                        raf(function poll() {
 
                             if (isPolling) {
 
                                 if (owns(attribute)) {
 
-                                    globalVariable.setTimeout(poll, delay);
+                                    raf(poll);
                                     isPolling = true;
 
                                 } else {
@@ -1900,6 +1910,12 @@ ARIA.addAlias = function (source, aliases) {
 
 ARIA.addAlias("labelledby", "labeledby");
 
+/**
+ * @file    Adds the "aria" and "role" properties to Node.prototype if ARIA is
+ *          set up to allow it.
+ * @author  James "Skateside" Long
+ * @license MIT
+ */
 (function (ARIA) {
 
     "use strict";
@@ -1910,6 +1926,17 @@ ARIA.addAlias("labelledby", "labeledby");
     var roleIsString = true;
     var roleInstances = new WeakMap();
 
+    /**
+     * Gets the instance of {@link ARIA.List} for the given element that handles
+     * the element's role attribute. If there is no instance, once is created
+     * before being returned.
+     *
+     * @private
+     * @param   {Element} element
+     *          Element whose role {@link ARIA.List} should be returned.
+     * @return  {ARIA.List}
+     *          ARIA.List instance.
+     */
     function getRoleInstance(element) {
 
         var list = roleInstances.get(element);
@@ -1925,11 +1952,38 @@ ARIA.addAlias("labelledby", "labeledby");
 
     }
 
+    /**
+     * Gets the value of the {@link ARIA.List} instance for the given element.
+     *
+     * @private
+     * @see     getRoleInstance
+     * @param   {Element} element
+     *          Element whose instance value should be returned.
+     * @return  {Array.<String>}
+     *          Value of the {@link ARIA.List} instance.
+     */
     function roleGetter(element) {
         return getRoleInstance(element).get();
     }
 
-    // https://github.com/LeaVerou/bliss/issues/49
+    /**
+     * Adds a lazy-loaded instance to Node.prototype.
+     *
+     * @private
+     * @see     https://github.com/LeaVerou/bliss/issues/49
+     * @param   {String} name
+     *          Name of the property to add.
+     * @param   {Function} valueMaker
+     *          Function which creates the value. This function is passed the
+     *          Node instance as a parameter.
+     * @param   {Function} [valueGetter]
+     *          Optional function for retrieving the value from the object. The
+     *          function is passed the Node instance as a parameter. If
+     *          ommitted, the value is retrieved by getting the property of the
+     *          Node instance at the given name.
+     * @param   {Object} [settings]
+     *          Optional additional settings for the property descriptor.
+     */
     function addNodeProperty(name, valueMaker, valueGetter, settings) {
 
         var descriptor = {

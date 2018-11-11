@@ -27,8 +27,8 @@
     },
     "devDependencies": {
         "chai": "^4.2.0",
-        "mocha": "^5.2.0",
         "gulp-mocha-phantomjs": "^0.12.2",
+        "mocha": "^5.2.0",
         "weakmap-polyfill": "^2.0.0"
     }
 }

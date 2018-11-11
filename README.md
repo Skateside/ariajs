@@ -69,7 +69,7 @@ The library optionally adds a new property to all elements: `aria`, containing p
 
   **aria.js** uses the ES6 [Proxy](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy) function to listen for the `delete` operator and adds a `setTimeout`-based fallback for browsers that don't understand `Proxy`. As a result, older browsers will asynchronously remove properties with the `delete` operator. In all browsers, setting the property to an empty string (`""`) will remove the attribute instantly.
 
-- Get, set and remove roles with ease.
+- Get and set roles with ease, a bit like a DOM Level 1 attribute (e.g. `id` or `className`).
 
   ```js
   // <div id="div-11">
@@ -77,8 +77,6 @@ The library optionally adds a new property to all elements: `aria`, containing p
   // <div id="div-11" role="button">
   document.getElementById("div-11").role;
   // -> ["button"]
-  delete document.getElementById("div-11").role;
-  // <div id="div-11">
   ```
 
 - Enjoy some utility functions added to a global `ARIA` variable.
@@ -121,7 +119,7 @@ This library is currently in **alpha** as I'm still working out the finer detail
 
 - [x] Browser test (IE11+).
 - [x] Get the `aria` property working.
-- [ ] Get the `role` property fully working (~~get~~, ~~set~~, delete).
+- [x] Get the `role` property working.
 - [x] Finish writing unit tests.
 - [ ] Write documentation in the WIKI.
 - [ ] Write some plugins for proprietary attributes and extended roles.

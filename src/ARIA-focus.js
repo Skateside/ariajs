@@ -5,7 +5,7 @@
  * this selector.
  * @type {String}
  */
-ARIA.FOCUSABLE = (
+ARIA.focusable = (
     "a[href]," +
     "button," +
     "iframe," +
@@ -20,7 +20,7 @@ ARIA.FOCUSABLE = (
  * Makes an element focusable. This is done by added a tabindex to the element
  * which can be optionally defined. If defined, the tabindex must be an integer
  * of -1 or at least 0 and less than 32767. If the given element would normally
- * be focusable (it matches {@link ARIA.FOCUSABLE}) then no action is taken
+ * be focusable (it matches {@link ARIA.focusable}) then no action is taken
  * unless the forceTabindex flag is passed.
  *
  * Be aware that this function doesn't check to see if other factors would
@@ -36,11 +36,11 @@ ARIA.FOCUSABLE = (
  *        focusable but not part of the tab order.
  * @param {Boolean} [forceTabindex=false]
  *        If set to true then the element will gain the tabindex attribute even
- *        if it matches {@link ARIA.FOCUSABLE}.
+ *        if it matches {@link ARIA.focusable}.
  */
 ARIA.makeFocusable = function (element, tabindex, forceTabindex) {
 
-    if (!ARIA.is(element, ARIA.FOCUSABLE) || forceTabindex) {
+    if (!ARIA.is(element, ARIA.focusable) || forceTabindex) {
 
         if (tabindex === undefined) {
             tabindex = -1;

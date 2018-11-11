@@ -444,7 +444,7 @@ describe("ARIA", function () {
             var button = document.createElement("button");
 
             document.body.appendChild(button);
-            chai.assert.isTrue(ARIA.is(button, ARIA.FOCUSABLE));
+            chai.assert.isTrue(ARIA.is(button, ARIA.focusable));
             chai.assert.isFalse(button.hasAttribute("tabindex"));
             ARIA.makeFocusable(button);
             chai.assert.isFalse(button.hasAttribute("tabindex"));
@@ -457,7 +457,7 @@ describe("ARIA", function () {
             var button = document.createElement("button");
 
             document.body.appendChild(button);
-            chai.assert.isTrue(ARIA.is(button, ARIA.FOCUSABLE));
+            chai.assert.isTrue(ARIA.is(button, ARIA.focusable));
             chai.assert.isFalse(button.hasAttribute("tabindex"));
             ARIA.makeFocusable(button, 1, true);
             chai.assert.isTrue(button.hasAttribute("tabindex"));

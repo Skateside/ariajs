@@ -1,3 +1,9 @@
+/**
+ * @file    Adds the "aria" and "role" properties to Node.prototype if ARIA is
+ *          set up to allow it.
+ * @author  James "Skateside" Long
+ * @license MIT
+ */
 (function (ARIA) {
 
     "use strict";
@@ -8,6 +14,17 @@
     var roleIsString = true;
     var roleInstances = new WeakMap();
 
+    /**
+     * Gets the instance of {@link ARIA.List} for the given element that handles
+     * the element's role attribute. If there is no instance, once is created
+     * before being returned.
+     *
+     * @private
+     * @param   {Element} element
+     *          Element whose role {@link ARIA.List} should be returned.
+     * @return  {ARIA.List}
+     *          ARIA.List instance.
+     */
     function getRoleInstance(element) {
 
         var list = roleInstances.get(element);
@@ -23,11 +40,38 @@
 
     }
 
+    /**
+     * Gets the value of the {@link ARIA.List} instance for the given element.
+     *
+     * @private
+     * @see     getRoleInstance
+     * @param   {Element} element
+     *          Element whose instance value should be returned.
+     * @return  {Array.<String>}
+     *          Value of the {@link ARIA.List} instance.
+     */
     function roleGetter(element) {
         return getRoleInstance(element).get();
     }
 
-    // https://github.com/LeaVerou/bliss/issues/49
+    /**
+     * Adds a lazy-loaded instance to Node.prototype.
+     *
+     * @private
+     * @see     https://github.com/LeaVerou/bliss/issues/49
+     * @param   {String} name
+     *          Name of the property to add.
+     * @param   {Function} valueMaker
+     *          Function which creates the value. This function is passed the
+     *          Node instance as a parameter.
+     * @param   {Function} [valueGetter]
+     *          Optional function for retrieving the value from the object. The
+     *          function is passed the Node instance as a parameter. If
+     *          ommitted, the value is retrieved by getting the property of the
+     *          Node instance at the given name.
+     * @param   {Object} [settings]
+     *          Optional additional settings for the property descriptor.
+     */
     function addNodeProperty(name, valueMaker, valueGetter, settings) {
 
         var descriptor = {

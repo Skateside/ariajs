@@ -61,18 +61,6 @@ describe("Element", function () {
 
         });
 
-        it("should allow role to be deleted", function () {
-
-            var roles = ["menuitem", "group"];
-
-            div.role = roles.join(" ");
-            chai.assert.deepEqual(div.role, roles);
-
-            delete div.role;
-            chai.assert.isFalse(div.hasAttribute("role"));
-
-        });
-
     });
 
 });

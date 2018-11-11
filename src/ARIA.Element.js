@@ -76,7 +76,7 @@ ARIA.Element = ARIA.createClass(/** @lends ARIA.ELement.prototype */{
             var value = attribute.value;
             var instance = (
                 value
-                ? this.getInstance(attribute)
+                ? this.getInstance(attribute.name)
                 : undefined
             );
 
@@ -193,7 +193,7 @@ ARIA.Element = ARIA.createClass(/** @lends ARIA.ELement.prototype */{
                     target[name] = value;
                 }
 
-                return true;
+                return value;
 
             },
 
@@ -226,11 +226,21 @@ ARIA.Element = ARIA.createClass(/** @lends ARIA.ELement.prototype */{
 // rely on polling.
 if (!globalVariable.Proxy) {
 
+    // Use requestAnimationFrame instead of setTimeout if possible. This has the
+    // advantage of pausing execution when the window loses focus.
+    var raf = (
+        globalVariable.requestAnimationFrame
+        || globalVariable.webkitRequestAnimationFrame
+        || globalVariable.mozRequestAnimationFrame
+        || function (callback) {
+            globalVariable.setTimeout(callback, 1000 / 60);
+        }
+    );
+
     ARIA.Element.prototype.activateTraps = function () {
 
         var that = this;
         var owns = Object.prototype.hasOwnProperty.bind(that);
-        var delay = 1000 / 60; // 60 fps
 
         Object.keys(ARIA.factories).forEach(function setProperty(attribute) {
 
@@ -252,13 +262,13 @@ if (!globalVariable.Proxy) {
                         isPolling = false;
                     } else if (value !== "" && !isPolling) {
 
-                        globalVariable.setTimeout(function poll() {
+                        raf(function poll() {
 
                             if (isPolling) {
 
                                 if (owns(attribute)) {
 
-                                    globalVariable.setTimeout(poll, delay);
+                                    raf(poll);
                                     isPolling = true;
 
                                 } else {
