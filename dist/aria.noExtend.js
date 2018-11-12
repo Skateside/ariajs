@@ -1,4 +1,4 @@
-/*! ariajs - v0.2.0 - MIT license - https://github.com/Skateside/ariajs - 2018-11-11 */
+/*! ariajs - v0.2.0 - MIT license - https://github.com/Skateside/ariajs - 2018-11-12 */
 (function (globalVariable) {
     "use strict";
 

@@ -1,4 +1,4 @@
-/*! ariajs - v0.2.0 - MIT license - https://github.com/Skateside/ariajs - 2018-11-11 */
+/*! ariajs - v0.2.0 - MIT license - https://github.com/Skateside/ariajs - 2018-11-12 */
 (function (globalVariable) {
     "use strict";
 
@@ -1939,13 +1939,15 @@ ARIA.addAlias("labelledby", "labeledby");
 
     "use strict";
 
+    var nodeProto = Node.prototype;
     var extendDOM = "";
 
     if (ARIA && typeof ARIA.extendDOM === "string") {
 
         extendDOM = ARIA.extendDOM.trim();
 
-        Object.defineProperty(Node.prototype, extendDOM, {
+        // https://github.com/LeaVerou/bliss/issues/49
+        Object.defineProperty(nodeProto, extendDOM, {
 
             configurable: true,
 
@@ -1953,7 +1955,7 @@ ARIA.addAlias("labelledby", "labeledby");
 
                 var object = this;
 
-                Object.defineProperty(Node.prototype, extendDOM, {
+                Object.defineProperty(nodeProto, extendDOM, {
                     get: undefined
                 });
 
@@ -1961,7 +1963,7 @@ ARIA.addAlias("labelledby", "labeledby");
                     value: new ARIA.Element(object)
                 });
 
-                Object.defineProperty(Node.prototype, extendDOM, {
+                Object.defineProperty(nodeProto, extendDOM, {
                     get: getter
                 });
 

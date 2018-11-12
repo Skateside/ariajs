@@ -8,13 +8,15 @@
 
     "use strict";
 
+    var nodeProto = Node.prototype;
     var extendDOM = "";
 
     if (ARIA && typeof ARIA.extendDOM === "string") {
 
         extendDOM = ARIA.extendDOM.trim();
 
-        Object.defineProperty(Node.prototype, extendDOM, {
+        // https://github.com/LeaVerou/bliss/issues/49
+        Object.defineProperty(nodeProto, extendDOM, {
 
             configurable: true,
 
@@ -22,7 +24,7 @@
 
                 var object = this;
 
-                Object.defineProperty(Node.prototype, extendDOM, {
+                Object.defineProperty(nodeProto, extendDOM, {
                     get: undefined
                 });
 
@@ -30,7 +32,7 @@
                     value: new ARIA.Element(object)
                 });
 
-                Object.defineProperty(Node.prototype, extendDOM, {
+                Object.defineProperty(nodeProto, extendDOM, {
                     get: getter
                 });
 
