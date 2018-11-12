@@ -77,7 +77,7 @@ describe("ARIA.Element", function () {
     // ... but for some reason, this fails every time and adding console.log()s
     // confirm it should fail.
     // I can't think of any reason why that would be the case.
-    it("should be update the attribute if the property is deleted", function (done) {
+    it("should be able to update the attribute if the property is deleted", function (done) {
 
         var label = makeUniqueId();
         var localDiv = document.createElement("div");
