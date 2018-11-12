@@ -70,30 +70,41 @@ describe("ARIA.Element", function () {
 
     });
 
+    // I don't get it.
+    // I can see this working when I try it in the browser (even IE11). Opening
+    // the console on this page and playing with document.body gives me the
+    // results I expect.
+    // ... but for some reason, this fails every time and adding console.log()s
+    // confirm it should fail.
+    // I can't think of any reason why that would be the case.
     it("should be update the attribute if the property is deleted", function (done) {
 
         var label = makeUniqueId();
-        var divCopy = div;
-        var elementCopy = element;
+        var localDiv = document.createElement("div");
+        localDiv.id = makeUniqueId();
+        var localElement = new ARIA.Element(localDiv);
 
-        elementCopy.label = label;
-        chai.assert.equal(elementCopy.label, label);
-        chai.assert.isTrue(divCopy.hasAttribute("aria-label"));
+        localElement.label = label;
+// console.log("After assign = " + stringifyElement(localDiv));
+        chai.assert.isTrue(localDiv.hasAttribute("aria-label"));
+        chai.assert.equal(localDiv.getAttribute("aria-label"), label);
 
-        delete elementCopy.label;
-
-        if (!divCopy.hasAttribute("aria-label")) {
-            done();
-        } else {
+        delete localElement.label;
+// console.log("After delete = " + stringifyElement(localDiv));
+        if (localDiv.hasAttribute("aria-label")) {
 
             window.setTimeout(function () {
-// console.log(elementCopy);
-// console.log(divCopy);
-                chai.assert.isFalse(divCopy.hasAttribute("aria-label"));
-                done();
+// console.log("After 100 ms = " + stringifyElement(localDiv));
+                if (localDiv.hasAttribute("aria-label")) {
+                    done(new chai.AssertionError("Expected attribute to be removed."));
+                } else {
+                    done();
+                }
 
-            }, 1000);
+            }, 100);
 
+        } else {
+            done();
         }
 
     });

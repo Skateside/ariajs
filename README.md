@@ -121,7 +121,7 @@ This library is currently in **alpha** as I'm still working out the finer detail
 
 - [x] Browser test (IE11+).
 - [x] Get the `aria` property working.
-- [ ] Finish writing unit tests (even for non-`Proxy` fall-back).
+- [x] Finish writing unit tests. (Except for the non-`Proxy` fall-back of `delete` which doesn't work and I don't know why.)
 - [ ] Write documentation in the WIKI.
 - [x] Write some plugins for proprietary attributes and extended roles.
 - [ ] Release for beta testing.
