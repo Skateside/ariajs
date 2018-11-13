@@ -9,38 +9,84 @@
     "use strict";
 
     var nodeProto = Node.prototype;
-    var extendDOM = "";
+    var ariaProp;
+    var roleProp;
 
-    if (ARIA && typeof ARIA.extendDOM === "string") {
+    function getString(source, property) {
 
-        extendDOM = ARIA.extendDOM.trim();
+        return (
+            typeof source[property] === "string"
+            ? source[property].trim()
+            : ""
+        );
 
-        // https://github.com/LeaVerou/bliss/issues/49
-        Object.defineProperty(nodeProto, extendDOM, {
+    }
 
-            configurable: true,
+    if (ARIA && ARIA.extendDOM) {
 
-            get: function getter() {
+        ariaProp = getString(ARIA.extendDOM, "aria");
+        roleProp = getString(ARIA.extendDOM, "role");
 
-                var object = this;
+        if (ariaProp && roleProp && ariaProp === roleProp) {
 
-                Object.defineProperty(nodeProto, extendDOM, {
-                    get: undefined
+            throw new Error(
+                "ARIA.extendDOM.aria and ARIA.extendDOM.role cannot be the same"
+            );
+
+        }
+
+        if (ariaProp) {
+
+            // https://github.com/LeaVerou/bliss/issues/49
+            Object.defineProperty(nodeProto, ariaProp, {
+
+                configurable: true,
+
+                get: function getter() {
+
+                    var object = this;
+
+                    Object.defineProperty(nodeProto, ariaProp, {
+                        get: undefined
+                    });
+
+                    Object.defineProperty(object, ariaProp, {
+                        value: new ARIA.Element(object)
+                    });
+
+                    Object.defineProperty(nodeProto, ariaProp, {
+                        get: getter
+                    });
+
+                    return object[ariaProp];
+
+                }
+
+            });
+
+            if (roleProp) {
+
+                Object.defineProperty(nodeProto, roleProp, {
+
+                    configurable: true,
+
+                    get: function () {
+                        return this[ariaProp].role;
+                    },
+
+                    set: function (value) {
+
+                        this[ariaProp].role = value;
+
+                        return true;
+
+                    }
+
                 });
-
-                Object.defineProperty(object, extendDOM, {
-                    value: new ARIA.Element(object)
-                });
-
-                Object.defineProperty(nodeProto, extendDOM, {
-                    get: getter
-                });
-
-                return object[extendDOM];
 
             }
 
-        });
+        }
 
     }
 

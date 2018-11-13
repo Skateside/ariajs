@@ -63,7 +63,7 @@ ARIA.runFactory = function (attribute, element) {
  * @return {Function}
  *         A factory function that takes the element and returns the instance.
  */
-ARIA.makeFactory = function (attribute, Constructor, modify) {
+ARIA.makeFactory = function (attribute, Constructor/*, modify*/) {
 
     return function (element) {
 
@@ -79,9 +79,9 @@ ARIA.makeFactory = function (attribute, Constructor, modify) {
 
         instance = new Constructor(element, attribute, tokens);
 
-        if (typeof modify === "function") {
-            modify(instance);
-        }
+        // if (typeof modify === "function") {
+        //     modify(instance);
+        // }
 
         return instance;
 
@@ -147,16 +147,6 @@ var factoryEntries = [
         "rowspan",
         "setsize"
     ]],
-    [ARIA.Integer, [
-        "tabindex"
-    ], function (instance) {
-
-        var uInt16 = Math.pow(2, 16);
-
-        instance.setMin(uInt16 / -2);
-        instance.setMax((uInt16 / 2) - 1);
-
-    }],
     [ARIA.Number, [
         "valuemax",
         "valuemin",
@@ -175,8 +165,7 @@ factoryEntries.forEach(function (entry) {
 
         ARIA.factories[attribute] = ARIA.makeFactory(
             ARIA.normalise(attribute),
-            entry[0],
-            entry[2]
+            entry[0]
         );
 
     });

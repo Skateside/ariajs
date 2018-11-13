@@ -33,4 +33,43 @@ describe("Element", function () {
 
     });
 
+    describe("#role", function () {
+
+        it("should be pre-loaded with existing values", function () {
+
+            var roles = ["button", "heading"];
+
+            div.setAttribute("role", roles.join(" "));
+            chai.assert.equal(div.role.length, roles.length);
+            chai.assert.deepEqual(div.role, roles);
+
+        });
+
+        it("should reject unrecognised roles", function () {
+
+            div.role = makeUniqueId();
+            chai.assert.equal(div.role.length, 0);
+
+        });
+
+        it("should allow the value to be set by passing a string", function () {
+
+            var roles = ["menuitem", "group"];
+            div.role = roles.join(" ");
+
+            chai.assert.deepEqual(div.role, roles);
+
+        });
+
+        it("should allow the attribute to be removed by setting an empty string", function () {
+
+            div.setAttribute("role", "heading");
+            chai.assert.equal(div.role.length, 1);
+            div.role = "";
+            chai.assert.isFalse(div.hasAttribute("role"));
+
+        });
+
+    });
+
 });

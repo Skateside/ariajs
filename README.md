@@ -69,20 +69,14 @@ The library optionally adds a new property to all elements: `aria`, containing p
 
   **aria.js** uses the ES6 [Proxy](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy) function to listen for the `delete` operator and adds a `setTimeout`-based fallback for browsers that don't understand `Proxy`. As a result, older browsers will asynchronously remove properties with the `delete` operator. In all browsers, setting the property to an empty string (`""`) will remove the attribute instantly.
 
-- Get and set roles and tab indices with ease, with validation included.
+- Get and set roles with ease, with validation included.
 
   ```js
   // <div id="role-1">
-  document.getElementById("role-1").aria.role = "button";
+  document.getElementById("role-1").role = "button";
   // <div id="role-1" role="button">
-  document.getElementById("role-1").aria.role;
+  document.getElementById("role-1").role;
   // -> ["button"]
-
-  // <div id="tabindex-1">
-  document.getElementById("tabindex-1").aria.tabindex = 123;
-  // <div id="tabindex-1" tabindex="123">
-  document.getElementById("tabindex-1").aria.tabindex;
-  // -> 123
   ```
 
 - Enjoy some utility functions added to a global `ARIA` variable.

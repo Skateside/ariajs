@@ -157,7 +157,8 @@ ARIA.Element = ARIA.createClass(/** @lends ARIA.ELement.prototype */{
                     target[name] = value;
                 }
 
-                return value;
+                // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy/handler/set#Return_value
+                return true;
 
             },
 

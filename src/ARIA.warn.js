@@ -5,18 +5,6 @@
 ARIA.WARNING_INVALID_TOKEN = "'{0}' is not a valid token for the '{1}' attribute";
 
 /**
- * A warning message for values that are too low.
- * @type {String}
- */
-ARIA.WARNING_VALUE_TOO_LOW = "The value for the '{1}' attribute should be at least {2}, {0} given";
-
-/**
-* A warning message for values that are too high.
- * @type {String}
- */
-ARIA.WARNING_VALUE_TOO_HIGH = "The value for the '{1}' attribute should be at most {2}, {0} given";
-
-/**
  * Replaces the placeholders in the string parameter with information from the
  * info parameter. Placeholders are wrapped in brackets e.g. "{0}".
  *

@@ -206,4 +206,10 @@ ARIA.restorePrevious = function () {
  * Name of the property for the {@link ARIA.Element} instance on DOM nodes.
  * @type {String}
  */
-ARIA.extendDOM = "aria";
+ARIA.extendDOM = {
+
+    aria: "aria",
+
+    role: "role"
+
+};

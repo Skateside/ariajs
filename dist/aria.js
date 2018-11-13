@@ -1,4 +1,4 @@
-/*! ariajs - v0.2.0 - MIT license - https://github.com/Skateside/ariajs - 2018-11-12 */
+/*! ariajs - v0.2.0 - MIT license - https://github.com/Skateside/ariajs - 2018-11-13 */
 (function (globalVariable) {
     "use strict";
 
@@ -340,7 +340,13 @@ ARIA.restorePrevious = function () {
  * Name of the property for the {@link ARIA.Element} instance on DOM nodes.
  * @type {String}
  */
-ARIA.extendDOM = "aria";
+ARIA.extendDOM = {
+
+    aria: "aria",
+
+    role: "role"
+
+};
 
 /**
  * Map of all mis-spellings and aliases. The attribute key should be the
@@ -685,18 +691,6 @@ ARIA.isNode = function (value) {
 ARIA.WARNING_INVALID_TOKEN = "'{0}' is not a valid token for the '{1}' attribute";
 
 /**
- * A warning message for values that are too low.
- * @type {String}
- */
-ARIA.WARNING_VALUE_TOO_LOW = "The value for the '{1}' attribute should be at least {2}, {0} given";
-
-/**
-* A warning message for values that are too high.
- * @type {String}
- */
-ARIA.WARNING_VALUE_TOO_HIGH = "The value for the '{1}' attribute should be at most {2}, {0} given";
-
-/**
  * Replaces the placeholders in the string parameter with information from the
  * info parameter. Placeholders are wrapped in brackets e.g. "{0}".
  *
@@ -943,51 +937,9 @@ ARIA.Number = ARIA.createClass(ARIA.Property, /** @lends ARIA.Number.prototype *
 
         if (!isValid) {
             ARIA.warn(ARIA.WARNING_INVALID_TOKEN, value, attribute);
-        } else if (!isNotANumber(min) && interpretted < min) {
-
-            ARIA.warn(ARIA.WARNING_VALUE_TOO_LOW, value, attribute, min);
-            isValid = false;
-
-        } else if (!isNotANumber(max) && interpretted > max) {
-
-            ARIA.warn(ARIA.WARNING_VALUE_TOO_HIGH, value, attribute, max);
-            isValid = false;
-
         }
 
         return isValid;
-
-    },
-
-    /**
-     * Sets the minimum value that is considered valid.
-     *
-     * @param {Number|String} min
-     *        Minimum value.
-     */
-    setMin: function (min) {
-
-        /**
-         * The minimum value that is considered valid.
-         * @type {Number}
-         */
-        this.min = this.interpret(min);
-
-    },
-
-    /**
-     * Sets the maximum value that is considered valid.
-     *
-     * @param {Number|String} max
-     *        Maximum value.
-     */
-    setMax: function (max) {
-
-        /**
-         * The maximum value that is considered valid.
-         * @type {Number}
-         */
-        this.max = this.interpret(max);
 
     }
 
@@ -1541,7 +1493,7 @@ ARIA.Element = ARIA.createClass(/** @lends ARIA.ELement.prototype */{
                     target[name] = value;
                 }
 
-                return value;
+                return true;
 
             },
 
@@ -1768,7 +1720,7 @@ ARIA.runFactory = function (attribute, element) {
  * @return {Function}
  *         A factory function that takes the element and returns the instance.
  */
-ARIA.makeFactory = function (attribute, Constructor, modify) {
+ARIA.makeFactory = function (attribute, Constructor/*, modify*/) {
 
     return function (element) {
 
@@ -1784,9 +1736,9 @@ ARIA.makeFactory = function (attribute, Constructor, modify) {
 
         instance = new Constructor(element, attribute, tokens);
 
-        if (typeof modify === "function") {
-            modify(instance);
-        }
+        // if (typeof modify === "function") {
+        //     modify(instance);
+        // }
 
         return instance;
 
@@ -1852,16 +1804,6 @@ var factoryEntries = [
         "rowspan",
         "setsize"
     ]],
-    [ARIA.Integer, [
-        "tabindex"
-    ], function (instance) {
-
-        var uInt16 = Math.pow(2, 16);
-
-        instance.setMin(uInt16 / -2);
-        instance.setMax((uInt16 / 2) - 1);
-
-    }],
     [ARIA.Number, [
         "valuemax",
         "valuemin",
@@ -1880,8 +1822,7 @@ factoryEntries.forEach(function (entry) {
 
         ARIA.factories[attribute] = ARIA.makeFactory(
             ARIA.normalise(attribute),
-            entry[0],
-            entry[2]
+            entry[0]
         );
 
     });
@@ -1940,38 +1881,80 @@ ARIA.addAlias("labelledby", "labeledby");
     "use strict";
 
     var nodeProto = Node.prototype;
-    var extendDOM = "";
+    var ariaProp;
+    var roleProp;
 
-    if (ARIA && typeof ARIA.extendDOM === "string") {
+    function getString(source, property) {
 
-        extendDOM = ARIA.extendDOM.trim();
+        return (
+            typeof source[property] === "string"
+            ? source[property].trim()
+            : ""
+        );
 
-        // https://github.com/LeaVerou/bliss/issues/49
-        Object.defineProperty(nodeProto, extendDOM, {
+    }
 
-            configurable: true,
+    if (ARIA && ARIA.extendDOM) {
 
-            get: function getter() {
+        ariaProp = getString(ARIA.extendDOM, "aria");
+        roleProp = getString(ARIA.extendDOM, "role");
 
-                var object = this;
+        if (ariaProp && roleProp && ariaProp === roleProp) {
 
-                Object.defineProperty(nodeProto, extendDOM, {
-                    get: undefined
+            throw new Error(
+                "ARIA.extendDOM.aria and ARIA.extendDOM.role cannot be the same"
+            );
+
+        }
+
+        if (ariaProp) {
+
+            // https://github.com/LeaVerou/bliss/issues/49
+            Object.defineProperty(nodeProto, ariaProp, {
+
+                configurable: true,
+
+                get: function getter() {
+
+                    var object = this;
+
+                    Object.defineProperty(nodeProto, ariaProp, {
+                        get: undefined
+                    });
+
+                    Object.defineProperty(object, ariaProp, {
+                        value: new ARIA.Element(object)
+                    });
+
+                    Object.defineProperty(nodeProto, ariaProp, {
+                        get: getter
+                    });
+
+                    return object[ariaProp];
+
+                }
+
+            });
+
+            if (roleProp) {
+
+                Object.defineProperty(nodeProto, roleProp, {
+
+                    configurable: true,
+
+                    get: function () {
+                        return this[ariaProp].role;
+                    },
+
+                    set: function (value) {
+                        this[ariaProp].role = value;
+                    }
+
                 });
-
-                Object.defineProperty(object, extendDOM, {
-                    value: new ARIA.Element(object)
-                });
-
-                Object.defineProperty(nodeProto, extendDOM, {
-                    get: getter
-                });
-
-                return object[extendDOM];
 
             }
 
-        });
+        }
 
     }
 
