@@ -57,13 +57,10 @@ ARIA.runFactory = function (attribute, element) {
  * @param  {Function} Constructor
  *         Constructor for {@link ARIA.Property} (or sub-class) that will create
  *         the property.
- * @param  {Function} [modify]
- *         Optional function for modifying the {@link ARIA.Property} instance
- *         before it's returned.
  * @return {Function}
  *         A factory function that takes the element and returns the instance.
  */
-ARIA.makeFactory = function (attribute, Constructor/*, modify*/) {
+ARIA.makeFactory = function (attribute, Constructor) {
 
     return function (element) {
 
@@ -77,13 +74,7 @@ ARIA.makeFactory = function (attribute, Constructor/*, modify*/) {
 
         }
 
-        instance = new Constructor(element, attribute, tokens);
-
-        // if (typeof modify === "function") {
-        //     modify(instance);
-        // }
-
-        return instance;
+        return new Constructor(element, attribute, tokens);
 
     };
 

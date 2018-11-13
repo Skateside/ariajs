@@ -337,13 +337,24 @@ ARIA.restorePrevious = function () {
 };
 
 /**
- * Name of the property for the {@link ARIA.Element} instance on DOM nodes.
- * @type {String}
+ * Properties for the DOM extension. If these properties are not a string then
+ * the DOM extension will no occur.
+ *
+ * @type {Object}
  */
 ARIA.extendDOM = {
 
+    /**
+    * Name of the property for the {@link ARIA.Element} instance on DOM nodes.
+    * @type {String}
+    */
     aria: "aria",
 
+    /**
+    * Name of the short-cut for the {@link ARIA.List} instance on DOM nodes that
+    * handles the role attribute.
+    * @type {String}
+    */
     role: "role"
 
 };
@@ -1493,6 +1504,7 @@ ARIA.Element = ARIA.createClass(/** @lends ARIA.ELement.prototype */{
                     target[name] = value;
                 }
 
+                // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy/handler/set#Return_value
                 return true;
 
             },
