@@ -75,11 +75,7 @@
                     },
 
                     set: function (value) {
-
                         this[ariaProp].role = value;
-
-                        return true;
-
                     }
 
                 });
