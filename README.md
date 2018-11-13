@@ -18,6 +18,6 @@ This library is currently in **alpha** as I'm still working out the finer detail
 - [x] Get the `aria` property working.
 - [x] Finish writing unit tests. (Except for the non-`Proxy` fall-back of `delete` which doesn't work and I don't know why.)
 - [x] Write some plugins for proprietary attributes and extended roles.
-- [ ] Write documentation in the WIKI.
+- [x] Write documentation in the WIKI.
 - [ ] Release for beta testing.
 - [ ] Write some widgets using this library to test feasibility?

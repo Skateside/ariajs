@@ -365,8 +365,7 @@ ARIA.extendDOM = {
  * @type {Object}
  */
 ARIA.translate = objectAssign(Object.create(null), {
-    "aria-role": "role",
-    "aria-tabindex": "tabindex"
+    "aria-role": "role"
 });
 
 /**
@@ -436,13 +435,13 @@ Object.defineProperties(ARIA, {
 ARIA.suffixMap = Object.create(null);
 
 /**
- * Converts the attribute into the WAI-ARIA suffic (e.g. "aria-label" becomes
+ * Converts the attribute into the WAI-ARIA suffix (e.g. "aria-label" becomes
  * "label" etc.).
  *
  * @param  {String} attribute
- *         Attribute whose stemp should be returned.
+ *         Attribute whose suffix should be returned.
  * @return {String}
- *         Stem of the attribute.
+ *         Suffix of the attribute.
  */
 ARIA.getSuffix = function (attribute) {
 
@@ -745,7 +744,12 @@ ARIA.enableWarnings = true;
 ARIA.warn = function (message) {
 
     if (ARIA.enableWarnings) {
-        console.warn("aria.js: " + ARIA.supplant(message, slice(arguments, 1)));
+
+        console.warn(
+            "aria.js: " +
+            ARIA.supplant.apply(undefined, [message].concat(slice(arguments, 1)))
+        );
+
     }
 
 };

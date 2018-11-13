@@ -48,7 +48,12 @@ ARIA.enableWarnings = true;
 ARIA.warn = function (message) {
 
     if (ARIA.enableWarnings) {
-        console.warn("aria.js: " + ARIA.supplant(message, slice(arguments, 1)));
+
+        console.warn(
+            "aria.js: " +
+            ARIA.supplant.apply(undefined, [message].concat(slice(arguments, 1)))
+        );
+
     }
 
 };
