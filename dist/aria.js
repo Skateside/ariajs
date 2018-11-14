@@ -683,7 +683,7 @@ ARIA.State = ARIA.createClass(ARIA.Property, /** @lends ARIA.State.prototype */{
 
         var interpretted = this.$super(value);
         var isTrue = interpretted === "true";
-console.log("ARIA.State#interpret(%o), interpretted = %o, returning %o", value, interpretted, (isTrue || interpretted === "false") ? isTrue : interpretted);
+
         return (
             (isTrue || interpretted === "false")
             ? isTrue
