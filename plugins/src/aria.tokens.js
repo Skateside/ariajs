@@ -283,7 +283,7 @@
                     "aria.js: " +
                     ARIA.supplant.apply(
                         undefined,
-                        [message].concat(slice(arguments, 1))
+                        [message].concat([slice(arguments, 1)])
                     )
                 );
 
@@ -432,6 +432,21 @@
         ARIA.List.addMethods(/** @lends ARIA.List.prototype */{
 
             /**
+             * @inheritDoc
+             */
+            init: function (element, attribute, tokens) {
+
+                /**
+                 * The list of values.
+                 * @type {Array.<String>}
+                 */
+                this.list = [];
+
+                this.$super(element, attribute, tokens);
+
+            },
+
+            /**
              * Sets the value of the list to be the given value. The values are
              * interpretted as an array (see {@link ARIA.List#interpret} and
              * validated (see {@link ARIA.List#isValidToken}); only unique
@@ -550,6 +565,9 @@
             }
 
         });
+
+        // Re-make the factories.
+        ARIA.createFactories();
 
     }
 

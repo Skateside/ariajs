@@ -133,4 +133,39 @@ describe("aria.tokens", function () {
 
     });
 
+    describe("ARIA.Element#role", function () {
+
+        it("should allow valid roles", function () {
+
+            var div = document.createElement("div");
+            var element = new ARIA.Element(div);
+            var value = "button";
+
+            element.role = value;
+            chai.assert.isTrue(div.hasAttribute("role"));
+            chai.assert.deepEqual(element.role, [value]);
+
+        });
+
+        it("should warn on invalid roles", function () {
+
+            var div = document.createElement("div");
+            var element = new ARIA.Element(div);
+            var isWarned = false;
+            var warn = console.warn;
+
+            console.warn = function () {
+                isWarned = true;
+            };
+
+            element.role = makeUniqueId();
+            chai.assert.isFalse(div.hasAttribute("role"));
+            chai.assert.isTrue(isWarned);
+
+            console.warn = warn;
+
+        });
+
+    });
+
 });

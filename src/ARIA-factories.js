@@ -68,7 +68,13 @@ ARIA.makeFactory = function (attribute, Constructor) {
 
 };
 
-var factoryEntries = [
+/**
+ * All the factory entries that create the {@link ARIA.factories}. Each entry is
+ * an array of two values: the {@link ARIA.Property} (or sub-class) constructor
+ * and an array of the WAI-ARIA attribute suffixes (see {@link ARIA.getSuffix}).
+ * @type {Array.<Array>}
+ */
+ARIA.factoryEntries = [
     [ARIA.Property, [
         "autocomplete",
         "current",
@@ -138,18 +144,30 @@ var factoryEntries = [
     ]]
 ];
 
-factoryEntries.forEach(function (entry) {
+/**
+ * Creates the {@link ARIA.factories} based on {@link ARIA.factoryEntries}. As a
+ * public function, this can be re-called if a plugin modifies
+ * {@link ARIA.makeFactory}.
+ */
+ARIA.createFactories = function () {
 
-    entry[1].forEach(function (attribute) {
+    ARIA.factoryEntries.forEach(function (entry) {
 
-        ARIA.factories[attribute] = ARIA.makeFactory(
-            ARIA.normalise(attribute),
-            entry[0]
-        );
+        entry[1].forEach(function (attribute) {
+
+            ARIA.factories[attribute] = ARIA.makeFactory(
+                ARIA.normalise(attribute),
+                entry[0]
+            );
+
+        });
 
     });
 
-});
+};
+
+// Make initial factories.
+ARIA.createFactories();
 
 /**
  * Creates an alias of WAI-ARIA attributes.

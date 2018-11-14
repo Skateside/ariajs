@@ -45,13 +45,6 @@ describe("aria.extendNode", function () {
 
         });
 
-        // it("should reject unrecognised roles", function () {
-        //
-        //     div.role = makeUniqueId();
-        //     chai.assert.equal(div.role.length, 0);
-        //
-        // });
-
         it("should allow the value to be set by passing a string", function () {
 
             var roles = ["menuitem", "group"];
