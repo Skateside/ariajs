@@ -1,4 +1,4 @@
-describe("Element", function () {
+describe("aria.extendNode", function () {
 
     var div;
 
@@ -6,7 +6,7 @@ describe("Element", function () {
         div = document.createElement("div");
     });
 
-    describe("#aria", function () {
+    describe("Element#aria", function () {
 
         it("should be an instance of ARIA.Element", function () {
             chai.assert.isTrue(div.aria instanceof ARIA.Element);
@@ -33,7 +33,7 @@ describe("Element", function () {
 
     });
 
-    describe("#role", function () {
+    describe("Element#role", function () {
 
         it("should be pre-loaded with existing values", function () {
 
@@ -45,12 +45,12 @@ describe("Element", function () {
 
         });
 
-        it("should reject unrecognised roles", function () {
-
-            div.role = makeUniqueId();
-            chai.assert.equal(div.role.length, 0);
-
-        });
+        // it("should reject unrecognised roles", function () {
+        //
+        //     div.role = makeUniqueId();
+        //     chai.assert.equal(div.role.length, 0);
+        //
+        // });
 
         it("should allow the value to be set by passing a string", function () {
 

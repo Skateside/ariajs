@@ -7,23 +7,6 @@
 ARIA.UndefinedState = ARIA.createClass(ARIA.State, /** @lends ARIA.UndefinedState.prototype */{
 
     /**
-     * @inheritDoc
-     */
-    init: function (element, attribute) {
-
-        this.$super(element, attribute);
-        this.tokens.push("undefined");
-
-    },
-
-    /**
-     * @inheritDoc
-     */
-    isValidToken: function (token) {
-        return token === undefined || this.$super(token);
-    },
-
-    /**
      * Interprets undefined as "undefined.
      *
      * @param  {?} value

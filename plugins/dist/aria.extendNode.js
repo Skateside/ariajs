@@ -1,6 +1,5 @@
 /**
- * @file    Adds the "aria" and "role" properties to Node.prototype if ARIA is
- *          set up to allow it.
+ * @file    Adds the "aria" and "role" properties to Node.prototype.
  * @author  James "Skateside" Long
  * @license MIT
  */
@@ -9,80 +8,70 @@
     "use strict";
 
     var nodeProto = Node.prototype;
-    var ariaProp;
-    var roleProp;
+    var ariaProp = "aria";
+    var roleProp = "role";
 
-    function getString(source, property) {
+    if (ARIA && ARIA.VERSION) {
 
-        return (
-            typeof source[property] === "string"
-            ? source[property].trim()
-            : ""
-        );
+        // https://github.com/LeaVerou/bliss/issues/49
 
-    }
+        /**
+         * An instance of {@link ARIA.Element} for the node to handle all
+         * WAI-ARIA attributes. Lazy-loaded to save on processing power.
+         *
+         * @memberof Node
+         * @instance
+         * @name     aria
+         * @type     {ARIA.Element}
+         */
+        Object.defineProperty(nodeProto, ariaProp, {
 
-    if (ARIA && ARIA.extendDOM) {
+            configurable: true,
 
-        ariaProp = getString(ARIA.extendDOM, "aria");
-        roleProp = getString(ARIA.extendDOM, "role");
+            get: function getter() {
 
-        if (ariaProp && roleProp && ariaProp === roleProp) {
+                var object = this;
 
-            throw new Error(
-                "ARIA.extendDOM.aria and ARIA.extendDOM.role cannot be the same"
-            );
-
-        }
-
-        if (ariaProp) {
-
-            // https://github.com/LeaVerou/bliss/issues/49
-            Object.defineProperty(nodeProto, ariaProp, {
-
-                configurable: true,
-
-                get: function getter() {
-
-                    var object = this;
-
-                    Object.defineProperty(nodeProto, ariaProp, {
-                        get: undefined
-                    });
-
-                    Object.defineProperty(object, ariaProp, {
-                        value: new ARIA.Element(object)
-                    });
-
-                    Object.defineProperty(nodeProto, ariaProp, {
-                        get: getter
-                    });
-
-                    return object[ariaProp];
-
-                }
-
-            });
-
-            if (roleProp) {
-
-                Object.defineProperty(nodeProto, roleProp, {
-
-                    configurable: true,
-
-                    get: function () {
-                        return this[ariaProp].role;
-                    },
-
-                    set: function (value) {
-                        this[ariaProp].role = value;
-                    }
-
+                Object.defineProperty(nodeProto, ariaProp, {
+                    get: undefined
                 });
+
+                Object.defineProperty(object, ariaProp, {
+                    value: new ARIA.Element(object)
+                });
+
+                Object.defineProperty(nodeProto, ariaProp, {
+                    get: getter
+                });
+
+                return object[ariaProp];
 
             }
 
-        }
+        });
+
+        /**
+         * An instance of {@link ARIA.List} for the node to handle the role
+         * attribute.
+         *
+         * @memberof Node
+         * @instance
+         * @name     aria
+         * @type     {ARIA.List}
+         */
+        Object.defineProperty(nodeProto, roleProp, {
+
+            configurable: true,
+
+            get: function () {
+                return this[ariaProp].role;
+            },
+
+            set: function (value) {
+                this[ariaProp].role = value;
+            }
+
+        });
 
     }
 

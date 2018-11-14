@@ -1,4 +1,4 @@
-/*! ariajs - v0.2.0 - MIT license - https://github.com/Skateside/ariajs - 2018-11-13 */
+/*! ariajs - v0.2.0 - MIT license - https://github.com/Skateside/ariajs - 2018-11-14 */
 (function (globalVariable) {
     "use strict";
 
@@ -13,21 +13,6 @@
  */
 var identity = function (x) {
     return x;
-};
-
-/**
- * A simple wrapper for Array#slice.
- *
- * @private
- * @param   {Array|Object} arrayLike
- *          Array or array-like structure to slice.
- * @param   {Number} [offset]
- *          Optional offset for the slice.
- * @return  {Array}
- *          Sliced array.
- */
-var slice = function (arrayLike, offset) {
-    return Array.prototype.slice.call(arrayLike, offset);
 };
 
 /**
@@ -66,9 +51,10 @@ var arrayFrom = Array.from || function (arrayLike, map, context) {
  */
 var objectAssign = Object.assign || function (source) {
 
-    slice(arguments, 1).forEach(function (object) {
+    Array.prototype.forEach.call(arguments, function (object, i) {
 
-        if (object) {
+        // Skip null objects and the first one (source parameter).
+        if (object && i > 0) {
 
             Object.keys(object).forEach(function (key) {
                 source[key] = object[key];
@@ -104,18 +90,6 @@ var fnTest = (
 );
 
 /**
- * A basic fallback for the isNaN function.
- *
- * @private
- * @function
- * @param    {?} value
- *           Value to test.
- * @return   {Boolean}
- *           true if the value is NaN, false otherwise.
- */
-var isNotANumber = Number.isNaN || globalVariable.isNaN;
-
-/**
  * A reference (and possible fallback) for requestAnimationFrame.
  *
  * @private
@@ -135,163 +109,7 @@ var requestAnimationFrame = (
 /**
  * @namespace
  */
-var ARIA = {
-
-    /**
-     * Collection of all valid tokens for any given attribute. The attribute
-     * key should be the normalised value - see {@link ARIA.normalise}.
-     * @type {[type]}
-     */
-    tokens: objectAssign(Object.create(null), {
-        "aria-autocomplete": [
-            "none",
-            "inline",
-            "list",
-            "both"
-        ],
-        "aria-current": [
-            "false",
-            "true",
-            "page",
-            "step",
-            "location",
-            "date",
-            "time"
-        ],
-        "aria-dropeffect": [
-            "none",
-            "copy",
-            "execute",
-            "link",
-            "move",
-            "popup"
-        ],
-        "aria-haspopup": [
-            "false",
-            "true",
-            "menu",
-            "listbox",
-            "tree",
-            "grid",
-            "dialog"
-        ],
-        "aria-invalid": [
-            "false",
-            "true",
-            "grammar",
-            "spelling"
-        ],
-        "aria-live": [
-            "off",
-            "assertive",
-            "polite"
-        ],
-        "aria-orientation": [
-            undefined,
-            "undefined",
-            "horizontal",
-            "vertical"
-        ],
-        "aria-relevant": [
-            "additions",
-            "all",
-            "removals",
-            "text"
-        ],
-        "aria-sort": [
-            "none",
-            "ascending",
-            "descending",
-            "other"
-        ],
-        // "Authors MUST NOT use abstract roles in content."
-        // https://www.w3.org/TR/wai-aria-1.1/#abstract_roles
-        "role": [
-            "alert",
-            "alertdialog",
-            "application",
-            "article",
-            "banner",
-            "button",
-            "cell",
-            "checkbox",
-            "columnheader",
-            "complementary",
-            "combobox",
-            // "command", // (abstract)
-            // "composite", // (abstract)
-            "contentinfo",
-            "definition",
-            "dialog",
-            "directory",
-            "document",
-            "feed",
-            "figure",
-            "form",
-            "grid",
-            "gridcell",
-            "group",
-            "heading",
-            "img",
-            // "input", // (abstract)
-            // "landmark", // (abstract)
-            "link",
-            "list",
-            "listbox",
-            "listitem",
-            "log",
-            "main",
-            "marquee",
-            "math",
-            "menu",
-            "menubar",
-            "menuitem",
-            "menuitemcheckbox",
-            "menuitemradio",
-            "navigation",
-            "none",
-            "note",
-            "option",
-            "presentation",
-            "progressbar",
-            "radio",
-            "radiogroup",
-            // "range", // (abstract)
-            "region",
-            // "roletype", // (abstract)
-            "row",
-            "rowgroup",
-            "rowheader",
-            "scrollbar",
-            "search",
-            "searchbox",
-            // "section", // (abstract)
-            // "sectionhead", // (abstract)
-            // "select", // (abstract)
-            "separator",
-            "slider",
-            "spinbutton",
-            "status",
-            // "structure", // (abstract)
-            "switch",
-            "tab",
-            "table",
-            "tablist",
-            "tabpanel",
-            "term",
-            "textbox",
-            "timer",
-            "toolbar",
-            "tooltip",
-            "tree",
-            "treegrid",
-            "treeitem"
-            // "widget", // (abstract)
-            // "window", // (abstract)
-        ]
-    })
-
-};
+var ARIA = {};
 
 /**
  * The version of the library.
@@ -333,29 +151,6 @@ ARIA.restorePrevious = function () {
     globalVariable.ARIA = previousAria;
 
     return ARIA;
-
-};
-
-/**
- * Properties for the DOM extension. If these properties are not a string then
- * the DOM extension will no occur.
- *
- * @type {Object}
- */
-ARIA.extendDOM = {
-
-    /**
-    * Name of the property for the {@link ARIA.Element} instance on DOM nodes.
-    * @type {String}
-    */
-    aria: "aria",
-
-    /**
-    * Name of the short-cut for the {@link ARIA.List} instance on DOM nodes that
-    * handles the role attribute.
-    * @type {String}
-    */
-    role: "role"
 
 };
 
@@ -695,66 +490,6 @@ ARIA.isNode = function (value) {
 };
 
 /**
- * A warning message for invalid tokens.
- * @type {String}
- */
-ARIA.WARNING_INVALID_TOKEN = "'{0}' is not a valid token for the '{1}' attribute";
-
-/**
- * Replaces the placeholders in the string parameter with information from the
- * info parameter. Placeholders are wrapped in brackets e.g. "{0}".
- *
- * @param  {String} string
- *         String containing placeholders.
- * @param  {Array|Object} info
- *         Info to fill the string placeholders.
- * @return {String}
- *         Populated string.
- */
-ARIA.supplant = function (string, info) {
-
-    return string.replace(/\{(\d+)\}/g, function (whole, index) {
-
-        var arg = info[index];
-
-        return (
-            (typeof arg === "string" || typeof arg === "number")
-            ? arg
-            : whole
-        );
-
-    });
-
-};
-
-/**
- * A flag to enable warnings.
- * @type {Boolean}
- */
-ARIA.enableWarnings = true;
-
-/**
- * Sends a warning.
- *
- * @param {String} message
- *        Message (and placeholders).
- * @param {Number|String} ...arguments
- *        Information to populate the message.
- */
-ARIA.warn = function (message) {
-
-    if (ARIA.enableWarnings) {
-
-        console.warn(
-            "aria.js: " +
-            ARIA.supplant.apply(undefined, [message].concat(slice(arguments, 1)))
-        );
-
-    }
-
-};
-
-/**
  * Handles basic WAI-ARIA properties.
  *
  * @class ARIA.Property
@@ -767,10 +502,8 @@ ARIA.Property = ARIA.createClass(/** @lends ARIA.Property.prototype */{
      *             Element whose attribute should be handled.
      * @param      {String} attribute
      *             Name of the attribute to handle.
-     * @param      {Array.<String>} [tokens]
-     *             Optional white-list of valid tokens for this property.
      */
-    init: function (element, attribute, tokens) {
+    init: function (element, attribute) {
 
         /**
          * Element whose attribute is being handled.
@@ -783,18 +516,6 @@ ARIA.Property = ARIA.createClass(/** @lends ARIA.Property.prototype */{
          * @type {String}
          */
         this.attribute = attribute;
-
-        /**
-         * White-list of valid tokens. This is a reference to a property of
-         * {@link ARIA.tokens} so updating that property will update all these
-         * instances.
-         * @type {Array.<String>}
-         */
-        this.tokens = (
-            (tokens && Array.isArray(tokens))
-            ? tokens
-            : []
-        );
 
         // Things like ARIA.List work with interpretted values rather than just
         // the attribute value. If the attribute already exists, pass the value
@@ -816,28 +537,6 @@ ARIA.Property = ARIA.createClass(/** @lends ARIA.Property.prototype */{
      */
     interpret: function (value) {
         return ARIA.Property.interpret(value);
-    },
-
-    /**
-     * Checks to see if the given token is valid for this current property. This
-     * function checks against {@link ARIA.Property#tokens}. If the token is not
-     * valid, a warning it sent. See {@link ARIA.warn}.
-     *
-     * @param  {String} token
-     *         Token to check.
-     * @return {Boolean}
-     *         true if the token is valid, false otherwise.
-     */
-    isValidToken: function (token) {
-
-        var isValid = (!this.tokens.length || this.tokens.indexOf(token) > -1);
-
-        if (!isValid) {
-            ARIA.warn(ARIA.WARNING_INVALID_TOKEN, token, this.attribute);
-        }
-
-        return isValid;
-
     },
 
     /**
@@ -877,10 +576,10 @@ ARIA.Property = ARIA.createClass(/** @lends ARIA.Property.prototype */{
         var attribute = this.attribute;
         var interpretted = this.interpret(value);
 
-        if (interpretted !== "" && this.isValidToken(interpretted)) {
-            ARIA.setAttribute(element, attribute, interpretted);
-        } else if (interpretted === "") {
+        if (interpretted === "") {
             ARIA.removeAttribute(element, attribute);
+        } else {
+            ARIA.setAttribute(element, attribute, interpretted);
         }
 
     },
@@ -937,25 +636,6 @@ ARIA.Number = ARIA.createClass(ARIA.Property, /** @lends ARIA.Number.prototype *
      */
     interpret: function (value) {
         return parseFloat(this.$super(value));
-    },
-
-    /**
-     * @inheritDoc
-     */
-    isValidToken: function (value) {
-
-        var interpretted = this.interpret(value);
-        var isValid = !isNotANumber(interpretted);
-        var attribute = this.attribute;
-        var min = this.min;
-        var max = this.max;
-
-        if (!isValid) {
-            ARIA.warn(ARIA.WARNING_INVALID_TOKEN, value, attribute);
-        }
-
-        return isValid;
-
     }
 
 });
@@ -992,32 +672,6 @@ ARIA.Integer = ARIA.createClass(ARIA.Number, /** @lends ARIA.Integer.prototype *
 ARIA.State = ARIA.createClass(ARIA.Property, /** @lends ARIA.State.prototype */{
 
     /**
-     * Unlike the parent {@link ARIA.Property}, an instance of ARIA.State cannot
-     * have tokens set.
-     *
-     * @constructs ARIA.State
-     * @param      {Element} element
-     *             Element whose attribute should be handled.
-     * @param      {String} attribute
-     *             Name of the attribute to handle.
-     */
-    init: function (element, attribute) {
-
-        this.$super(element, attribute, [
-            "true",
-            "false"
-        ]);
-
-    },
-
-    /**
-     * @inheritDoc
-     */
-    isValidToken: function (token) {
-        return typeof token === "boolean" || this.$super(token);
-    },
-
-    /**
      * Coerces the given value into a boolean.
      *
      * @param  {?} value
@@ -1029,7 +683,7 @@ ARIA.State = ARIA.createClass(ARIA.Property, /** @lends ARIA.State.prototype */{
 
         var interpretted = this.$super(value);
         var isTrue = interpretted === "true";
-
+console.log("ARIA.State#interpret(%o), interpretted = %o, returning %o", value, interpretted, (isTrue || interpretted === "false") ? isTrue : interpretted);
         return (
             (isTrue || interpretted === "false")
             ? isTrue
@@ -1047,23 +701,6 @@ ARIA.State = ARIA.createClass(ARIA.Property, /** @lends ARIA.State.prototype */{
  * @extends ARIA.State
  */
 ARIA.UndefinedState = ARIA.createClass(ARIA.State, /** @lends ARIA.UndefinedState.prototype */{
-
-    /**
-     * @inheritDoc
-     */
-    init: function (element, attribute) {
-
-        this.$super(element, attribute);
-        this.tokens.push("undefined");
-
-    },
-
-    /**
-     * @inheritDoc
-     */
-    isValidToken: function (token) {
-        return token === undefined || this.$super(token);
-    },
 
     /**
      * Interprets undefined as "undefined.
@@ -1114,16 +751,6 @@ ARIA.UndefinedState = ARIA.createClass(ARIA.State, /** @lends ARIA.UndefinedStat
 ARIA.Tristate = ARIA.createClass(ARIA.State, /** @lends ARIA.Tristate.prototype */{
 
     /**
-     * @inheritDoc
-     */
-    init: function (element, attribute) {
-
-        this.$super(element, attribute);
-        this.tokens.push("mixed");
-
-    },
-
-    /**
      * Allows the token "mixed".
      *
      * @param  {?} value
@@ -1155,7 +782,7 @@ ARIA.List = ARIA.createClass(ARIA.Property, /** ARIA.List.prototype */{
     /**
      * @inheritDoc
      */
-    init: function (element, attribute, tokens) {
+    init: function (element, attribute) {
 
         /**
          * The list of values.
@@ -1163,7 +790,7 @@ ARIA.List = ARIA.createClass(ARIA.Property, /** ARIA.List.prototype */{
          */
         this.list = [];
 
-        this.$super(element, attribute, tokens);
+        this.$super(element, attribute);
 
     },
 
@@ -1206,11 +833,7 @@ ARIA.List = ARIA.createClass(ARIA.Property, /** ARIA.List.prototype */{
         var that = this;
         var values = that.interpret(value).reduce(function (unique, token) {
 
-            if (
-                token
-                && that.isValidToken(token)
-                && unique.indexOf(token) < 0
-            ) {
+            if (token && unique.indexOf(token) < 0) {
                 unique.push(token);
             }
 
@@ -1728,19 +1351,7 @@ ARIA.runFactory = function (attribute, element) {
 ARIA.makeFactory = function (attribute, Constructor) {
 
     return function (element) {
-
-        var instance;
-        var tokens = ARIA.tokens[attribute];
-
-        if (!tokens) {
-
-            tokens = [];
-            ARIA.tokens[attribute] = tokens;
-
-        }
-
-        return new Constructor(element, attribute, tokens);
-
+        return new Constructor(element, attribute);
     };
 
 };
@@ -1840,17 +1451,17 @@ factoryEntries.forEach(function (entry) {
  */
 ARIA.addAlias = function (source, aliases) {
 
-    var normalSource = ARIA.normalise(source).slice(5);
+    var suffix = ARIA.getSuffix(ARIA.normalise(source));
 
     if (!Array.isArray(aliases)) {
         aliases = [aliases];
     }
 
-    if (!ARIA.getFactory(normalSource)) {
+    if (!ARIA.getFactory(suffix)) {
 
         throw new ReferenceError(
             "ARIA.factories."
-            + normalSource
+            + suffix
             + " does not exist"
         );
 
@@ -1858,105 +1469,15 @@ ARIA.addAlias = function (source, aliases) {
 
     aliases.forEach(function (alias) {
 
-        var normalAlias = ARIA.normalise(alias).slice(5);
+        var normalAlias = ARIA.getSuffix(ARIA.normalise(alias));
 
-        ARIA.translate[normalAlias] = normalSource;
-        ARIA.factories[normalAlias] = ARIA.factories[normalSource];
+        ARIA.translate[normalAlias] = suffix;
+        ARIA.factories[normalAlias] = ARIA.factories[suffix];
 
     });
 
 };
 
 ARIA.addAlias("labelledby", "labeledby");
-
-/**
- * @file    Adds the "aria" and "role" properties to Node.prototype if ARIA is
- *          set up to allow it.
- * @author  James "Skateside" Long
- * @license MIT
- */
-(function (ARIA) {
-
-    "use strict";
-
-    var nodeProto = Node.prototype;
-    var ariaProp;
-    var roleProp;
-
-    function getString(source, property) {
-
-        return (
-            typeof source[property] === "string"
-            ? source[property].trim()
-            : ""
-        );
-
-    }
-
-    if (ARIA && ARIA.extendDOM) {
-
-        ariaProp = getString(ARIA.extendDOM, "aria");
-        roleProp = getString(ARIA.extendDOM, "role");
-
-        if (ariaProp && roleProp && ariaProp === roleProp) {
-
-            throw new Error(
-                "ARIA.extendDOM.aria and ARIA.extendDOM.role cannot be the same"
-            );
-
-        }
-
-        if (ariaProp) {
-
-            // https://github.com/LeaVerou/bliss/issues/49
-            Object.defineProperty(nodeProto, ariaProp, {
-
-                configurable: true,
-
-                get: function getter() {
-
-                    var object = this;
-
-                    Object.defineProperty(nodeProto, ariaProp, {
-                        get: undefined
-                    });
-
-                    Object.defineProperty(object, ariaProp, {
-                        value: new ARIA.Element(object)
-                    });
-
-                    Object.defineProperty(nodeProto, ariaProp, {
-                        get: getter
-                    });
-
-                    return object[ariaProp];
-
-                }
-
-            });
-
-            if (roleProp) {
-
-                Object.defineProperty(nodeProto, roleProp, {
-
-                    configurable: true,
-
-                    get: function () {
-                        return this[ariaProp].role;
-                    },
-
-                    set: function (value) {
-                        this[ariaProp].role = value;
-                    }
-
-                });
-
-            }
-
-        }
-
-    }
-
-}(window.ARIA));
 }(window));
 //# sourceMappingURL=aria.js.map

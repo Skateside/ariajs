@@ -17,25 +17,6 @@ ARIA.Number = ARIA.createClass(ARIA.Property, /** @lends ARIA.Number.prototype *
      */
     interpret: function (value) {
         return parseFloat(this.$super(value));
-    },
-
-    /**
-     * @inheritDoc
-     */
-    isValidToken: function (value) {
-
-        var interpretted = this.interpret(value);
-        var isValid = !isNotANumber(interpretted);
-        var attribute = this.attribute;
-        var min = this.min;
-        var max = this.max;
-
-        if (!isValid) {
-            ARIA.warn(ARIA.WARNING_INVALID_TOKEN, value, attribute);
-        }
-
-        return isValid;
-
     }
 
 });

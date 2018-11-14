@@ -63,19 +63,7 @@ ARIA.runFactory = function (attribute, element) {
 ARIA.makeFactory = function (attribute, Constructor) {
 
     return function (element) {
-
-        var instance;
-        var tokens = ARIA.tokens[attribute];
-
-        if (!tokens) {
-
-            tokens = [];
-            ARIA.tokens[attribute] = tokens;
-
-        }
-
-        return new Constructor(element, attribute, tokens);
-
+        return new Constructor(element, attribute);
     };
 
 };
@@ -175,17 +163,17 @@ factoryEntries.forEach(function (entry) {
  */
 ARIA.addAlias = function (source, aliases) {
 
-    var normalSource = ARIA.normalise(source).slice(5);
+    var suffix = ARIA.getSuffix(ARIA.normalise(source));
 
     if (!Array.isArray(aliases)) {
         aliases = [aliases];
     }
 
-    if (!ARIA.getFactory(normalSource)) {
+    if (!ARIA.getFactory(suffix)) {
 
         throw new ReferenceError(
             "ARIA.factories."
-            + normalSource
+            + suffix
             + " does not exist"
         );
 
@@ -193,10 +181,10 @@ ARIA.addAlias = function (source, aliases) {
 
     aliases.forEach(function (alias) {
 
-        var normalAlias = ARIA.normalise(alias).slice(5);
+        var normalAlias = ARIA.getSuffix(ARIA.normalise(alias));
 
-        ARIA.translate[normalAlias] = normalSource;
-        ARIA.factories[normalAlias] = ARIA.factories[normalSource];
+        ARIA.translate[normalAlias] = suffix;
+        ARIA.factories[normalAlias] = ARIA.factories[suffix];
 
     });
 

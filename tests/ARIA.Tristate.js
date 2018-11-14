@@ -15,10 +15,6 @@ describe("ARIA.Tristate", function () {
         chai.assert.isTrue(tristate instanceof ARIA.State);
     });
 
-    it("should consider \"mixed\" to be a valid token", function () {
-        chai.assert.isTrue(tristate.isValidToken("mixed"));
-    });
-
     it("should interpret a value as true, false or \"mixed\"", function () {
 
         chai.assert.isTrue(tristate.interpret(true));

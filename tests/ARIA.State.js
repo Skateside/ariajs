@@ -28,18 +28,6 @@ describe("ARIA.State", function () {
 
     });
 
-    it("should reject non boolean values", function () {
-
-        chai.assert.isFalse(div.hasAttribute(ATTRIBUTE));
-        state.set(1);
-        chai.assert.isFalse(div.hasAttribute(ATTRIBUTE));
-        state.set("TRUE");
-        chai.assert.isFalse(div.hasAttribute(ATTRIBUTE));
-        state.set("");
-        chai.assert.isFalse(div.hasAttribute(ATTRIBUTE));
-
-    });
-
     it("should always return a boolean when using the get method", function () {
 
         state.set("true");

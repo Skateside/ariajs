@@ -8,16 +8,6 @@
 ARIA.Tristate = ARIA.createClass(ARIA.State, /** @lends ARIA.Tristate.prototype */{
 
     /**
-     * @inheritDoc
-     */
-    init: function (element, attribute) {
-
-        this.$super(element, attribute);
-        this.tokens.push("mixed");
-
-    },
-
-    /**
      * Allows the token "mixed".
      *
      * @param  {?} value

@@ -1,8 +1,9 @@
 /**
- * @file    Adds the Digital Publishing roles to the white-list of role tokens.
- * @see     https://www.w3.org/TR/dpub-aria-1.0/
- * @author  James "Skateside" Long
- * @license MIT
+ * @file     Adds the Digital Publishing roles to the white-list of role tokens.
+ * @see      https://www.w3.org/TR/dpub-aria-1.0/
+ * @author   James "Skateside" Long
+ * @license  MIT
+ * @requires aria.tokens.js
  */
 (function (ARIA) {
 

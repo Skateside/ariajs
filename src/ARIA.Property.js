@@ -11,10 +11,8 @@ ARIA.Property = ARIA.createClass(/** @lends ARIA.Property.prototype */{
      *             Element whose attribute should be handled.
      * @param      {String} attribute
      *             Name of the attribute to handle.
-     * @param      {Array.<String>} [tokens]
-     *             Optional white-list of valid tokens for this property.
      */
-    init: function (element, attribute, tokens) {
+    init: function (element, attribute) {
 
         /**
          * Element whose attribute is being handled.
@@ -27,18 +25,6 @@ ARIA.Property = ARIA.createClass(/** @lends ARIA.Property.prototype */{
          * @type {String}
          */
         this.attribute = attribute;
-
-        /**
-         * White-list of valid tokens. This is a reference to a property of
-         * {@link ARIA.tokens} so updating that property will update all these
-         * instances.
-         * @type {Array.<String>}
-         */
-        this.tokens = (
-            (tokens && Array.isArray(tokens))
-            ? tokens
-            : []
-        );
 
         // Things like ARIA.List work with interpretted values rather than just
         // the attribute value. If the attribute already exists, pass the value
@@ -60,28 +46,6 @@ ARIA.Property = ARIA.createClass(/** @lends ARIA.Property.prototype */{
      */
     interpret: function (value) {
         return ARIA.Property.interpret(value);
-    },
-
-    /**
-     * Checks to see if the given token is valid for this current property. This
-     * function checks against {@link ARIA.Property#tokens}. If the token is not
-     * valid, a warning it sent. See {@link ARIA.warn}.
-     *
-     * @param  {String} token
-     *         Token to check.
-     * @return {Boolean}
-     *         true if the token is valid, false otherwise.
-     */
-    isValidToken: function (token) {
-
-        var isValid = (!this.tokens.length || this.tokens.indexOf(token) > -1);
-
-        if (!isValid) {
-            ARIA.warn(ARIA.WARNING_INVALID_TOKEN, token, this.attribute);
-        }
-
-        return isValid;
-
     },
 
     /**
@@ -121,10 +85,10 @@ ARIA.Property = ARIA.createClass(/** @lends ARIA.Property.prototype */{
         var attribute = this.attribute;
         var interpretted = this.interpret(value);
 
-        if (interpretted !== "" && this.isValidToken(interpretted)) {
-            ARIA.setAttribute(element, attribute, interpretted);
-        } else if (interpretted === "") {
+        if (interpretted === "") {
             ARIA.removeAttribute(element, attribute);
+        } else {
+            ARIA.setAttribute(element, attribute, interpretted);
         }
 
     },

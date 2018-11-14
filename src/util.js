@@ -12,21 +12,6 @@ var identity = function (x) {
 };
 
 /**
- * A simple wrapper for Array#slice.
- *
- * @private
- * @param   {Array|Object} arrayLike
- *          Array or array-like structure to slice.
- * @param   {Number} [offset]
- *          Optional offset for the slice.
- * @return  {Array}
- *          Sliced array.
- */
-var slice = function (arrayLike, offset) {
-    return Array.prototype.slice.call(arrayLike, offset);
-};
-
-/**
  * A simple fall-back for Array.from.
  *
  * @private
@@ -62,9 +47,10 @@ var arrayFrom = Array.from || function (arrayLike, map, context) {
  */
 var objectAssign = Object.assign || function (source) {
 
-    slice(arguments, 1).forEach(function (object) {
+    Array.prototype.forEach.call(arguments, function (object, i) {
 
-        if (object) {
+        // Skip null objects and the first one (source parameter).
+        if (object && i > 0) {
 
             Object.keys(object).forEach(function (key) {
                 source[key] = object[key];
@@ -98,18 +84,6 @@ var fnTest = (
     ? (/[.'"]\$super\b/)
     : (/.*/)
 );
-
-/**
- * A basic fallback for the isNaN function.
- *
- * @private
- * @function
- * @param    {?} value
- *           Value to test.
- * @return   {Boolean}
- *           true if the value is NaN, false otherwise.
- */
-var isNotANumber = Number.isNaN || globalVariable.isNaN;
 
 /**
  * A reference (and possible fallback) for requestAnimationFrame.

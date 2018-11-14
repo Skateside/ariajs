@@ -7,32 +7,6 @@
 ARIA.State = ARIA.createClass(ARIA.Property, /** @lends ARIA.State.prototype */{
 
     /**
-     * Unlike the parent {@link ARIA.Property}, an instance of ARIA.State cannot
-     * have tokens set.
-     *
-     * @constructs ARIA.State
-     * @param      {Element} element
-     *             Element whose attribute should be handled.
-     * @param      {String} attribute
-     *             Name of the attribute to handle.
-     */
-    init: function (element, attribute) {
-
-        this.$super(element, attribute, [
-            "true",
-            "false"
-        ]);
-
-    },
-
-    /**
-     * @inheritDoc
-     */
-    isValidToken: function (token) {
-        return typeof token === "boolean" || this.$super(token);
-    },
-
-    /**
      * Coerces the given value into a boolean.
      *
      * @param  {?} value
@@ -44,7 +18,7 @@ ARIA.State = ARIA.createClass(ARIA.Property, /** @lends ARIA.State.prototype */{
 
         var interpretted = this.$super(value);
         var isTrue = interpretted === "true";
-
+console.log("ARIA.State#interpret(%o), interpretted = %o, returning %o", value, interpretted, (isTrue || interpretted === "false") ? isTrue : interpretted);
         return (
             (isTrue || interpretted === "false")
             ? isTrue

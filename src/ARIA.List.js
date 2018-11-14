@@ -9,7 +9,7 @@ ARIA.List = ARIA.createClass(ARIA.Property, /** ARIA.List.prototype */{
     /**
      * @inheritDoc
      */
-    init: function (element, attribute, tokens) {
+    init: function (element, attribute) {
 
         /**
          * The list of values.
@@ -17,7 +17,7 @@ ARIA.List = ARIA.createClass(ARIA.Property, /** ARIA.List.prototype */{
          */
         this.list = [];
 
-        this.$super(element, attribute, tokens);
+        this.$super(element, attribute);
 
     },
 
@@ -60,11 +60,7 @@ ARIA.List = ARIA.createClass(ARIA.Property, /** ARIA.List.prototype */{
         var that = this;
         var values = that.interpret(value).reduce(function (unique, token) {
 
-            if (
-                token
-                && that.isValidToken(token)
-                && unique.indexOf(token) < 0
-            ) {
+            if (token && unique.indexOf(token) < 0) {
                 unique.push(token);
             }
 

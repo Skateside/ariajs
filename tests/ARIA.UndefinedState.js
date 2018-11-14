@@ -15,14 +15,6 @@ describe("ARIA.UndefinedState", function () {
         chai.assert.isTrue(undefinedState instanceof ARIA.State);
     });
 
-    it("should consider undefined to be a valid token", function () {
-
-        chai.assert.isTrue(undefinedState.isValidToken("undefined"));
-        chai.assert.isTrue(undefinedState.isValidToken(undefined));
-        chai.assert.isTrue(undefinedState.isValidToken());
-
-    });
-
     it("should interpret a value as true, false or undefined", function () {
 
         chai.assert.isTrue(undefinedState.interpret(true));
