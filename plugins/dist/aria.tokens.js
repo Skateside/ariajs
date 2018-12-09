@@ -268,25 +268,16 @@
         };
 
         /**
-         * Sends a warning.
+         * Sends a warning if {@link ARIA.enableWarnings} is set to true. The
+         * message passed will be prefixes with "aria.js: ".
          *
          * @param {String} message
-         *        Message (and placeholders).
-         * @param {Number|String} ...arguments
-         *        Information to populate the message.
+         *        The warning message.
          */
         ARIA.warn = function (message) {
 
             if (ARIA.enableWarnings) {
-
-                console.warn(
-                    "aria.js: " +
-                    ARIA.supplant.apply(
-                        undefined,
-                        [message].concat([slice(arguments, 1)])
-                    )
-                );
-
+                console.warn("aria.js: " + message);
             }
 
         };
@@ -393,9 +384,10 @@
                 if (!isValid) {
 
                     ARIA.warn(
-                        ARIA.WARNING_INVALID_TOKEN,
-                        token,
-                        this.attribute
+                        ARIA.supplant(ARIA.WARNING_INVALID_TOKEN, [
+                            token,
+                            this.attribute
+                        ])
                     );
 
                 }
@@ -503,7 +495,14 @@
                 var max = this.max;
 
                 if (!isValid) {
-                    ARIA.warn(ARIA.WARNING_INVALID_TOKEN, value, attribute);
+
+                    ARIA.warn(
+                        ARIA.supplant(ARIA.WARNING_INVALID_TOKEN, [
+                            value,
+                            attribute
+                        ])
+                    );
+
                 }
 
                 return isValid;
