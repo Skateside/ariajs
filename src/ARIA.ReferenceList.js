@@ -43,7 +43,7 @@ ARIA.ReferenceList = ARIA.createClass(ARIA.List, /** @lends ARIA.ReferenceList.p
      *         Array of elements.
      */
     get: function () {
-        return this.$super().map(ARIA.getById);
+        return this.$super(ARIA.getById);
     }
 
 });

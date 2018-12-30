@@ -69,6 +69,8 @@
         "false"
     ];
 
+    var triggerBackup;
+
     if (ARIA && ARIA.VERSION) {
 
         /**
@@ -313,6 +315,8 @@
 
         };
 
+        triggerBackup = ARIA.Property.prototype.trigger;
+
         ARIA.Property.addMethods(/** @lends ARIA.Property.prototype */{
 
             /**
@@ -396,26 +400,13 @@
 
             },
 
-            /**
-             * Sets {@link ARIA.Property#attribute} to the given value, once
-             * interpretted (see {@link ARIA.Property#interpret}) and validated
-             * (see {@link ARIA.Property#isValidToken}). If the value is
-             * interpretted as an empty string, the attribute is removed.
-             *
-             * @param {?} value
-             *        Value to set.
-             */
-            set: function (value) {
+            // Documentation is unchanged, but we pass a new method to the
+            // detail. No JSDoc way of saying that, as far as I know.
+            trigger: function (event, detail) {
 
-                var element = this.element;
-                var attribute = this.attribute;
-                var interpretted = this.interpret(value);
-
-                if (interpretted !== "" && this.isValidToken(interpretted)) {
-                    ARIA.setAttribute(element, attribute, interpretted);
-                } else if (interpretted === "") {
-                    ARIA.removeAttribute(element, attribute);
-                }
+                return triggerBackup.call(this, event, objectAssign({
+                    isValidToken: this.isValidToken.bind(this)
+                }, detail));
 
             }
 
@@ -439,43 +430,29 @@
             },
 
             /**
-             * Sets the value of the list to be the given value. The values are
-             * interpretted as an array (see {@link ARIA.List#interpret} and
-             * validated (see {@link ARIA.List#isValidToken}); only unique
-             * values are added.
+             * Checks the given tokens to make sure they're all valid.
              *
-             * @param {?} value
-             *        Value(s) to add. If the given value is a string, it is
-             *        assumed to be a space-separated list.
+             * @param  {Array.<String>} tokens
+             *         Tokens to validate.
+             * @return {Boolean}
+             *         true if all tokens are valid, false otherwise.
              */
-            set: function (value) {
+            areValidTokens: function (tokens) {
 
-                var that = this;
-                var values = that
-                    .interpret(value)
-                    .reduce(function (unique, token) {
+                return tokens.every(function (token) {
+                    return this.isValidToken(token);
+                }, this);
 
-                        if (
-                            token
-                            && that.isValidToken(token)
-                            && unique.indexOf(token) < 0
-                        ) {
-                            unique.push(token);
-                        }
+            },
 
-                        return unique;
+            /**
+             * @inheritDoc
+             */
+            trigger: function (event, detail) {
 
-                    }, []);
-                var element = that.element;
-                var attribute = that.attribute;
-
-                that.list = values;
-
-                if (values.length) {
-                    ARIA.setAttribute(element, attribute, values.join(" "));
-                } else {
-                    ARIA.removeAttribute(element, attribute);
-                }
+                return this.$super(event, objectAssign({
+                    areValidTokens: this.areValidTokens.bind(this)
+                }, detail));
 
             }
 
@@ -491,8 +468,6 @@
                 var interpretted = this.interpret(value);
                 var isValid = !isNotANumber(interpretted);
                 var attribute = this.attribute;
-                var min = this.min;
-                var max = this.max;
 
                 if (!isValid) {
 
@@ -561,6 +536,23 @@
              */
             isValidToken: function (token) {
                 return token === undefined || this.$super(token);
+            }
+
+        });
+
+        // Add validation.
+        ARIA.on(ARIA.EVENT_PRE_SET, function (e) {
+
+            var detail = e.detail;
+            var value = detail.value;
+            var isValid = (
+                Array.isArray(value)
+                ? detail.areValidTokens(value)
+                : detail.isValidToken(value)
+            );
+
+            if (!isValid) {
+                e.preventDefault();
             }
 
         });

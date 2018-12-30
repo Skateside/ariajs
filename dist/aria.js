@@ -1,4 +1,4 @@
-/*! ariajs - v0.2.0 - MIT license - https://github.com/Skateside/ariajs - 2018-11-14 */
+/*! ariajs - v0.2.0 - MIT license - https://github.com/Skateside/ariajs - 2018-12-30 */
 (function (globalVariable) {
     "use strict";
 
@@ -107,6 +107,102 @@ var requestAnimationFrame = (
 );
 
 /**
+ * Interprets a value so that it is a string. If the given value is null or
+ * undefined, an empty string is returned.
+ *
+ * @private
+ * @param   {?} value
+ *          Value to convert into a string.
+ * @return  {String}
+ *          Interpretted string.
+ */
+var interpretString = function (value) {
+
+    return (
+        (value === "" || value === null || value === undefined)
+        ? ""
+        : String(value).trim()
+    );
+
+};
+
+/**
+ * Create a lower-case version of {@link interpretString}.
+ *
+ * @private
+ * @param   {?} value
+ *          Value to convert into a string.
+ * @return  {String}
+ *          Interpretted lower-case string.
+ */
+var interpretLowerString = function (value) {
+    return interpretString(value).toLowerCase();
+};
+
+/**
+ * Helper function for slicing array-like objects.
+ *
+ * @private
+ * @param   {Object} arrayLike
+ *          Array-like structure.
+ * @param   {Number} [start]
+ *          Optional start for the slice.
+ * @return  {Array}
+ *          Sliced array.
+ */
+var slice = function (arrayLike, start) {
+    return Array.prototype.slice.call(arrayLike, start);
+};
+
+/**
+ * Takes the arguments and converts them into a valid JSON string.
+ *
+ * @private
+ * @return  {String}
+ *          JSON string based on the given arguments.
+ */
+var stringifyArguments = function () {
+    return JSON.stringify(slice(arguments));
+};
+
+/**
+ * Checks to see if the given object has the given property.
+ *
+ * @private
+ * @param   {Object} object
+ *          Object whose property's existence should be checked.
+ * @param   {String} property
+ *          Name of the property to check for.
+ * @return  {Boolean}
+ *          true if the object has the property, false otherwise.
+ */
+var owns = function (object, property) {
+    return Object.prototype.hasOwnProperty.call(object, property);
+};
+
+/**
+ * Removes duplicated values from the given array.
+ *
+ * @param  {Array} array
+ *         Array to reduce.
+ * @return {Array}
+ *         Array containing unique values.
+ */
+var arrayUnique = function (array) {
+
+    return array.reduce(function (unique, item) {
+
+        if (unique.indexOf(item) < 0) {
+            unique.push(item);
+        }
+
+        return unique;
+
+    }, []);
+
+};
+
+/**
  * @namespace
  */
 var ARIA = {};
@@ -155,103 +251,113 @@ ARIA.restorePrevious = function () {
 };
 
 /**
- * Map of all mis-spellings and aliases. The attribute key should be the
- * normalised value - see {@link ARIA.normalise}.
+ * Memoises a function so that the cached values are returned if they exist.
+ *
+ * @param  {Function} func
+ *         Function to cache,
+ * @param  {Function} [keyMaker]
+ *         Optional function to create the cache's key.
+ * @param  {Object} [cache]
+ *         Optional cache for the function.
+ * @return {Function}
+ *         Memoised function.
+ */
+ARIA.memoise = function (func, keyMaker, cache) {
+
+    var context = this;
+
+    if (cache === undefined) {
+        cache = Object.create(null);
+    }
+
+    if (keyMaker === undefined) {
+        keyMaker = stringifyArguments;
+    }
+
+    return function () {
+
+        var args = slice(arguments);
+        var key = keyMaker.apply(context, args);
+        var response = cache[key];
+
+        if (!owns(cache, key)) {
+
+            response = func.apply(context, args);
+            cache[key] = response;
+
+        }
+
+        return response;
+
+    };
+
+};
+
+/**
+ * The cache for {@link ARIA.addPrefix}. See also {@link ARIA.translate}.
+ * @type {Object}
+ */
+ARIA.prefixCache = Object.create(null);
+
+/**
+ * The cache for {@link ARIA.removePrefix}.
+ * @type {Object}
+ */
+ARIA.suffixCache = Object.create(null);
+
+/**
+ * Translations for after the {@link ARIA.addPrefix} process has happened.
+ * Unlike {@link ARIA.prefixCache}, this map translates values that have already
+ * been processed (trimmed and converted into lower-case). As such, it's
+ * probably easier to modify this map than the cache.
  * @type {Object}
  */
 ARIA.translate = objectAssign(Object.create(null), {
-    "aria-role": "role"
+    "labeledby": "aria-labelledby",
+    "role": "role"
 });
 
 /**
- * Normalises an attribute name so that it is in lowercase and always starts
- * with "aria-". This function has the alias of {@link ARIA.normalize} and
- * changing one will update the other.
+ * The regular expression used to match the WAI-ARIA prefix.
+ * @type {RegExp}
+ */
+ARIA.PREFIX_REGEXP = (/^(aria\-)?/);
+
+/**
+ * Adds the WAI-ARIA prefix to the given attribute if it doesn't already have
+ * it.
  *
- * @memberof ARIA
- * @name     normalise
+ * @function
  * @param    {String} attribute
- *           Attribute to normalise.
- * @return   {String}
- *           Normalised attribute.
- *
- * @example
- * ARIA.normalise("aria-busy"); // -> "aria-busy"
- * ARIA.normalise("busy"); // -> "aria-busy"
- * ARIA.normalise("  busy  "); // -> "aria-busy"
- * ARIA.normalise("BUSY"); // -> "aria-busy"
+ *           Attribute that should be prefixed with "aria-", if it isn't
+ *           already.
  */
-var normalise = function (attribute) {
+ARIA.addPrefix = ARIA.memoise(
+    function (attribute) {
 
-    var string = String(attribute)
-        .toLowerCase()
-        .replace(/^\s*(?:aria\-)?|\s*$/g, "");
-    var normal = "aria-" + string;
+        var removed = ARIA.removePrefix(attribute);
 
-    return ARIA.translate[normal] || normal;
+        return ARIA.translate[removed] || ("aria-" + removed);
 
-};
-
-var normaliseDescriptor = {
-
-    configurable: false,
-    enumerable: true,
-
-    get: function () {
-        return normalise;
     },
-
-    set: function (normaliser) {
-        normalise = normaliser;
-    }
-
-};
-
-Object.defineProperties(ARIA, {
-
-    normalise: normaliseDescriptor,
-
-    /**
-     * An alias of {@link ARIA.normalise}.
-     *
-     * @memberof ARIA
-     * @function
-     */
-    normalize: normaliseDescriptor
-
-});
+    identity,
+    ARIA.prefixCache
+);
 
 /**
- * A map of all conversions for {@link ARIA.getSuffix}. As well as acting like a
- * cache for frequent conversions, this also allows plugins to use un-expected
- * attribute names since the conversion can be added here.
- * @type {Object}
- */
-ARIA.suffixMap = Object.create(null);
-
-/**
- * Converts the attribute into the WAI-ARIA suffix (e.g. "aria-label" becomes
- * "label" etc.).
+ * Removes the WAI-ARIA prefix from the given attribute if it has it.
  *
- * @param  {String} attribute
- *         Attribute whose suffix should be returned.
- * @return {String}
- *         Suffix of the attribute.
+ * @function
+ * @param    {String} attribute
+ *           Attribute that should have the "aria-" prefix removed.
  */
-ARIA.getSuffix = function (attribute) {
-
-    var mapped = ARIA.suffixMap[attribute];
-
-    if (!mapped) {
-
-        mapped = attribute.replace(/^aria\-/, "");
-        ARIA.suffixMap[attribute] = mapped;
-
-    }
-
-    return mapped;
-
-};
+ARIA.removePrefix = ARIA.memoise(
+    function (attribute) {
+        return interpretLowerString(attribute).replace(ARIA.PREFIX_REGEXP, "");
+    },
+    identity,
+    ARIA.suffixCache
+);
 
 /**
  * Adds one or more methods to the class.
@@ -490,6 +596,184 @@ ARIA.isNode = function (value) {
 };
 
 /**
+ * A map for keeping all dummy elements in {@link ARIA.Observer}.
+ * @private
+ * @type {WeakMap}
+ */
+var observerMap = new WeakMap();
+
+/**
+ * Creates observers.
+ *
+ * @class ARIA.Observer
+ */
+ARIA.Observer = ARIA.createClass(/** @lends ARIA.Observer.prototype */{
+
+    /**
+     * Gets the element that will dispatch events for this observer.
+     *
+     * @return {Element}
+     *         Element that will dispatch events.
+     */
+    getEventElement: function () {
+
+        var dummy = observerMap.get(this);
+
+        if (!dummy) {
+
+            dummy = document.createElement("div");
+            observerMap.set(this, dummy);
+
+        }
+
+        return dummy;
+
+    },
+
+    /**
+     * Creates a custom event.
+     *
+     * @param  {String} name
+     *         Name of the event to create.
+     * @param  {?} [detail]
+     *         Optional detail to be passed to the event.
+     * @return {CustomEvent}
+     *         Custom event.
+     */
+    createEvent: function (name, detail) {
+
+        return new CustomEvent(name, {
+            bubbles: true,
+            cancelable: true,
+            detail: detail
+        });
+
+    },
+
+    /**
+     * Dispatches the given event on the element that comes from
+     * {@link ARIA.Observer#getEventElement}. If the event parameter is a
+     * string, it is passed to {@link ARIA.Observer#createEvent}.
+     *
+     * @param  {Event|string} event
+     *         Either the event to dispatch or the name of the event to
+     *         dispatch.
+     * @param  {?} [detail]
+     *         Optional detail for the event. This is only used if the event
+     *         parameter is a string.
+     * @return {Event}
+     *         The event that was dispatched.
+     */
+    dispatchEvent: function (event, detail) {
+
+        if (typeof event === "string") {
+            event = this.createEvent(event, detail);
+        }
+
+        this.getEventElement().dispatchEvent(event);
+
+        return event;
+
+    },
+
+    /**
+     * Adds an event listener to the element that comes from
+     * {@link ARIA.Observer#getEventElement}.
+     *
+     * @param {String} name
+     *        Name of the event to which a listener should be added.
+     * @param {Function} handler
+     *        Function to execute when the event is dispatched.
+     */
+    addEventListener: function (name, handler) {
+        this.getEventElement().addEventListener(name, handler);
+    },
+
+    /**
+     * Removes an event listener from the element that comes from
+     * {@link ARIA.Observer#getEventElement}.
+     *
+     * @param {String} name
+     *        Name of the event from which a listener should be removed.
+     * @param {Function} handler
+     *        Function to remove from the event listener.
+     */
+    removeEventListener: function (name, handler) {
+        this.getEventElement().removeEventListener(name, handler);
+    }
+
+});
+
+// Create a fall-back for browsers that don't allow CustomEvent to be used as a
+// constructor.
+try {
+
+    var event = new CustomEvent("my-custom-event", {
+        bubbles: true,
+        cancelable: true,
+        detail: {}
+    });
+
+} catch (ignore) {
+
+    ARIA.Observer.prototype.createEvent = function (name, detail) {
+
+        var event = document.createEvent("CustomEvent");
+
+        event.initCustomEvent(name, true, true, detail);
+
+        return event;
+
+    };
+
+}
+
+/**
+ * Instance of {@link ARIA.Observer} that is used by {@link ARIA.trigger},
+ * {@link ARIA.on} and {@link ARIA.off}.
+ * @type {ARIA.Observer}
+ */
+ARIA.observer = new ARIA.Observer();
+
+/**
+ * Dispatches an event with {@link ARIA.observer}.
+ *
+ * @param  {String} name
+ *         Name of the event to dispatch.
+ * @param  {?} [detail]
+ *         Optional detail for the event.
+ * @return {Event}
+ *         Event that was dispatched.
+ */
+ARIA.trigger = function (name, detail) {
+    return ARIA.observer.dispatchEvent(name, detail);
+};
+
+/**
+ * Adds a handler to the given event.
+ *
+ * @param {String} name
+ *        Name of the event to listen for.
+ * @param {Function} handler
+ *        Handler to execute when the event is dispatched.
+ */
+ARIA.on = function (name, handler) {
+    ARIA.observer.addEventListener(name, handler);
+};
+
+/**
+ * Revmoes a handler from the given event.
+ *
+ * @param {String} name
+ *        Name of the event to stop listening to.
+ * @param {Function} handler
+ *        Handler to remove from the event.
+ */
+ARIA.off = function (name, handler) {
+    ARIA.observer.removeEventListener(name, handler);
+};
+
+/**
  * Handles basic WAI-ARIA properties.
  *
  * @class ARIA.Property
@@ -540,6 +824,27 @@ ARIA.Property = ARIA.createClass(/** @lends ARIA.Property.prototype */{
     },
 
     /**
+     * Helper function for dispatching an event using {@link ARIA.trigger} which
+     * automatically passes {@link ARIA.Property#element} and
+     * {@link ARIA.Property#attribute} to the event details.
+     *
+     * @param  {String} event
+     *         Name of the event to dispatch.
+     * @param  {Object} [detail]
+     *         Optional additional details.
+     * @return {Event}
+     *         Dispatched event.
+     */
+    trigger: function (event, detail) {
+
+        return ARIA.trigger(event, objectAssign({
+            element: this.element,
+            attribute: this.attribute
+        }, detail));
+
+    },
+
+    /**
      * Gets the value of {@link ARIA.Property#attribute} and interprets it
      * (see {@link ARIA.Property#interpret}). If {@link ARIA.Property#element}
      * doesn't have {@link ARIA.Property#attribute} then null is returned.
@@ -548,16 +853,52 @@ ARIA.Property = ARIA.createClass(/** @lends ARIA.Property.prototype */{
      *         Interpretted value of {@link ARIA.Property#attribute} or null if
      *         the attribute is not set.
      */
+    // get: function () {
+    //
+    //     var element = this.element;
+    //     var attribute = this.attribute;
+    //
+    //     return (
+    //         ARIA.hasAttribute(element, attribute)
+    //         ? this.interpret(ARIA.getAttribute(element, attribute))
+    //         : null
+    //     );
+    //
+    // },
+
+    /**
+     * Gets the value of {@link ARIA.Property#attribute} from
+     * {@link ARIA.Property#element} and interprets it (see
+     * {@link ARIA.Property#interpret}) before returning it. If the element
+     * doesn't have the attribute, null is returned.
+     *
+     * @return {String|null}
+     *         Interpretted value of {@link ARIA.Property#attribute} or null if
+     *         the attribute is not set.
+     * @fires  ARIA.Property#preget
+     * @fires  ARIA.Property#postget
+     */
     get: function () {
 
+        var preEvent = this.trigger(ARIA.EVENT_PRE_GET);
         var element = this.element;
         var attribute = this.attribute;
+        var value;
 
-        return (
-            ARIA.hasAttribute(element, attribute)
-            ? this.interpret(ARIA.getAttribute(element, attribute))
-            : null
-        );
+        if (!preEvent.defaultPrevented) {
+
+            value = (
+                ARIA.hasAttribute(element, attribute)
+                ? this.interpret(ARIA.getAttribute(element, attribute))
+                : null
+            );
+            this.trigger(ARIA.EVENT_POST_GET, {
+                value: value
+            });
+
+        }
+
+        return value;
 
     },
 
@@ -570,16 +911,71 @@ ARIA.Property = ARIA.createClass(/** @lends ARIA.Property.prototype */{
      * @param {?} value
      *        Value to set.
      */
+    // set: function (value) {
+    //
+    //     var element = this.element;
+    //     var attribute = this.attribute;
+    //     var interpretted = this.interpret(value);
+    //
+    //     if (interpretted === "") {
+    //         ARIA.removeAttribute(element, attribute);
+    //     } else {
+    //         ARIA.setAttribute(element, attribute, interpretted);
+    //     }
+    //
+    // },
+
+    /**
+     * Sets the value of {@link ARIA.Property#attribute} on
+     * {@link ARIA.Property#element} to the given value once it's been
+     * interpretted (see {@link ARIA.Property#interpret}). If the value is
+     * interpretted as an empty string, the attribute is removed using
+     * {@link ARIA.Property#remove}.
+     *
+     * @param {?} value
+     *        Value to set.
+     * @fires ARIA.Property#preset
+     * @fires ARIA.Property#postset
+     */
     set: function (value) {
 
-        var element = this.element;
-        var attribute = this.attribute;
         var interpretted = this.interpret(value);
+        var eventData = {
+            raw: value,
+            value: interpretted
+        };
+        var preEvent = this.trigger(ARIA.EVENT_PRE_SET, eventData);
 
-        if (interpretted === "") {
-            ARIA.removeAttribute(element, attribute);
-        } else {
-            ARIA.setAttribute(element, attribute, interpretted);
+        if (!preEvent.defaultPrevented) {
+
+            if (interpretted === "") {
+                this.remove();
+            } else {
+                ARIA.setAttribute(this.element, this.attribute, interpretted);
+            }
+
+            this.trigger(ARIA.EVENT_POST_SET, eventData);
+
+        }
+
+    },
+
+    /**
+     * Removes {@link ARIA.Property#attribute} from
+     * {@link ARIA.Property#element}.
+     *
+     * @fires ARIA.Property#preremove
+     * @fires ARIA.Property#postremove
+     */
+    remove: function () {
+
+        var preEvent = this.trigger(ARIA.EVENT_PRE_REMOVE);
+
+        if (!preEvent.defaultPrevented) {
+
+            ARIA.removeAttribute(this.element, this.attribute);
+            this.trigger(ARIA.EVENT_POST_REMOVE);
+
         }
 
     },
@@ -607,15 +1003,139 @@ ARIA.Property = ARIA.createClass(/** @lends ARIA.Property.prototype */{
  * @return {String}
  *         String based on the value.
  */
-ARIA.Property.interpret = function (value) {
+ARIA.Property.interpret = interpretString;
 
-    return (
-        (value === null || value === undefined)
-        ? ""
-        : String(value).trim()
-    );
+/**
+ * Name of the {@link ARIA.Property#preset} event.
+ * @type {String}
+ */
+ARIA.EVENT_PRE_SET = "ariajs-pre-set";
+/**
+ * Event triggered before setting a WAI-ARIA property with
+ * {@link ARIA.Property#set}. If the default action of this event is prevented,
+ * the value is not set.
+ *
+ * @event    ARIA.Property#preset
+ * @type     {Event}
+ * @property {Object} detail
+ *           Event details.
+ * @property {Element} detail.element
+ *           Element that will have the attribute value set.
+ * @property {String} detail.attribute
+ *           Name of the attribute that will be set.
+ * @property {String} detail.raw
+ *           Raw value for to set on the value.
+ * @property {Array<Element>|Array<String>|Element|Number|String} detail.value
+ *           Version of the value after it has been passed through
+ *           {@link ARIA.Property#interpret}. This is the value that will be set
+ *           on the attribute.
+ */
 
-};
+/**
+ * Name of the {@link ARIA.Property#postset} event.
+ * @type {String}
+ */
+ARIA.EVENT_POST_SET = "ariajs-post-set";
+/**
+ * Event triggered after setting a WAI-ARIA property with
+ * {@link ARIA.Property#set}.
+ *
+ * @event    ARIA.Property#postset
+ * @type     {Event}
+ * @property {Object} detail
+ *           Event details.
+ * @property {Element} detail.element
+ *           Element that had the attribute value set.
+ * @property {String} detail.attribute
+ *           Name of the attribute that was set.
+ * @property {String} detail.raw
+ *           Raw value of the attribute.
+ * @property {Array<Element>|Array<String>|Element|Number|String} detail.value
+ *           Version of the value after it has been passed through
+ *           {@link ARIA.Property#interpret}.
+ */
+
+/**
+ * Name of the {@link ARIA.Property#preget} event.
+ * @type {String}
+ */
+ARIA.EVENT_PRE_GET = "ariajs-pre-get";
+/**
+ * Event triggered before getting a WAI-ARIA property with
+ * {@link ARIA.Property#get}. If the default action of this event is prevented,
+ * the value is not retrieved.
+ *
+ * @event    ARIA.Property#preget
+ * @type     {Event}
+ * @property {Object} detail
+ *           Event details.
+ * @property {Element} detail.element
+ *           Element whose attribute value should be retrieved.
+ * @property {String} detail.attribute
+ *           Name of the attribute whose value should be retrieved.
+ */
+
+/**
+ * Name of the {@link ARIA.Property#postget} event.
+ * @type {String}
+ */
+ARIA.EVENT_POST_GET = "ariajs-post-get";
+/**
+ * Event triggered before getting a WAI-ARIA property with
+ * {@link ARIA.Property#get}.
+ *
+ * @event    ARIA.Property#postget
+ * @type     {Event}
+ * @property {Object} detail
+ *           Event details.
+ * @property {Element} detail.element
+ *           Element whose attribute value should be retrieved.
+ * @property {String} detail.attribute
+ *           Name of the attribute whose value should be retrieved.
+ * @property {?} detail.value
+ *           The value of the attribute after being passed through
+ *           {@link ARIA.Property#interpret}. If the element does not have the
+ *           attribute, this value will be null.
+ */
+
+/**
+ * Name of the {@link ARIA.Property#preremove} event.
+ * @type {String}
+ */
+ARIA.EVENT_PRE_REMOVE = "ariajs-pre-remove";
+/**
+ * Event triggered before removing a WAI-ARIA attribute using
+ * {@link ARIA.Property#remove}. If the default is prevented, the attribute is
+ * not removed.
+ *
+ * @event    ARIA.Property#preremove
+ * @type     {Event}
+ * @property {Object} detail
+ *           Event details.
+ * @property {Element} detail.element
+ *           Element whose attribute should be removed.
+ * @property {String} detail.attribute
+ *           Name of the attribute to remove.
+ */
+
+/**
+ * Name of the {@link ARIA.Property#postremove} event.
+ * @type {String}
+ */
+ARIA.EVENT_POST_REMOVE = "ariajs-post-remove";
+/**
+ * Event triggered after removing a WAI-ARIA attribute using
+ * {@link ARIA.Property#remove}.
+ *
+ * @event    ARIA.Property#postremove
+ * @type     {Event}
+ * @property {Object} detail
+ *           Event details.
+ * @property {Element} detail.element
+ *           Element whose attribute should be removed.
+ * @property {String} detail.attribute
+ *           Name of the attribute to remove.
+ */
 
 /**
  * Handles number values.
@@ -828,27 +1348,72 @@ ARIA.List = ARIA.createClass(ARIA.Property, /** ARIA.List.prototype */{
      *        Value(s) to add. If the given value is a string, it is assumed to
      *        be a space-separated list.
      */
+    // set: function (value) {
+    //
+    //     var that = this;
+    //     var values = that.interpret(value).reduce(function (unique, token) {
+    //
+    //         if (token && unique.indexOf(token) < 0) {
+    //             unique.push(token);
+    //         }
+    //
+    //         return unique;
+    //
+    //     }, []);
+    //     var element = that.element;
+    //     var attribute = that.attribute;
+    //
+    //     that.list = values;
+    //
+    //     if (values.length) {
+    //         ARIA.setAttribute(element, attribute, values.join(" "));
+    //     } else {
+    //         ARIA.removeAttribute(element, attribute);
+    //     }
+    //
+    // },
+
+    /**
+     * Sets the value of the list to be the given value. The values are
+     * interpretted as an array (see {@link ARIA.List#interpret}). If the values
+     * are interpretted as empty array, the attribute is removed using
+     * {@link ARIA.Property#remove}. Only unique values are added (see
+     * {@link ARIA.arrayUnique}).
+     *
+     * @param {?} value
+     *        Value(s) to add. If the given value is a string, it is assumed to
+     *        be a space-separated list.
+     * @fires ARIA.Property#preset
+     * @fires ARIA.Property#postset
+     */
     set: function (value) {
 
         var that = this;
-        var values = that.interpret(value).reduce(function (unique, token) {
+        var values = arrayUnique(that.interpret(value));
+        var eventData = {
+            raw: value,
+            value: values
+        };
+        var preEvent = this.trigger(ARIA.EVENT_PRE_SET, eventData);
 
-            if (token && unique.indexOf(token) < 0) {
-                unique.push(token);
+        if (!preEvent.defaultPrevented) {
+
+            that.list = values;
+
+            if (values.length) {
+
+                ARIA.setAttribute(
+                    this.element,
+                    this.attribute,
+                    values.join(" ")
+                );
+
+            } else {
+                this.remove();
             }
 
-            return unique;
+            this.trigger(ARIA.EVENT_POST_SET, eventData);
 
-        }, []);
-        var element = that.element;
-        var attribute = that.attribute;
-
-        that.list = values;
-
-        if (values.length) {
-            ARIA.setAttribute(element, attribute, values.join(" "));
-        } else {
-            ARIA.removeAttribute(element, attribute);
         }
 
     },
@@ -859,8 +1424,37 @@ ARIA.List = ARIA.createClass(ARIA.Property, /** ARIA.List.prototype */{
      * @return {Array.<String>}
      *         Value of the attribute as an array.
      */
-    get: function () {
-        return this.list.concat();
+    // get: function () {
+    //     return this.list.concat();
+    // }
+
+    /**
+     * Gets the value of {@link ARIA.Property#attribute} as an array. Modifying
+     * the array will not affect the attribute.
+     *
+     * @param  {Function} [map]
+     *         Optional mapping function for converting the results.
+     * @return {Array.<String>}
+     *         Value of the attribute as an array.
+     * @fires  ARIA.Property#preget
+     * @fires  ARIA.Property#postget
+     */
+    get: function (map) {
+
+        var preEvent = this.trigger(ARIA.EVENT_PRE_GET);
+        var list = [];
+
+        if (!preEvent.defaultPrevented) {
+
+            list = arrayFrom(this.list, map);
+            this.trigger(ARIA.EVENT_POST_GET, {
+                value: list
+            });
+
+        }
+
+        return list;
+
     }
 
 });
@@ -967,7 +1561,8 @@ ARIA.ReferenceList = ARIA.createClass(ARIA.List, /** @lends ARIA.ReferenceList.p
      *         Array of elements.
      */
     get: function () {
-        return this.$super().map(ARIA.getById);
+        return this.$super(ARIA.getById);
+        // return this.$super().map(ARIA.getById);
     }
 
 });
@@ -1175,7 +1770,7 @@ ARIA.Element.makeObserver = function (element, checker, setter, unsetter) {
         mutations.forEach(function (mutation) {
 
             var attribute = mutation.attributeName || "";
-            var suffix = ARIA.getSuffix(attribute);
+            var suffix = ARIA.removePrefix(attribute);
             var data = {
                 attribute: attribute,
                 suffix: suffix
@@ -1228,7 +1823,6 @@ if (!globalVariable.Proxy) {
     ARIA.Element.prototype.activateTraps = function () {
 
         var that = this;
-        var owns = Object.prototype.hasOwnProperty.bind(that);
 
         Object.keys(ARIA.factories).forEach(function setProperty(attribute) {
 
@@ -1254,7 +1848,7 @@ if (!globalVariable.Proxy) {
 
                             if (isPolling) {
 
-                                if (owns(attribute)) {
+                                if (owns(that, attribute)) {
 
                                     requestAnimationFrame(poll);
                                     isPolling = true;
@@ -1306,7 +1900,7 @@ ARIA.getFactory = function (attribute) {
 
     return (
         ARIA.factories[attribute]
-        || ARIA.factories[ARIA.getSuffix(ARIA.normalise(attribute))]
+        || ARIA.factories[ARIA.removePrefix(attribute)]
     );
 
 };
@@ -1359,7 +1953,7 @@ ARIA.makeFactory = function (attribute, Constructor) {
 /**
  * All the factory entries that create the {@link ARIA.factories}. Each entry is
  * an array of two values: the {@link ARIA.Property} (or sub-class) constructor
- * and an array of the WAI-ARIA attribute suffixes (see {@link ARIA.getSuffix}).
+ * and an array of the WAI-ARIA attribute suffixes (see {@link ARIA.removePrefix}).
  * @type {Array.<Array>}
  */
 ARIA.factoryEntries = [
@@ -1444,7 +2038,7 @@ ARIA.createFactories = function () {
         entry[1].forEach(function (attribute) {
 
             ARIA.factories[attribute] = ARIA.makeFactory(
-                ARIA.normalise(attribute),
+                ARIA.addPrefix(attribute),
                 entry[0]
             );
 
@@ -1469,7 +2063,7 @@ ARIA.createFactories();
  */
 ARIA.addAlias = function (source, aliases) {
 
-    var suffix = ARIA.getSuffix(ARIA.normalise(source));
+    var suffix = ARIA.removePrefix(source);
 
     if (!Array.isArray(aliases)) {
         aliases = [aliases];
@@ -1487,7 +2081,7 @@ ARIA.addAlias = function (source, aliases) {
 
     aliases.forEach(function (alias) {
 
-        var normalAlias = ARIA.getSuffix(ARIA.normalise(alias));
+        var normalAlias = ARIA.removePrefix(alias);
 
         ARIA.translate[normalAlias] = suffix;
         ARIA.factories[normalAlias] = ARIA.factories[suffix];

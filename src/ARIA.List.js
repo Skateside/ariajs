@@ -48,46 +48,76 @@ ARIA.List = ARIA.createClass(ARIA.Property, /** ARIA.List.prototype */{
 
     /**
      * Sets the value of the list to be the given value. The values are
-     * interpretted as an array (see {@link ARIA.List#interpret} and validated
-     * (see {@link ARIA.List#isValidToken}); only unique values are added.
+     * interpretted as an array (see {@link ARIA.List#interpret}). If the values
+     * are interpretted as empty array, the attribute is removed using
+     * {@link ARIA.Property#remove}. Only unique values are added (see
+     * {@link ARIA.arrayUnique}).
      *
      * @param {?} value
      *        Value(s) to add. If the given value is a string, it is assumed to
      *        be a space-separated list.
+     * @fires ARIA.Property#preset
+     * @fires ARIA.Property#postset
      */
     set: function (value) {
 
         var that = this;
-        var values = that.interpret(value).reduce(function (unique, token) {
+        var values = arrayUnique(that.interpret(value));
+        var eventData = {
+            raw: value,
+            value: values
+        };
+        var preEvent = this.trigger(ARIA.EVENT_PRE_SET, eventData);
 
-            if (token && unique.indexOf(token) < 0) {
-                unique.push(token);
+        if (!preEvent.defaultPrevented) {
+
+            that.list = values;
+
+            if (values.length) {
+
+                ARIA.setAttribute(
+                    this.element,
+                    this.attribute,
+                    values.join(" ")
+                );
+
+            } else {
+                this.remove();
             }
 
-            return unique;
+            this.trigger(ARIA.EVENT_POST_SET, eventData);
 
-        }, []);
-        var element = that.element;
-        var attribute = that.attribute;
-
-        that.list = values;
-
-        if (values.length) {
-            ARIA.setAttribute(element, attribute, values.join(" "));
-        } else {
-            ARIA.removeAttribute(element, attribute);
         }
 
     },
 
     /**
-     * Gets the value of the attribute as an array.
+     * Gets the value of {@link ARIA.Property#attribute} as an array. Modifying
+     * the array will not affect the attribute.
      *
+     * @param  {Function} [map]
+     *         Optional mapping function for converting the results.
      * @return {Array.<String>}
      *         Value of the attribute as an array.
+     * @fires  ARIA.Property#preget
+     * @fires  ARIA.Property#postget
      */
-    get: function () {
-        return this.list.concat();
+    get: function (map) {
+
+        var preEvent = this.trigger(ARIA.EVENT_PRE_GET);
+        var list = [];
+
+        if (!preEvent.defaultPrevented) {
+
+            list = arrayFrom(this.list, map);
+            this.trigger(ARIA.EVENT_POST_GET, {
+                value: list
+            });
+
+        }
+
+        return list;
+
     }
 
 });

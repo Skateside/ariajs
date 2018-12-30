@@ -92,54 +92,101 @@ describe("ARIA", function () {
 
         });
 
-        it("should allow results to be translated", function () {
-
-            var one = "aria-" + makeUniqueId();
-            var two = "aria-" + makeUniqueId();
-
-            ARIA.translate[one] = two;
-            chai.assert.equal(ARIA.normalise(one), two);
-
-            delete ARIA.translate[one];
-
-        });
+        // it("should allow results to be translated", function () {
+        //
+        //     var one = "aria-" + makeUniqueId();
+        //     var two = "aria-" + makeUniqueId();
+        //
+        //     ARIA.translate[one] = two;
+        //     chai.assert.equal(ARIA.addPrefix(one), two);
+        //
+        //     delete ARIA.translate[one];
+        //
+        // });
 
     });
 
-    describe("normalise", function () {
+    describe("addPrefix", function () {
 
         it("should prefix attributes with \"aria-\"", function () {
-            chai.assert.equal(ARIA.normalise("busy"), "aria-busy");
+            chai.assert.equal(ARIA.addPrefix("busy"), "aria-busy");
         });
 
         it("should not modify already prefixed attributes", function () {
 
             var attribute = "aria-busy";
 
-            chai.assert.equal(ARIA.normalise(attribute), attribute);
+            chai.assert.equal(ARIA.addPrefix(attribute), attribute);
 
         });
 
         it("should trim and convert to lowercase", function () {
 
-            chai.assert.equal(ARIA.normalise(" aria-busy "), "aria-busy");
-            chai.assert.equal(ARIA.normalise(" BUSY "), "aria-busy");
+            chai.assert.equal(ARIA.addPrefix(" aria-busy "), "aria-busy");
+            chai.assert.equal(ARIA.addPrefix(" BUSY "), "aria-busy");
 
         });
 
-        it("should have the alias of \"normalize\"", function () {
+        it("should read values from ARIA.prefixCache", function () {
 
-            var normalise = ARIA.normalise;
-            var newNormal = function (attr) {
-                return attr.toUpperCase();
-            };
+            var one = makeUniqueId();
+            var two = makeUniqueId();
 
-            chai.assert.equal(ARIA.normalise, ARIA.normalize);
+            ARIA.prefixCache[one] = two;
+            chai.assert.equal(ARIA.addPrefix(one), two);
+            delete ARIA.prefixCache[one];
 
-            ARIA.normalise = newNormal;
-            chai.assert.equal(ARIA.normalise, ARIA.normalize);
+        });
 
-            ARIA.normalise = normalise;
+        it("should be able to translate conversions using ARIA.translate", function () {
+
+            var one = makeUniqueId();
+            var two = makeUniqueId();
+
+            ARIA.translate[one] = two;
+            chai.assert.equal(ARIA.addPrefix(one), two);
+            delete ARIA.translate[one];
+
+        });
+
+    });
+
+    describe("removePrefix", function () {
+
+        it("should remove the leading \"aria-\" from attributes", function () {
+            chai.assert.equal(ARIA.removePrefix("aria-busy"), "busy");
+        });
+
+        it("should trim and convert to lowercase before removing", function () {
+
+            chai.assert.equal("busy", ARIA.removePrefix(" aria-busy "));
+            chai.assert.equal("busy", ARIA.removePrefix(" ARIA-BUSY "));
+
+        });
+
+        it("should not change attributes without a leading prefix", function () {
+            chai.assert.equal(ARIA.removePrefix("data-busy"), "data-busy");
+        });
+
+        it("should read values from ARIA.suffixCache", function () {
+
+            var one = makeUniqueId();
+            var two = makeUniqueId();
+
+            ARIA.suffixCache[one] = two;
+            chai.assert.equal(ARIA.removePrefix(one), two);
+            delete ARIA.suffixCache[one];
+
+        });
+
+        it("should remove the match defined in ARIA.PREFIX_REGEXP", function () {
+
+            var regexp = ARIA.PREFIX_REGEXP;
+            var attribute = makeUniqueId();
+
+            ARIA.PREFIX_REGEXP = (/^data\-/);
+            chai.assert.equal(ARIA.removePrefix("data-" + attribute), attribute);
+            ARIA.PREFIX_REGEXP = regexp;
 
         });
 

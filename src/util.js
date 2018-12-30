@@ -101,3 +101,99 @@ var requestAnimationFrame = (
         globalVariable.setTimeout(callback, 1000 / 60);
     }
 );
+
+/**
+ * Interprets a value so that it is a string. If the given value is null or
+ * undefined, an empty string is returned.
+ *
+ * @private
+ * @param   {?} value
+ *          Value to convert into a string.
+ * @return  {String}
+ *          Interpretted string.
+ */
+var interpretString = function (value) {
+
+    return (
+        (value === "" || value === null || value === undefined)
+        ? ""
+        : String(value).trim()
+    );
+
+};
+
+/**
+ * Create a lower-case version of {@link interpretString}.
+ *
+ * @private
+ * @param   {?} value
+ *          Value to convert into a string.
+ * @return  {String}
+ *          Interpretted lower-case string.
+ */
+var interpretLowerString = function (value) {
+    return interpretString(value).toLowerCase();
+};
+
+/**
+ * Helper function for slicing array-like objects.
+ *
+ * @private
+ * @param   {Object} arrayLike
+ *          Array-like structure.
+ * @param   {Number} [start]
+ *          Optional start for the slice.
+ * @return  {Array}
+ *          Sliced array.
+ */
+var slice = function (arrayLike, start) {
+    return Array.prototype.slice.call(arrayLike, start);
+};
+
+/**
+ * Takes the arguments and converts them into a valid JSON string.
+ *
+ * @private
+ * @return  {String}
+ *          JSON string based on the given arguments.
+ */
+var stringifyArguments = function () {
+    return JSON.stringify(slice(arguments));
+};
+
+/**
+ * Checks to see if the given object has the given property.
+ *
+ * @private
+ * @param   {Object} object
+ *          Object whose property's existence should be checked.
+ * @param   {String} property
+ *          Name of the property to check for.
+ * @return  {Boolean}
+ *          true if the object has the property, false otherwise.
+ */
+var owns = function (object, property) {
+    return Object.prototype.hasOwnProperty.call(object, property);
+};
+
+/**
+ * Removes duplicated values from the given array.
+ *
+ * @param  {Array} array
+ *         Array to reduce.
+ * @return {Array}
+ *         Array containing unique values.
+ */
+var arrayUnique = function (array) {
+
+    return array.reduce(function (unique, item) {
+
+        if (unique.indexOf(item) < 0) {
+            unique.push(item);
+        }
+
+        return unique;
+
+    }, []);
+
+};

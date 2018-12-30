@@ -18,7 +18,7 @@ ARIA.getFactory = function (attribute) {
 
     return (
         ARIA.factories[attribute]
-        || ARIA.factories[ARIA.getSuffix(ARIA.normalise(attribute))]
+        || ARIA.factories[ARIA.removePrefix(attribute)]
     );
 
 };
@@ -71,7 +71,7 @@ ARIA.makeFactory = function (attribute, Constructor) {
 /**
  * All the factory entries that create the {@link ARIA.factories}. Each entry is
  * an array of two values: the {@link ARIA.Property} (or sub-class) constructor
- * and an array of the WAI-ARIA attribute suffixes (see {@link ARIA.getSuffix}).
+ * and an array of the WAI-ARIA attribute suffixes (see {@link ARIA.removePrefix}).
  * @type {Array.<Array>}
  */
 ARIA.factoryEntries = [
@@ -156,7 +156,7 @@ ARIA.createFactories = function () {
         entry[1].forEach(function (attribute) {
 
             ARIA.factories[attribute] = ARIA.makeFactory(
-                ARIA.normalise(attribute),
+                ARIA.addPrefix(attribute),
                 entry[0]
             );
 
@@ -181,7 +181,7 @@ ARIA.createFactories();
  */
 ARIA.addAlias = function (source, aliases) {
 
-    var suffix = ARIA.getSuffix(ARIA.normalise(source));
+    var suffix = ARIA.removePrefix(source);
 
     if (!Array.isArray(aliases)) {
         aliases = [aliases];
@@ -199,7 +199,7 @@ ARIA.addAlias = function (source, aliases) {
 
     aliases.forEach(function (alias) {
 
-        var normalAlias = ARIA.getSuffix(ARIA.normalise(alias));
+        var normalAlias = ARIA.removePrefix(alias);
 
         ARIA.translate[normalAlias] = suffix;
         ARIA.factories[normalAlias] = ARIA.factories[suffix];

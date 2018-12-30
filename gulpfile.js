@@ -29,9 +29,11 @@ gulp.task("js", function () {
     return gulp.src([
             "./src/util.js",
             "./src/ARIA.js",
-            "./src/ARIA.normalise.js",
+            // "./src/ARIA.normalise.js",
+            "./src/ARIA-prefix.js",
             "./src/ARIA.createClass.js",
             "./src/ARIA-dom.js",
+            "./src/ARIA.Observer.js",
             "./src/ARIA.Property.js",
             "./src/ARIA.Number.js",
             "./src/ARIA.Integer.js",

@@ -201,7 +201,7 @@ ARIA.Element.makeObserver = function (element, checker, setter, unsetter) {
         mutations.forEach(function (mutation) {
 
             var attribute = mutation.attributeName || "";
-            var suffix = ARIA.getSuffix(attribute);
+            var suffix = ARIA.removePrefix(attribute);
             var data = {
                 attribute: attribute,
                 suffix: suffix
@@ -254,7 +254,6 @@ if (!globalVariable.Proxy) {
     ARIA.Element.prototype.activateTraps = function () {
 
         var that = this;
-        var owns = Object.prototype.hasOwnProperty.bind(that);
 
         Object.keys(ARIA.factories).forEach(function setProperty(attribute) {
 
@@ -280,7 +279,7 @@ if (!globalVariable.Proxy) {
 
                             if (isPolling) {
 
-                                if (owns(attribute)) {
+                                if (owns(that, attribute)) {
 
                                     requestAnimationFrame(poll);
                                     isPolling = true;
