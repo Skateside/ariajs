@@ -366,7 +366,7 @@ ARIA.removePrefix = ARIA.memoize(
         var normalised = interpretLowerString(attribute);
 
         return (
-            ARIA.untranslate(normalised)
+            ARIA.untranslate[normalised]
             || normalised.replace(ARIA.PREFIX_REGEXP, "")
         );
 
