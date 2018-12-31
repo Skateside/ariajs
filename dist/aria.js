@@ -1,4 +1,4 @@
-/*! ariajs - v0.2.0 - MIT license - https://github.com/Skateside/ariajs - 2018-12-30 */
+/*! ariajs - v0.2.0 - MIT license - https://github.com/Skateside/ariajs - 2018-12-31 */
 (function (globalVariable) {
     "use strict";
 
@@ -262,7 +262,7 @@ ARIA.restorePrevious = function () {
  * @return {Function}
  *         Memoised function.
  */
-ARIA.memoise = function (func, keyMaker, cache) {
+ARIA.memoize = function (func, keyMaker, cache) {
 
     var context = this;
 
@@ -332,7 +332,7 @@ ARIA.PREFIX_REGEXP = (/^(aria\-)?/);
  *           Attribute that should be prefixed with "aria-", if it isn't
  *           already.
  */
-ARIA.addPrefix = ARIA.memoise(
+ARIA.addPrefix = ARIA.memoize(
     function (attribute) {
 
         var removed = ARIA.removePrefix(attribute);
@@ -351,7 +351,7 @@ ARIA.addPrefix = ARIA.memoise(
  * @param    {String} attribute
  *           Attribute that should have the "aria-" prefix removed.
  */
-ARIA.removePrefix = ARIA.memoise(
+ARIA.removePrefix = ARIA.memoize(
     function (attribute) {
         return interpretLowerString(attribute).replace(ARIA.PREFIX_REGEXP, "");
     },
@@ -845,28 +845,6 @@ ARIA.Property = ARIA.createClass(/** @lends ARIA.Property.prototype */{
     },
 
     /**
-     * Gets the value of {@link ARIA.Property#attribute} and interprets it
-     * (see {@link ARIA.Property#interpret}). If {@link ARIA.Property#element}
-     * doesn't have {@link ARIA.Property#attribute} then null is returned.
-     *
-     * @return {String|null}
-     *         Interpretted value of {@link ARIA.Property#attribute} or null if
-     *         the attribute is not set.
-     */
-    // get: function () {
-    //
-    //     var element = this.element;
-    //     var attribute = this.attribute;
-    //
-    //     return (
-    //         ARIA.hasAttribute(element, attribute)
-    //         ? this.interpret(ARIA.getAttribute(element, attribute))
-    //         : null
-    //     );
-    //
-    // },
-
-    /**
      * Gets the value of {@link ARIA.Property#attribute} from
      * {@link ARIA.Property#element} and interprets it (see
      * {@link ARIA.Property#interpret}) before returning it. If the element
@@ -901,29 +879,6 @@ ARIA.Property = ARIA.createClass(/** @lends ARIA.Property.prototype */{
         return value;
 
     },
-
-    /**
-     * Sets {@link ARIA.Property#attribute} to the given value, once
-     * interpretted (see {@link ARIA.Property#interpret}) and validated (see
-     * {@link ARIA.Property#isValidToken}). If the value is interpretted as an
-     * empty string, the attribute is removed.
-     *
-     * @param {?} value
-     *        Value to set.
-     */
-    // set: function (value) {
-    //
-    //     var element = this.element;
-    //     var attribute = this.attribute;
-    //     var interpretted = this.interpret(value);
-    //
-    //     if (interpretted === "") {
-    //         ARIA.removeAttribute(element, attribute);
-    //     } else {
-    //         ARIA.setAttribute(element, attribute, interpretted);
-    //     }
-    //
-    // },
 
     /**
      * Sets the value of {@link ARIA.Property#attribute} on
@@ -1341,40 +1296,6 @@ ARIA.List = ARIA.createClass(ARIA.Property, /** ARIA.List.prototype */{
 
     /**
      * Sets the value of the list to be the given value. The values are
-     * interpretted as an array (see {@link ARIA.List#interpret} and validated
-     * (see {@link ARIA.List#isValidToken}); only unique values are added.
-     *
-     * @param {?} value
-     *        Value(s) to add. If the given value is a string, it is assumed to
-     *        be a space-separated list.
-     */
-    // set: function (value) {
-    //
-    //     var that = this;
-    //     var values = that.interpret(value).reduce(function (unique, token) {
-    //
-    //         if (token && unique.indexOf(token) < 0) {
-    //             unique.push(token);
-    //         }
-    //
-    //         return unique;
-    //
-    //     }, []);
-    //     var element = that.element;
-    //     var attribute = that.attribute;
-    //
-    //     that.list = values;
-    //
-    //     if (values.length) {
-    //         ARIA.setAttribute(element, attribute, values.join(" "));
-    //     } else {
-    //         ARIA.removeAttribute(element, attribute);
-    //     }
-    //
-    // },
-
-    /**
-     * Sets the value of the list to be the given value. The values are
      * interpretted as an array (see {@link ARIA.List#interpret}). If the values
      * are interpretted as empty array, the attribute is removed using
      * {@link ARIA.Property#remove}. Only unique values are added (see
@@ -1417,16 +1338,6 @@ ARIA.List = ARIA.createClass(ARIA.Property, /** ARIA.List.prototype */{
         }
 
     },
-
-    /**
-     * Gets the value of the attribute as an array.
-     *
-     * @return {Array.<String>}
-     *         Value of the attribute as an array.
-     */
-    // get: function () {
-    //     return this.list.concat();
-    // }
 
     /**
      * Gets the value of {@link ARIA.Property#attribute} as an array. Modifying
@@ -1562,7 +1473,6 @@ ARIA.ReferenceList = ARIA.createClass(ARIA.List, /** @lends ARIA.ReferenceList.p
      */
     get: function () {
         return this.$super(ARIA.getById);
-        // return this.$super().map(ARIA.getById);
     }
 
 });

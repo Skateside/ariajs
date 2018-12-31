@@ -10,7 +10,7 @@
  * @return {Function}
  *         Memoised function.
  */
-ARIA.memoise = function (func, keyMaker, cache) {
+ARIA.memoize = function (func, keyMaker, cache) {
 
     var context = this;
 
@@ -80,7 +80,7 @@ ARIA.PREFIX_REGEXP = (/^(aria\-)?/);
  *           Attribute that should be prefixed with "aria-", if it isn't
  *           already.
  */
-ARIA.addPrefix = ARIA.memoise(
+ARIA.addPrefix = ARIA.memoize(
     function (attribute) {
 
         var removed = ARIA.removePrefix(attribute);
@@ -99,7 +99,7 @@ ARIA.addPrefix = ARIA.memoise(
  * @param    {String} attribute
  *           Attribute that should have the "aria-" prefix removed.
  */
-ARIA.removePrefix = ARIA.memoise(
+ARIA.removePrefix = ARIA.memoize(
     function (attribute) {
         return interpretLowerString(attribute).replace(ARIA.PREFIX_REGEXP, "");
     },
