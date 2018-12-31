@@ -1,4 +1,4 @@
-describe("aria.tokens.digitalPublishing", function () {
+describe("aria.digitalPublishing", function () {
 
     describe("ARIA.Element#role", function () {
 
