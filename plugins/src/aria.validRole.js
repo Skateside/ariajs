@@ -5,6 +5,7 @@
  * @author   James "Skateside" Long
  * @license  MIT
  * @requires aria.tokens.js
+ * @requires aria.focus.js
  */
 (function (ARIA) {
 

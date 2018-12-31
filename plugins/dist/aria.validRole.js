@@ -5,6 +5,7 @@
  * @author   James "Skateside" Long
  * @license  MIT
  * @requires aria.tokens.js
+ * @requires aria.focus.js
  */
 (function (ARIA) {
 
@@ -605,4 +606,4 @@
 
 }(window.ARIA));
 
-//# sourceMappingURL=aria.tokens.validRole.js.map
+//# sourceMappingURL=aria.validRole.js.map
