@@ -15,7 +15,7 @@
 
         // Add the suffix map to allow the attribute to generate the correct
         // suffix.
-        ARIA.suffixCache[normalised] = stem;
+        ARIA.untranslate[normalised] = stem;
 
         // Allow ARIA.normalise to return the correct value.
         ARIA.translate["aria-" + stem] = normalised;

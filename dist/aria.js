@@ -318,6 +318,15 @@ ARIA.translate = objectAssign(Object.create(null), {
 });
 
 /**
+ * Translations for afgter the {@link ARIA.removePrefix} process has happened.
+ * Unlike {@link ARIA.suffixCache}, this map translates values that have already
+ * been process (trimmed and converted into lower-case). As such, it's probably
+ * easier to modify this map than the cache.
+ * @type {Object}
+ */
+ARIA.untranslate = Object.create(null);
+
+/**
  * The regular expression used to match the WAI-ARIA prefix.
  * @type {RegExp}
  */
@@ -353,7 +362,14 @@ ARIA.addPrefix = ARIA.memoize(
  */
 ARIA.removePrefix = ARIA.memoize(
     function (attribute) {
-        return interpretLowerString(attribute).replace(ARIA.PREFIX_REGEXP, "");
+
+        var normalised = interpretLowerString(attribute);
+
+        return (
+            ARIA.untranslate(normalised)
+            || normalised.replace(ARIA.PREFIX_REGEXP, "")
+        );
+
     },
     identity,
     ARIA.suffixCache
