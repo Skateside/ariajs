@@ -1,0 +1,17 @@
+{
+    "digitalPublishing": {
+        "requires": [
+            "tokens"
+        ]
+    },
+    "extendNode": {},
+    "flowFrom": {},
+    "focus": {},
+    "tokens": {},
+    "validRole": {
+        "requires": [
+            "tokens",
+            "focus"
+        ]
+    }
+}

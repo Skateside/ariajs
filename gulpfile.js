@@ -5,7 +5,53 @@ var minify          = require("gulp-minify");
 var sourcemaps      = require("gulp-sourcemaps");
 var fs              = require("fs");
 var pkgJson         = JSON.parse(fs.readFileSync("./package.json"))
+var pluginMeta      = JSON.parse(fs.readFileSync("./plugins.json"));
 
+/**
+ * Reads the arguments passed to a gulp task.
+ *
+ * @param  {Array} args
+ *         The results of process.argv
+ * @return {Object}
+ *         Arguments passed to the gulp task.
+ */
+var readArgs = function (args) {
+
+    var read = {};
+    var i = 3;
+    var il = args.length;
+    var arg;
+    var prop;
+    var value;
+
+    while (i < il) {
+
+        arg = args[i];
+
+        if (arg.indexOf("--") === 0) {
+
+            prop = arg.slice(2);
+            value = true;
+
+        } else {
+            value = arg;
+        }
+
+        read[prop] = value;
+        i += 1;
+
+    }
+
+    return read;
+
+};
+
+/**
+ * Gets today's date as a string.
+ *
+ * @return {String}
+ *         Date in the format "YYYY-MM-DD".
+ */
 var getToday = function () {
 
     var date = new Date();
@@ -29,7 +75,6 @@ gulp.task("js", function () {
     return gulp.src([
             "./src/util.js",
             "./src/ARIA.js",
-            // "./src/ARIA.normalise.js",
             "./src/ARIA-prefix.js",
             "./src/ARIA.createClass.js",
             "./src/ARIA-dom.js",
@@ -125,7 +170,6 @@ gulp.task("test", function () {
 
     gulp.src("./tests/testrunner.html")
         .pipe(mochaPhantomJS({
-            // globals: ["window", "ARIA", "makeUniqueId"],
             reporter: "spec",
             phantomjs: {
                 useColors: true
@@ -143,3 +187,66 @@ gulp.task("watch", [
     "plugins:watch",
     // "test:watch"
 ]);
+
+gulp.task("build", ["js", "plugins"], function () {
+
+    var args = readArgs(process.argv);
+    var plugins = (args.p || args.plugins || "").trim().split(/\s+/);
+    var rawRequires = [];
+    var requireKeys = {};
+    var files = [
+        "./dist/aria.js"
+    ];
+
+    if (plugins.length === 1 && plugins[0] === "all") {
+        plugins = Object.keys(pluginMeta);
+    }
+
+    plugins.forEach(function (plugin) {
+
+        var meta = pluginMeta[plugin];
+
+        if (meta) {
+
+            if (meta.requires) {
+                rawRequires = [].concat(meta.requires, rawRequires);
+            }
+
+            rawRequires.push(plugin);
+
+        } else {
+            console.log("\nWARNING: Unable to find '" + plugin + "' plugin\n");
+        }
+
+    });
+
+    rawRequires.forEach(function (raw) {
+        requireKeys[raw] = true;
+    });
+
+    Object.keys(requireKeys).forEach(function (ref) {
+        files.push("./plugins/src/aria." + ref + ".js");
+    });
+
+    gulp.src(files)
+        .pipe(concat.header(
+            "/*! " + files.join(", ") + " */\n"
+        ))
+        .pipe(concat("aria.custom.js"))
+        .pipe(sourcemaps.init())
+        .pipe(minify({
+            ext: {
+                min: ".min.js"
+            },
+            preserveComments: function (node, comment) {
+                return comment.value.startsWith("!");
+            }
+        }))
+        .pipe(sourcemaps.write("./", {
+            sourceMappingURL: function (file) {
+                return file.relative + ".map";
+            }
+        }))
+        .pipe(gulp.dest("./dist/"));
+
+});
