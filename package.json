@@ -1,6 +1,6 @@
 {
     "name": "ariajs",
-    "version": "0.2.0",
+    "version": "0.3.0",
     "description": "Helper library for working with WAI-ARIA attributes",
     "main": "dist/aria.js",
     "author": "James \"Skateside\" Long",

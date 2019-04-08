@@ -2,6 +2,18 @@
 
 A helper library for working with WAI-ARIA attributes, designed to make manipulating them as simple as possible.
 
+## Open for Beta
+
+`aria.js` is now open for beta testing. If you notice an issue, [please open an issue](https://github.com/Skateside/ariajs/issues). If you want to be really awesome, you can always create a pull request. I'm looking for certain things during this beta test:
+
+- Does this library create any noticeable performance hits?
+- Do all features work as expected?
+- Is [the documentation](https://github.com/Skateside/ariajs/wiki) easy to follow?
+
+This library _should_ be intuitive and the documentation _should_ be easy to understand. If this isn't the case, please let me know.
+
+If you want to contact me without raising an issue, you can find me on Twitter: [@Skateside](https://twitter.com/Skateside). I'd love to see how you're using this library or whether you (dis)like any features of it.
+
 ## Documentation
 
 The documentation for this library can be found in [the Wiki](https://github.com/Skateside/ariajs/wiki).
@@ -60,15 +72,3 @@ Gulp task | Description | Watch version
 `gulp plugins` | Creates the plugins from their source files in `./plugins/src/` | `gulp plugins:watch`
 `gulp test` | Runs the unit tests for `aria.js`. You will need to run `gulp js` first. | `gulp test:watch`
 `gulp watch` | Runs `gulp js:watch`, `gulp plugins:watch` and `gulp test:watch` | (none)
-
-## State of this library
-
-This library is currently in **alpha** as I'm still working out the finer details. Here's my to-do list:
-
-- [x] Browser test (IE11+).
-- [x] Get the `aria` property working.
-- [x] Finish writing unit tests. (Except for the non-`Proxy` fall-back of `delete` which doesn't work and I don't know why - see [issue 5](https://github.com/Skateside/ariajs/issues/5).)
-- [x] Write some plugins for proprietary attributes and extended roles.
-- [x] Write documentation in the WIKI.
-- [ ] Release for beta testing.
-- [ ] Write some widgets using this library to test feasibility?
