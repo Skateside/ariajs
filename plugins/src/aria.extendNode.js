@@ -56,7 +56,7 @@
          *
          * @memberof Node
          * @instance
-         * @name     aria
+         * @name     role
          * @type     {ARIA.List}
          */
         Object.defineProperty(nodeProto, roleProp, {
