@@ -2,6 +2,7 @@ import {
     prefix,
     translate
 } from "../util.js";
+import AriaElement from "../AriaElement.js";
 
 export default class Property {
 
@@ -14,8 +15,8 @@ export default class Property {
             attribute
         } = this;
 
-        if (Property.hasAttribute(element, attribute)) {
-            this.set(Property.getAttribute(element, attribute));
+        if (AriaElement.hasAttribute(element, attribute)) {
+            this.set(AriaElement.getAttribute(element, attribute));
         }
 
     }
@@ -44,41 +45,19 @@ export default class Property {
         let val = this.write(value);
 
         if (val === "") {
-            Property.removeAttribute(element, attribute);
+            AriaElement.removeAttribute(element, attribute);
         } else {
-            Property.setAttribute(element, attribute, val);
+            AriaElement.setAttribute(element, attribute, val);
         }
 
     }
 
     get() {
-        return this.read(Property.getAttribute(this.element, this.attribute));
-    }
-
-    static setAttribute(element, attribute, value) {
-        element.setAttribute(attribute, value);
-    }
-
-    static getAttribute(element, attribute) {
-
-        return (
-            Property.hasAttribute(element, attribute)
-            ? element.getAttribute(attribute)
-            : null
-        );
-
-    }
-
-    static hasAttribute(element, attribute) {
-        return element.hasAttribute(attribute);
-    }
-
-    static removeAttribute(element, attribute) {
-        element.removeAttribute(attribute);
+        return this.read(AriaElement.getAttribute(this.element, this.attribute));
     }
 
     toString() {
-        return Property.getAttribute(this.element, this.attribute) || "";
+        return AriaElement.getAttribute(this.element, this.attribute) || "";
     }
 
 }
