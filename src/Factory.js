@@ -10,7 +10,7 @@ export default class Factory {
         this.factories = Object.create(null);
     }
 
-    get(attribute) {
+    lookup(attribute) {
 
         let {
             factories
@@ -22,7 +22,7 @@ export default class Factory {
 
     run(attribute, element) {
 
-        let factory = this.get(attribute);
+        let factory = this.lookup(attribute);
 
         if (!factory) {
 
@@ -46,7 +46,7 @@ export default class Factory {
 
     alias(source, alias) {
 
-        let factory = this.get(source);
+        let factory = this.lookup(source);
 
         if (!factory) {
             throw new ReferenceError(source + " is not a recognised factory");

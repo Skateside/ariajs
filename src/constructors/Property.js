@@ -1,22 +1,14 @@
-import {
-    prefix,
-    translate
-} from "../util.js";
+import Attribute from "../Attribute.js";
 import AriaElement from "../AriaElement.js";
 
 export default class Property {
 
-    constructor(...args) {
+    constructor(element, attribute) {
 
-        this.setup(...args);
+        this.setup(element, attribute);
 
-        let {
-            element,
-            attribute
-        } = this;
-
-        if (AriaElement.hasAttribute(element, attribute)) {
-            this.set(AriaElement.getAttribute(element, attribute));
+        if (attribute.exists()) {
+            this.set(attribute.getValue());
         }
 
     }
@@ -24,7 +16,9 @@ export default class Property {
     setup(element, attribute) {
 
         this.element = element;
-        this.attribute = translate(prefix(attribute));
+        this.attribute = attribute;
+
+        attribute.setElement(element.getValue());
 
     }
 
@@ -45,19 +39,19 @@ export default class Property {
         let val = this.write(value);
 
         if (val === "") {
-            AriaElement.removeAttribute(element, attribute);
+            attribute.remove();
         } else {
-            AriaElement.setAttribute(element, attribute, val);
+            attribute.set(val);
         }
 
     }
 
     get() {
-        return this.read(AriaElement.getAttribute(this.element, this.attribute));
+        return this.read(this.attribute.getValue());
     }
 
     toString() {
-        return AriaElement.getAttribute(this.element, this.attribute) || "";
+        return this.attribute.getValue("");
     }
 
 }
