@@ -1,4 +1,4 @@
-class AttributeFactory {
+export default class AttributeFactory {
 
     static get OVERRIDE() {
         return true;
@@ -12,6 +12,7 @@ class AttributeFactory {
 
         let factories = this.factories;
         let normal = Name.create(name);
+// BUG: Name is undefined
 
         if (!factories[normal] || isOverride) {
             factories[normal] = () => new Attribute(normal, new Value());
@@ -27,7 +28,9 @@ class AttributeFactory {
             factories = Object.entries(factories);
         }
 
-        factories.forEach(([name, Value]) => this.addFactory(name, Value, isOverride));
+        factories.forEach(([name, Value]) => {
+            this.addFactory(name, Value, isOverride)
+        });
 
     }
 

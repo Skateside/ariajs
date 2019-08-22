@@ -1,13 +1,28 @@
-import StringType from "./StringType.js";
+import BasicType from "./BasicType.js";
+import Facade from "../Facade.js";
 
-class ListType extends StringType {
+export default class ListType extends BasicType {
+
+    static facadeMethods = [
+        "add",
+        "remove",
+        "contains",
+        "toggle",
+        "keys",
+        "values",
+        "entries",
+        Symbol.iterator,
+        "toString"
+    ];
 
     constructor() {
-        super();
-        this.value = new Set();
+
+        super(new Set());
+        this.facade = new Facade(this, this.constructor.facadeMethods);
+
     }
 
-    coerceToArray(value) {
+    coerce(value) {
 
         if (
             value === ""
@@ -33,12 +48,12 @@ class ListType extends StringType {
     write(value) {
 
         this.value.clear();
-        this.coerceToArray(value).forEach((coerced) => this.value.add(coerced));
+        this.add(...this.coerce(value));
 
     }
 
     read() {
-        return [...super.read()];
+        return this.facade;
     }
 
     add(...values) {
@@ -67,78 +82,28 @@ class ListType extends StringType {
 
     }
 
-    item(i) {
-
-        let value = [...this.value];
-        let item;
-
-        if (Object.prototype.hasOwnProperty.call(value, i)) {
-            item = value[i];
-        }
-
-        return item;
-
-    }
-
     forEach(handler, context) {
         this.value.forEach((value, i) => handler.call(context, value, i));
     }
 
     keys() {
         return this.value.keys();
-
-        // let value = this.value;
-        // let i = 0;
-        // let il = value.length;
-        //
-        // while (i < il) {
-        //     yield i++;
-        // }
-
     }
 
     values() {
-
         return this.value.values();
-
-        // let value = this.value;
-        // let i = 0;
-        // let il = value.length;
-        //
-        // while (i < il) {
-        //     yield value[i++];
-        // }
-
     }
 
     entries() {
-
         return this.value.entries();
-
-        // let value = this.value;
-        // let i = 0;
-        // let il = value.length;
-        //
-        // while (i < il) {
-        //     yield [i, value[i++]];
-        // }
-
     }
 
     [Symbol.iterator]() {
         return this.value.values();
-        // let value = this.value;
-        // let i = 0;
-        // let il = value.length;
-        //
-        // while (i < il) {
-        //     yield value[i++];
-        // }
-
     }
 
     toString() {
         return [...this.value].join(" ");
     }
-    
+
 }
