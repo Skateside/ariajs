@@ -1,4 +1,4 @@
-class Facade {
+export default class Facade {
 
     constructor(source, methods) {
 

@@ -12,7 +12,7 @@ export default class ReferenceType extends BasicType {
     }
 
     read() {
-        return this.value.identify();
+        return this.value.element();
     }
 
 }

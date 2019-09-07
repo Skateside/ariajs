@@ -3,25 +3,27 @@ import Reference from "../Reference.js";
 
 export default class ReferenceListType extends ListType {
 
-    // write(value) {
-    // }
-
-    read() {
-    }
-
     add(...values) {
-
-        return super.add(
-            ...Array.from(values, (value) => Reference.interpret(value))
-        );
-
+        return super.add(...this.interpretValues(values));
     }
 
     remove(...values) {
+        return super.remove(...this.interpretValues(values));
+    }
 
-        return super.remove(
-            ...Array.from(values, (value) => Reference.interpret(value))
-        );
+    interpretValues(values) {
+
+        return values
+            .map((value) => this.coerceValue(value))
+            .flat();
+
+    }
+
+    coerceValue(value) {
+
+        return this
+            .coerce(value)
+            .map((coerced) => Reference.interpret(coerced));
 
     }
 
@@ -31,6 +33,27 @@ export default class ReferenceListType extends ListType {
 
     toggle(value, force) {
         return super.toggle(Reference.interpret(value), force);
+    }
+
+    replace(oldValue, newValue) {
+
+        return super.replace(
+            Reference.interpret(oldValue),
+            Reference.interpret(newValue)
+        );
+
+    }
+
+    item(index) {
+
+        let item = super.item(index);
+
+        return (
+            item
+            ? item.element()
+            : null
+        );
+
     }
 
 }
