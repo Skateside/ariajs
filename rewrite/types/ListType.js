@@ -1,5 +1,5 @@
 import BasicType from "./BasicType.js";
-import ListFacade from "../ListFacade.js";
+import ListFacade from "../facades/ListFacade.js";
 
 export default class ListType extends BasicType {
 
@@ -35,8 +35,11 @@ export default class ListType extends BasicType {
 
     write(value) {
 
-        this.value.length = 0;
+        // this.value.length = 0;
+        this.clear();
         this.add(...this.coerce(value));
+
+        return !this.isEmpty();
 
     }
 
@@ -189,6 +192,14 @@ export default class ListType extends BasicType {
 
     size() {
         return this.value.length;
+    }
+
+    isEmpty() {
+        return this.size() === 0;
+    }
+
+    clear() {
+        this.value.length = 0;
     }
 
 }

@@ -1,23 +1,23 @@
 import Facade from "./Facade.js";
 
-let facadeMethods = [
-    "add",
-    "remove",
-    "item",
-    "toggle",
-    "contains",
-    "replace",
-    "forEach",
-    "toString",
-    "keys",
-    "values",
-    "entries",
-    Symbol.iterator
-];
-
 export default class ListFacade extends Facade {
 
-    constructor(source, methods = facadeMethods) {
+    static facadeMethods = [
+        "add",
+        "remove",
+        "item",
+        "toggle",
+        "contains",
+        "replace",
+        "forEach",
+        "toString",
+        "keys",
+        "values",
+        "entries",
+        Symbol.iterator
+    ];
+
+    constructor(source, methods = ListFacade.facadeMethods) {
 
         super(source, methods);
 

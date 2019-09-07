@@ -2,16 +2,18 @@ import BasicType from "./BasicType.js";
 
 export default class StateType extends BasicType {
 
-    constructor() {
-        super(false);
-    }
-
     coerce(value) {
-        return String(value).toLowerCase() === "true";
+
+        if (value !== this.constructor.EMPTY_VALUE) {
+            value = String(value).toLowerCase() === "true";
+        }
+
+        return value;
+
     }
 
     write(value) {
-        super.write(this.coerce(value));
+        return super.write(this.coerce(value));
     }
 
 }
