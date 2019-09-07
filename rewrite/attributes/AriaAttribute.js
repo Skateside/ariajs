@@ -2,90 +2,66 @@ import Attribute from "./Attribute.js";
 
 class AriaAttribute extends Attribute {
 
-    static get RAW() {
-        return "raw";
+    static get PREFIX() {
+        return "aria-";
     }
 
-    static get PREFIXED() {
-        return "prefixed";
-    }
+    static validateString(name) {
 
-    static get UNPREFIXED() {
-        return "unprefixed";
-    }
-
-    static prefix = "aria-";
-
-    constructor(raw) {
-
-        super(raw);
-        this.nameCache = Object.create(null);
-
-    }
-
-    name(mode = this.constructor.PREFIXED) {
-
-        let {
-            nameCache
-        } = this;
-
-        if (nameCache[mode]) {
-            return nameCache[mode];
+        if (typeof name !== "string") {
+            throw new TypeError("AriaAttribute requires a string");
         }
 
-        let method = `create_${mode}`;
-
-        if (!this[method]) {
-            throw new Error(`Unrecognised name mode '${mode}'`);
-        }
-
-        nameCache[mode] = this[method]();
-
-        return nameCache[mode];
+        return true;
 
     }
 
-    coerce(raw) {
+    static prefix(name) {
 
-        if (
-            raw === ""
-            || raw === null
-            || raw === undefined
-        ) {
-            return "";
-        }
+        this.validateString(name);
 
-        return String(raw).trim().toLowerCase();
-
-    }
-
-    create_raw() {
-        return this.coerce(this.raw);
-    }
-
-    create_prefixed() {
-
-        let name = this.coerce(this.raw);
-        let prefix = this.constructor.prefix;
+        let prefix = AriaAttribute.PREFIX;
 
         if (!name.startsWith(prefix)) {
-            name = `${prefix}${name}`;
+            name = prefix + name;
         }
 
         return name;
 
     }
 
-    create_unprefixed() {
+    static unprefix(name) {
 
-        let name = this.coerce(this.raw);
-        let prefix = this.constructor.prefix;
+        this.validateString(name);
+
+        let prefix = AriaAttribute.PREFIX;
 
         if (name.startsWith(prefix)) {
-            name = name.substr(prefix.length);
+            name = name.slice(prefix.length);
         }
 
         return name;
+
+    }
+
+    static create(name) {
+        return super.create(this.prefix(name));
+    }
+
+    constructor(attributeName) {
+
+        super(attributeName);
+
+        let prefix = this.constructor.PREFIX;
+
+        if (!attributeName.startsWith(prefix)) {
+
+            throw new Error(
+                "AriaAttribute constructor must be passed an attribute "
+                + "starting with '" + prefix + "'"
+            );
+
+        }
 
     }
 

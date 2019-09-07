@@ -19,24 +19,27 @@ export default class Reference {
 
     identify() {
 
-        if (!this.reference) {
-            return undefined;
-        }
+        let {
+            id,
+            reference
+        } = this;
 
-        let id = this.id;
+        if (!reference) {
+            return;
+        }
 
         if (!id) {
 
-            id = Attribute.create(this, "id");
+            id = Attribute.create("id");
             this.id = id;
 
         }
 
-        if (!id.exists()) {
-            id.write(this.generateId());
+        if (!id.exists(reference)) {
+            id.write(reference, this.generateId());
         }
 
-        return id.read();
+        return id.read(reference);
 
     }
 

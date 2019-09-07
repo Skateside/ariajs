@@ -1,20 +1,20 @@
 export default class Attribute {
 
-    constructor(raw) {
-        this.raw = raw;
+    constructor(attributeName) {
+
+        if (typeof attributeName !== "string" || (/\s/).test(attributeName)) {
+            throw new Error("Invalid attribute name");
+        }
+
+        this.attributeName = attributeName.toLowerCase();
+
     }
 
     name() {
-        return this.raw;
+        return this.attributeName;
     }
 
-    refer(reference) {
-        this.reference = reference;
-    }
-
-    read() {
-
-        let element = this.reference.element();
+    read(element) {
 
         return (
             element
@@ -24,9 +24,7 @@ export default class Attribute {
 
     }
 
-    write(value) {
-
-        let element = this.reference.element();
+    write(element, value) {
 
         if (!element) {
             return false;
@@ -38,9 +36,7 @@ export default class Attribute {
 
     }
 
-    clear() {
-
-        let element = this.reference.element();
+    clear(element) {
 
         if (!element) {
             return false;
@@ -52,21 +48,28 @@ export default class Attribute {
 
     }
 
-    exists() {
-
-        let element = this.reference.element();
-
+    exists(element) {
         return Boolean(element) && element.hasAttribute(this.name());
-
     }
 
-    static create(reference, attribute) {
+    isEmpty(element) {
+        return this.exists(element) && this.read(element) !== "";
+    }
 
-        let attr = new this(attribute);
+    static cache = Object.create(null);
 
-        attr.refer(Reference.interpret(reference));
+    static create(attribute) {
 
-        return attr;
+        let cached = this.cache[attribute];
+
+        if (!cached) {
+
+            cached = new this(attribute);
+            this.cache[attribute] = cached;
+
+        }
+
+        return cached;
 
     }
 

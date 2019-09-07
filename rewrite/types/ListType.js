@@ -35,9 +35,9 @@ export default class ListType extends BasicType {
 
     write(value) {
 
-        // this.value.length = 0;
-        this.clear();
+        this.value.length = 0;
         this.add(...this.coerce(value));
+        this.dispatchEvent(this.constructor.EVENT_UPDATED);
 
         return !this.isEmpty();
 
@@ -48,11 +48,17 @@ export default class ListType extends BasicType {
     }
 
     add(...values) {
+
         values.forEach((value) => this.addUnique(value));
+        this.dispatchEvent(this.constructor.EVENT_UPDATED);
+
     }
 
     remove(...values) {
+
         values.forEach((value) => this.removeValue(value));
+        this.dispatchEvent(this.constructor.EVENT_UPDATED);
+
     }
 
     item(index) {
@@ -79,6 +85,8 @@ export default class ListType extends BasicType {
             : "remove"
         ](value);
 
+        this.dispatchEvent(this.constructor.EVENT_UPDATED);
+
         return true;
 
     }
@@ -96,6 +104,8 @@ export default class ListType extends BasicType {
         }
 
         this.value[index] = newValue;
+        this.dispatchEvent(this.constructor.EVENT_UPDATED);
+
         return true;
 
     }
@@ -199,7 +209,7 @@ export default class ListType extends BasicType {
     }
 
     clear() {
-        this.value.length = 0;
+        this.write([]);
     }
 
 }

@@ -1,16 +1,27 @@
-export default class BasicType {
+import Observer from "../Observer.js";
+
+export default class BasicType extends Observer {
 
     static get EMPTY_VALUE() {
         return "";
     }
 
-    constructor(value = this.constructor.EMPTY_VALUE) {
+    static get EVENT_UPDATED() {
+        return "updated";
+    }
+
+    constructor(value = BasicType.EMPTY_VALUE) {
+
+        super();
+
         this.value = value;
+
     }
 
     write(value) {
 
         this.value = value;
+        this.dispatchEvent(this.constructor.EVENT_UPDATED);
 
         return !this.isEmpty();
 
@@ -21,7 +32,7 @@ export default class BasicType {
     }
 
     clear() {
-        this.value = this.constructor.EMPTY_VALUE;
+        return this.write(this.constructor.EMPTY_VALUE);
     }
 
     toString() {
@@ -31,15 +42,5 @@ export default class BasicType {
     isEmpty() {
         return this.value === this.constructor.EMPTY_VALUE;
     }
-
-    // static create(value) {
-    //
-    //     let type = new this()
-    //
-    //     type.write(value);
-    //
-    //     return type;
-    //
-    // }
 
 }
