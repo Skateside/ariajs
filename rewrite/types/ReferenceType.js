@@ -3,10 +3,6 @@ import Reference from "../Reference.js";
 
 export default class ReferenceType extends BasicType {
 
-    // constructor() {
-    //     super(new Reference(null));
-    // }
-
     write(value) {
         return super.write(Reference.interpret(value));
     }
@@ -16,15 +12,11 @@ export default class ReferenceType extends BasicType {
         let value = this.value;
 
         return (
-            (value instanceof Reference)
+            Reference.isReference(value)
             ? value.element()
             : this.constructor.EMPTY_VALUE
         );
 
     }
-
-    // isEmpty() {
-    //     return this.read() === null;
-    // }
 
 }

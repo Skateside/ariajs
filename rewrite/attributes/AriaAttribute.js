@@ -1,24 +1,14 @@
 import Attribute from "./Attribute.js";
 
-class AriaAttribute extends Attribute {
+export default class AriaAttribute extends Attribute {
 
     static get PREFIX() {
         return "aria-";
     }
 
-    static validateString(name) {
-
-        if (typeof name !== "string") {
-            throw new TypeError("AriaAttribute requires a string");
-        }
-
-        return true;
-
-    }
-
     static prefix(name) {
 
-        this.validateString(name);
+        this.validateName(name);
 
         let prefix = AriaAttribute.PREFIX;
 
@@ -32,7 +22,7 @@ class AriaAttribute extends Attribute {
 
     static unprefix(name) {
 
-        this.validateString(name);
+        this.validateName(name);
 
         let prefix = AriaAttribute.PREFIX;
 
@@ -57,8 +47,8 @@ class AriaAttribute extends Attribute {
         if (!attributeName.startsWith(prefix)) {
 
             throw new Error(
-                "AriaAttribute constructor must be passed an attribute "
-                + "starting with '" + prefix + "'"
+                "AriaAttribute constructor must be passed an attribute name "
+                + `starting with '${prefix}', '${attributeName}' given.`
             );
 
         }

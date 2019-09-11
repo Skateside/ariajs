@@ -1,28 +1,34 @@
-import BasicType from "./types/BasicType.js";
-
 export default class Mediator {
 
-    constructor({ type, attribute, element }) {
+    constructor({ type, attribute, reference }) {
 
         this.type = type;
         this.attribute = attribute;
-        this.element = element;
+        this.reference = reference
+        this.element = reference.element();
 
-        this.type.addEventListener(
-            BasicType.EVENT_UPDATED,
-            () => this.updateFromType()
-        );
+        type.observe(() => this.updateFromType());
+        reference.observe(attribute.name(), () => this.updateFromAttribute());
 
-        // NOTE:
-        // it would be good to listen for attribute changes here.
+        if (attribute.exists(this.element) {
+            this.updateFromAttribute();
+        }
 
     }
 
     write(value) {
 
         this.type.write(value);
-        this.update();
+        this.updateFromType();
 
+    }
+
+    read() {
+        return this.type.read();
+    }
+
+    clear() {
+        return this.type.clear();
     }
 
     updateFromType() {
@@ -58,14 +64,6 @@ export default class Mediator {
 
         return type.write(attribute.read(element));
 
-    }
-
-    read() {
-        return this.type.read();
-    }
-
-    clear() {
-        return this.type.clear();
     }
 
     static isMediator(object) {

@@ -1,4 +1,3 @@
-import AriaAttribute from "./attributes/AriaAttribute.js";
 import Mediator from "./Mediator.js";
 
 export default class Factory {
@@ -21,22 +20,31 @@ export default class Factory {
         this.factories = Object.create(null);
     }
 
-    addFactory(name, Type, Attr = AriaAttribute, override = false) {
+    // add(name, Type, Attr = AriaAttribute, override = false) {
+    add(name, Type, Attr, override = false) {
 
-        if (this.factories[name] && override !== this.constructor.OVERRIDE) {
+        if (!name) {
+            throw new TypeError(`Invalid name '${name}'.`);
+        }
+
+        if (this.recognises(name) && override !== this.constructor.OVERRIDE) {
             throw new Error(`'${name}' factory already exists.`);
         }
 
-        this.factories[name] = (element) => {
+        this.factories[name] = (reference) => {
 
             return new Mediator({
-                element,
+                reference,
                 type: new Type(),
                 attribute: new Attr(name)
             });
 
         };
 
+    }
+
+    recognises(...names) {
+        return names.find((name) => Boolean(this.factories[name]));
     }
 
     create(name, reference) {

@@ -1,6 +1,6 @@
 import StateType from "./StateType.js";
 
-export default class UndefinedType extends StateType {
+export default class UndefinedStateType extends StateType {
 
     coerce(value) {
 

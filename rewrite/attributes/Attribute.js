@@ -2,10 +2,7 @@ export default class Attribute {
 
     constructor(attributeName) {
 
-        if (typeof attributeName !== "string" || (/\s/).test(attributeName)) {
-            throw new Error("Invalid attribute name");
-        }
-
+        this.constructor.validateName(attributeName);
         this.attributeName = attributeName.toLowerCase();
 
     }
@@ -70,6 +67,16 @@ export default class Attribute {
         }
 
         return cached;
+
+    }
+
+    static validateName(attributeName) {
+
+        if (typeof attributeName !== "string" || (/\s/).test(attributeName)) {
+            throw new Error("Invalid attribute name");
+        }
+
+        return true;
 
     }
 

@@ -20,24 +20,29 @@ export default class ListFacade extends Facade {
     constructor(source, methods = ListFacade.facadeMethods) {
 
         super(source, methods);
+        this.source = source;
 
         return new Proxy(this, {
-
-            get(target, name) {
-
-                if (name === "length") {
-                    return source.size();
-                }
-
-                if (source.coerceIndex(name) !== null) {
-                    return target.item(name);
-                }
-
-                return target[name];
-
-            }
-
+            get: this.get.bind(this)
         });
+
+    }
+
+    get(target, name) {
+
+        let {
+            source
+        } = this;
+
+        if (name === "length") {
+            return source.size();
+        }
+
+        if (source.coerceIndex(name) !== null) {
+            return target.item(name);
+        }
+
+        return target[name];
 
     }
 

@@ -36,20 +36,20 @@ export default class Reference {
         }
 
         if (!id.exists(reference)) {
-            id.write(reference, this.generateId());
+            id.write(reference, this.constructor.generateId());
         }
 
         return id.read(reference);
 
     }
 
-    generateId(prefix = this.constructor.defaultPrefix) {
+    static generateId(prefix = this.defaultPrefix) {
 
         let id;
 
         do {
-            id = `${prefix}${this.constructor.counter++}`;
-        } while (this.constructor.lookup(id));
+            id = `${prefix}${this.counter++}`;
+        } while (this.lookup(id));
 
         return id;
 
@@ -73,6 +73,10 @@ export default class Reference {
 
         return new this(reference);
 
+    }
+
+    static isReference(object) {
+        return object instanceof this;
     }
 
 }

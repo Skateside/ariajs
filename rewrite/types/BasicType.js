@@ -43,4 +43,8 @@ export default class BasicType extends Observer {
         return this.value === this.constructor.EMPTY_VALUE;
     }
 
+    observe(listener) {
+        this.addEventListener(this.constructor.EVENT_UPDATED, listener);
+    }
+
 }

@@ -1,91 +1,16 @@
-import AriaAttribute from "./attributes/AriaAttribute.js";
-import Factory from "./Factory.js";
-import Mediator from "./Mediator.js";
+import MediatorFacade from "./facades/MediatorFacade.js";
+import Reference from "./Reference.js";
 
-export default class Aria {
+export default class Aria extends Reference {
 
     constructor(element) {
 
-        this.element = element;
-        this.values = Object.create(null);
+        super(element);
+
+        this.observations = Object.create(null);
         this.observer = this.makeObserver();
 
-        return new Proxy(this, {
-            get: this.get.bind(this),
-            set: this.set.bind(this),
-            deleteProperty: this.deleteProperty.bind(this)
-        });
-
-    }
-
-    get(target, name) {
-
-        let property = this.lookup(target, name);
-
-        if (Mediator.isMediator(property)) {
-            return property.read();
-        }
-
-        return property;
-
-    }
-
-    set(target, name, value) {
-
-        let property = this.lookup(target, name);
-
-        if (Mediator.isMediator(property)) {
-            return property.write(value);
-        }
-
-        target[name] = value;
-
-        return true;
-
-    }
-
-    deleteProperty(target, name) {
-
-        let property = this.lookup(target, name);
-
-        if (Mediator.isMediator(property)) {
-            return property.clear();
-        }
-
-        delete target[name];
-        return true;
-
-    }
-
-    lookup(object, property) {
-
-        if (Object.prototype.hasOwnProperty.call(object, property)) {
-            return object[property];
-        }
-
-        let value = this.build(property);
-
-        if (value) {
-
-            object[property] = value;
-            return value;
-
-        }
-
-    }
-
-    build(property) {
-
-        let instance = this.instances[property];
-
-        if (!instance) {
-
-            instance = Factory.get().create(property, this.element);
-            this.instances[property] = instance;
-
-        }
-
-        return instance;
+        return new MediatorFacade(this);
 
     }
 
@@ -95,7 +20,7 @@ export default class Aria {
             this.checkMutations(mutations);
         });
 
-        observer.observe(this.element, {
+        observer.observe(this.reference, {
             attributes: true
         });
 
@@ -105,24 +30,26 @@ export default class Aria {
 
     checkMutations(mutations) {
 
-        mutations.forEach(({ type, attributeName = "" }) => {
-            this.checkMutation(type, attributeName);
+        mutations.forEach(({ attributeName }) => {
+            this.checkMutation(attributeName);
         });
 
     }
 
-    checkMutation(type, attributeName) {
+    checkMutation(attributeName) {
 
-        if (type !== "attributes" || !attributeName) {
+        let observation = this.observations[attributeName];
+
+        if (!observation) {
             return;
         }
 
-        let instance = this.build(AriaAttribute.unprefix(attributeName));
+        observation();
 
-        if (Mediator.isMediator(instance)) {
-            instance.updateFromAttribute();
-        }
+    }
 
+    observe(attributeName, handler) {
+        this.observations[attributeName] = handler;
     }
 
 }
