@@ -1,4 +1,4 @@
-import Attribute from "./attributes/Attribute.js";
+import Attribute from "../attributes/Attribute.js";
 
 export default class Reference {
 

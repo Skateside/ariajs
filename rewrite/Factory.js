@@ -20,7 +20,6 @@ export default class Factory {
         this.factories = Object.create(null);
     }
 
-    // add(name, Type, Attr = AriaAttribute, override = false) {
     add(name, Type, Attr, override = false) {
 
         if (!name) {

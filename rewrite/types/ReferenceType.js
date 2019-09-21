@@ -1,5 +1,5 @@
 import BasicType from "./BasicType.js";
-import Reference from "../Reference.js";
+import Reference from "../references/Reference.js";
 
 export default class ReferenceType extends BasicType {
 
