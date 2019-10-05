@@ -20,6 +20,10 @@ export default class Factory {
         this.factories = Object.create(null);
     }
 
+    setObserver(observer) {
+        this.observer = observer;
+    }
+
     add(name, Type, Attr, override = false) {
 
         if (!name) {
@@ -32,9 +36,12 @@ export default class Factory {
 
         this.factories[name] = (reference) => {
 
+            let type = new Type();
+            type.setObserver(this.observer);
+
             return new Mediator({
                 reference,
-                type: new Type(),
+                type,
                 attribute: new Attr(name)
             });
 

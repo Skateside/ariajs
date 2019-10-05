@@ -1,7 +1,7 @@
-import BasicType from "./BasicType.js";
+import ObservableBasicType from "./ObservableBasicType.js";
 import Reference from "../references/Reference.js";
 
-export default class ReferenceType extends BasicType {
+export default class ReferenceType extends ObservableBasicType {
 
     write(value) {
         return super.write(Reference.interpret(value));

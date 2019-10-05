@@ -1,6 +1,6 @@
-import BasicType from "./BasicType.js";
+import ObservableBasicType from "./ObservableBasicType.js";
 
-export default class StateType extends BasicType {
+export default class StateType extends ObservableBasicType {
 
     coerce(value) {
 

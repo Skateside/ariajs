@@ -1,6 +1,6 @@
-import BasicType from "./BasicType.js";
+import ObservableBasicType from "./ObservableBasicType.js";
 
-export default class FloatType extends BasicType {
+export default class FloatType extends ObservableBasicType {
 
     write(value) {
 

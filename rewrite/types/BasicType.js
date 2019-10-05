@@ -1,27 +1,16 @@
-import Observer from "../Observer.js";
-
-export default class BasicType extends Observer {
+export default class BasicType {
 
     static get EMPTY_VALUE() {
         return "";
     }
 
-    static get EVENT_UPDATED() {
-        return "updated";
-    }
-
-    constructor(value = BasicType.EMPTY_VALUE) {
-
-        super();
-
+    constructor(value = this.constructor.EMPTY_VALUE) {
         this.value = value;
-
     }
 
     write(value) {
 
         this.value = value;
-        this.dispatchEvent(this.constructor.EVENT_UPDATED);
 
         return !this.isEmpty();
 
@@ -41,10 +30,6 @@ export default class BasicType extends Observer {
 
     isEmpty() {
         return this.value === this.constructor.EMPTY_VALUE;
-    }
-
-    observe(listener) {
-        this.addEventListener(this.constructor.EVENT_UPDATED, listener);
     }
 
 }

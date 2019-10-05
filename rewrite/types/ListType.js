@@ -1,7 +1,7 @@
-import BasicType from "./BasicType.js";
+import ObservableBasicType from "./ObservableBasicType.js";
 import ListFacade from "../facades/ListFacade.js";
 
-export default class ListType extends BasicType {
+export default class ListType extends ObservableBasicType {
 
     constructor() {
 
@@ -37,7 +37,7 @@ export default class ListType extends BasicType {
 
         this.value.length = 0;
         this.add(...this.coerce(value));
-        this.dispatchEvent(this.constructor.EVENT_UPDATED);
+        this.announceUpdate();
 
         return !this.isEmpty();
 
