@@ -68,7 +68,7 @@ export default class ListType extends ObservableBasicType {
         return (
             idx === null
             ? idx
-            : this.lookup(idx])
+            : this.lookup(idx)
         );
 
     }

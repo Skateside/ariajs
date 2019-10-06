@@ -2,3 +2,4 @@ node_modules/
 thoughts/
 wiki/
 dist/
+yarn-error.log

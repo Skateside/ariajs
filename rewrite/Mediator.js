@@ -10,7 +10,7 @@ export default class Mediator {
         type.observe(() => this.updateFromType());
         reference.observe(attribute.name(), () => this.updateFromAttribute());
 
-        if (attribute.exists(this.element) {
+        if (attribute.exists(this.element)) {
             this.updateFromAttribute();
         }
 

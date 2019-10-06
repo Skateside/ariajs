@@ -19,16 +19,17 @@
     "bugs": {
         "url": "https://github.com/Skateside/ariajs/issues"
     },
-    "dependencies": {
-        "gulp": "^3.9.1",
-        "gulp-concat-util": "^0.5.5",
-        "gulp-minify": "^3.1.0",
-        "gulp-sourcemaps": "^2.6.4"
+    "scripts": {
+        "build": "webpack",
+        "build-dev": "webpack --mode=development"
     },
     "devDependencies": {
-        "chai": "^4.2.0",
-        "gulp-mocha-phantomjs": "^0.12.2",
-        "mocha": "^5.2.0",
-        "weakmap-polyfill": "^2.0.0"
+        "@babel/core": "^7.6.2",
+        "@babel/plugin-proposal-class-properties": "^7.5.5",
+        "@babel/preset-env": "^7.6.2",
+        "babel-loader": "^8.0.6",
+        "webpack": "^4.41.0",
+        "webpack-auto-inject-version": "^1.2.2",
+        "webpack-cli": "^3.3.9"
     }
 }
