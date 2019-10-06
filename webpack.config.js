@@ -3,10 +3,12 @@ let WebpackAutoInject = require("webpack-auto-inject-version");
 
 let config = {
     mode: "production",
-    entry: "./rewrite/setup.js",
+    entry: {
+        aria: "./rewrite/setup.js"
+    },
     output: {
         path: path.resolve(__dirname, "dist"),
-        filename: "aria.js"
+        filename: "[name].js"
     },
     plugins: [
         new WebpackAutoInject({
@@ -24,7 +26,7 @@ let config = {
                     loader: "babel-loader",
                     options: {
                         presets: ["@babel/preset-env"],
-                        plugins: ["@babel/plugin-proposal-class-properties"]
+                        plugins: ["@babel/plugin-proposal-class-properties"],
                     }
                 }
             }
@@ -34,10 +36,11 @@ let config = {
 
 module.exports = (env, argv) => {
 
-    if (argv.mode == "development") {
+    if (argv.mode === "development") {
 
         config.mode = "development";
         config.devtool = "source-map";
+        config.entry.jest = "./jest/jest.js";
 
     }
 

@@ -111,7 +111,8 @@ export default class ListType extends ObservableBasicType {
     }
 
     toString() {
-        return this.value.map((item) => item.toString()).join(" ");
+        // return this.value.map((item) => item.toString()).join(" ");
+        return this.value.map(this.constructor.stringify).join(" ");
     }
 
     forEach(handler, context) {

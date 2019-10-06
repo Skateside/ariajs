@@ -15,7 +15,7 @@ export default class Attribute {
 
         return (
             element
-            ? element.getAttribute(this.name())
+            ? (element.getAttribute(this.name()) || "")
             : undefined
         );
 
@@ -50,7 +50,7 @@ export default class Attribute {
     }
 
     isEmpty(element) {
-        return this.exists(element) && this.read(element) !== "";
+        return !this.exists(element) || this.read(element) === "";
     }
 
     static cache = Object.create(null);

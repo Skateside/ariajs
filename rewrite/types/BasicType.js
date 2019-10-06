@@ -4,6 +4,16 @@ export default class BasicType {
         return "";
     }
 
+    static stringify(value) {
+
+        if (value === "" || value === null || value === undefined) {
+            return "";
+        }
+
+        return value.toString();
+
+    }
+
     constructor(value = this.constructor.EMPTY_VALUE) {
         this.value = value;
     }
@@ -25,7 +35,7 @@ export default class BasicType {
     }
 
     toString() {
-        return this.value.toString();
+        return this.constructor.stringify(this.value);
     }
 
     isEmpty() {

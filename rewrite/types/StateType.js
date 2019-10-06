@@ -5,7 +5,7 @@ export default class StateType extends ObservableBasicType {
     coerce(value) {
 
         if (value !== this.constructor.EMPTY_VALUE) {
-            value = String(value).toLowerCase() === "true";
+            value = this.constructor.stringify(value).toLowerCase() === "true";
         }
 
         return value;
