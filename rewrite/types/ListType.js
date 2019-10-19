@@ -50,14 +50,14 @@ export default class ListType extends ObservableBasicType {
     add(...values) {
 
         values.forEach((value) => this.addUnique(value));
-        this.dispatchEvent(this.constructor.EVENT_UPDATED);
+        this.announceUpdate();
 
     }
 
     remove(...values) {
 
         values.forEach((value) => this.removeValue(value));
-        this.dispatchEvent(this.constructor.EVENT_UPDATED);
+        this.announceUpdate();
 
     }
 
@@ -85,7 +85,7 @@ export default class ListType extends ObservableBasicType {
             : "remove"
         ](value);
 
-        this.dispatchEvent(this.constructor.EVENT_UPDATED);
+        this.announceUpdate();
 
         return true;
 
@@ -104,14 +104,13 @@ export default class ListType extends ObservableBasicType {
         }
 
         this.value[index] = newValue;
-        this.dispatchEvent(this.constructor.EVENT_UPDATED);
+        this.announceUpdate();
 
         return true;
 
     }
 
     toString() {
-        // return this.value.map((item) => item.toString()).join(" ");
         return this.value.map(this.constructor.stringify).join(" ");
     }
 
@@ -183,7 +182,14 @@ export default class ListType extends ObservableBasicType {
 
     coerceIndex(index) {
 
-        let idx = Math.floor(index);
+        let idx = -1;
+
+        try {
+            idx = Math.floor(index);
+        } catch (ignore) {
+            // Math.floor(Symbol.iterator) -> TypeError
+            // Cannot convert a Symbol value to a number
+        }
 
         if (
             idx < 0

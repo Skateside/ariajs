@@ -6,6 +6,10 @@ export default class ObservableBasicType extends BasicType {
         return "updated";
     }
 
+    setObserver(observer) {
+        this.observer = observer;
+    }
+
     write(value) {
 
         let written = super.write(value);
@@ -18,7 +22,11 @@ export default class ObservableBasicType extends BasicType {
 
     announceUpdate() {
 
-        this.dispatchEvent(this.constructor.EVENT_UPDATED, {
+        if (!this.observer) {
+            return;
+        }
+
+        this.observer.dispatchEvent(this.constructor.EVENT_UPDATED, {
             type: this
         });
 
@@ -26,7 +34,11 @@ export default class ObservableBasicType extends BasicType {
 
     observe(listener) {
 
-        this.addEventListener(this.constructor.EVENT_UPDATED, (e) => {
+        if (!this.observer) {
+            return;
+        }
+
+        this.observer.addEventListener(this.constructor.EVENT_UPDATED, (e) => {
             this.dispatchListener(e, listener);
         });
 
