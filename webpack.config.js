@@ -36,6 +36,12 @@ let config = {
                 }
             }
         ]
+    },
+    resolve: {
+        alias: {
+            "~": path.resolve(__dirname + "/rewrite"),
+            "~j": path.resolve(__dirname + "/jest")
+        }
     }
 };
 

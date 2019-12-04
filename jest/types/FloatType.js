@@ -1,8 +1,8 @@
-import FloatType from "../../rewrite/types/FloatType.js";
+import FloatType from "~/types/FloatType.js";
 import {
     randomString,
     randomNumber
-} from "../jest-common.js";
+} from "~j/jest-common.js";
 
 describe("FloatType", () => {
 

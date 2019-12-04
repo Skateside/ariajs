@@ -1,4 +1,4 @@
-import MediatorFacade from "../facades/MediatorFacade.js";
+import MediatorFacade from "~/facades/MediatorFacade.js";
 import Reference from "./Reference.js";
 
 export default class Aria extends Reference {

@@ -1,8 +1,8 @@
-import BasicType from "../../rewrite/types/BasicType.js";
+import BasicType from "~/types/BasicType.js";
 import {
     randomString,
     randomNumber
-} from "../jest-common.js";
+} from "~j/jest-common.js";
 
 describe("BasicType", () => {
 

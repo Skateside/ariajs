@@ -1,8 +1,8 @@
-import Attribute from "../../rewrite/attributes/Attribute.js";
+import Attribute from "~/attributes/Attribute.js";
 import {
     randomString,
     randomNumber
-} from "../jest-common.js";
+} from "~j/jest-common.js";
 
 describe("Attribute", () => {
 

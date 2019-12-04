@@ -1,8 +1,8 @@
-import ObservableBasicType from "../../rewrite/types/ObservableBasicType.js";
-import Observer from "../../rewrite/Observer.js";
+import ObservableBasicType from "~/types/ObservableBasicType.js";
+import Observer from "~/Observer.js";
 import {
     randomString
-} from "../jest-common.js";
+} from "~j/jest-common.js";
 
 describe("ObservableBasicType", () => {
 
@@ -64,7 +64,7 @@ describe("ObservableBasicType", () => {
         observable.observe(() => isFired = true);
         other.observe(() => isOtherFired = true);
         observable.write(randomString());
-        
+
         expect(isFired).toBe(true);
         expect(isOtherFired).toBe(false);
 

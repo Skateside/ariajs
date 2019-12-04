@@ -1,5 +1,5 @@
 import ObservableBasicType from "./ObservableBasicType.js";
-import Reference from "../references/Reference.js";
+import Reference from "~/references/Reference.js";
 
 export default class ReferenceType extends ObservableBasicType {
 

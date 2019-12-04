@@ -1,5 +1,5 @@
 import ListType from "./ListType.js";
-import Reference from "../references/Reference.js";
+import Reference from "~/references/Reference.js";
 
 export default class ReferenceListType extends ListType {
 

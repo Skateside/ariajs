@@ -1,5 +1,5 @@
 import ObservableBasicType from "./ObservableBasicType.js";
-import ListFacade from "../facades/ListFacade.js";
+import ListFacade from "~/facades/ListFacade.js";
 
 export default class ListType extends ObservableBasicType {
 
@@ -184,11 +184,10 @@ export default class ListType extends ObservableBasicType {
 
         let idx = -1;
 
-        try {
+        // This filters out situations where `index` is `Symbol.iterator`.
+        // Attempting to `Math.floor(Symbol.iterator)` will throw a TypeError.
+        if (typeof index === "string" || typeof index === "number") {
             idx = Math.floor(index);
-        } catch (ignore) {
-            // Math.floor(Symbol.iterator) -> TypeError
-            // Cannot convert a Symbol value to a number
         }
 
         if (

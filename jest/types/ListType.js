@@ -1,8 +1,8 @@
-import ListType from "../../rewrite/types/ListType.js";
-import ListFacade from "../../rewrite/facades/ListFacade.js";
+import ListType from "~/types/ListType.js";
+import ListFacade from "~/facades/ListFacade.js";
 import {
     randomString
-} from "../jest-common.js";
+} from "~j/jest-common.js";
 
 describe("ListType", () => {
 

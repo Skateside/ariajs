@@ -1,7 +1,7 @@
 import Facade from "./Facade.js";
-import Factory from "../Factory.js";
-import Mediator from "../Mediator.js";
-import AriaAttribute from "../attributes/AriaAttribute.js";
+import Factory from "~/Factory.js";
+import Mediator from "~/Mediator.js";
+import AriaAttribute from "~/attributes/AriaAttribute.js";
 
 export default class MediatorFacade extends Facade {
 
@@ -59,7 +59,7 @@ export default class MediatorFacade extends Facade {
 
     lookup(object, property) {
 
-        // Most of our properties will be Mediator instances and therefor
+        // Most of our properties will be Mediator instances and therefore
         // truthy. Fallback to a check for someone setting a falsy value.
         if (
             object[property]

@@ -1,8 +1,8 @@
-import Attribute from "../../rewrite/attributes/Attribute.js";
-import AriaAttribute from "../../rewrite/attributes/AriaAttribute.js";
+import Attribute from "~/attributes/Attribute.js";
+import AriaAttribute from "~/attributes/AriaAttribute.js";
 import {
     randomString
-} from "../jest-common.js";
+} from "~j/jest-common.js";
 
 describe("AriaAttribute", () => {
 

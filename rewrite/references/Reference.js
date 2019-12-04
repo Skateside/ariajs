@@ -1,4 +1,4 @@
-import Attribute from "../attributes/Attribute.js";
+import Attribute from "~/attributes/Attribute.js";
 
 export default class Reference {
 
@@ -62,6 +62,10 @@ export default class Reference {
     static interpret(value) {
 
         let reference = null;
+
+        if (this.isReference(value)) {
+            return value;
+        }
 
         if (value instanceof Element) {
             reference = value;
