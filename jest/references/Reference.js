@@ -88,4 +88,34 @@ describe("Reference", () => {
 
     });
 
+    test("Reference.interpret() will return the same Reference", () => {
+
+        let element = document.createElement("div");
+        let references = [
+            Reference.interpret(element),
+            Reference.interpret(element)
+        ];
+
+        references.forEach(
+            (reference) => document.body.appendChild(reference.element())
+        );
+
+        expect(references[0]).toBe(references[1]);
+        expect(
+            Reference.interpret(references[0].element())
+        ).toBe(references[1]);
+        expect(
+            Reference.interpret(references[0].identify())
+        ).toBe(references[1]);
+
+        // setTimeout is needed to prevent a NotFoundError on document.body
+        // I have no idea why it's necessary, but setTimeout solves the issue.
+        setTimeout(() => {
+            references.forEach(
+                (reference) => document.body.removeChild(reference.element())
+            );
+        }, 10);
+
+    });
+
 });

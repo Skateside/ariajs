@@ -30,7 +30,8 @@
     "scripts": {
         "build": "webpack",
         "build-dev": "webpack --mode=development",
-        "test": "jest"
+        "test": "jest",
+        "test-build": "webpack --mode=development; jest"
     },
     "devDependencies": {
         "@babel/core": "^7.6.2",

@@ -4,6 +4,7 @@ export default class Reference {
 
     static defaultPrefix = "aria-element-";
     static counter = 0;
+    static cache = new WeakMap();
 
     constructor(element) {
         this.reference = element;
@@ -75,7 +76,37 @@ export default class Reference {
             reference = this.lookup(value);
         }
 
-        return new this(reference);
+        if (!reference) {
+            return this.makeNull();
+        }
+
+        return this.makeCached(reference);
+
+    }
+
+    static makeNull() {
+
+        if (!this.nullObject) {
+            this.nullObject = new this(null);
+        }
+
+        return this.nullObject;
+
+    }
+
+    static makeCached(reference) {
+
+        let cache = this.cache;
+
+        if (cache.has(reference)) {
+            return cache.get(reference);
+        }
+
+        let instance = new this(reference);
+
+        cache.set(reference, instance);
+
+        return instance;
 
     }
 

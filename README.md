@@ -25,4 +25,4 @@ ARIA.js will require some polyfills to work in IE11:
 - [`Proxy`](https://www.npmjs.com/package/es6-proxy-polyfill) (note that ARIA.js uses Proxy's `deleteProperty` trap which can rarely be polyfilled)
 - [`Symbol`](https://github.com/rousan/symbol-es6)
 
-Because this uses some features that are difficult to polyfill correctly, ARIA.js isn't guaranteed to work fully in IE11.
+Because this uses some features that are difficult to polyfill correctly, **ARIA.js is not guaranteed to work fully in IE11**.

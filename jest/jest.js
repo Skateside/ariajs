@@ -17,3 +17,4 @@ import "./types/FloatType.js";
 import "./types/IntegerType.js";
 import "./types/ListType.js";
 import "./types/ReferenceType.js";
+import "./types/ReferenceListType.js";
