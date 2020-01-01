@@ -4,16 +4,20 @@ export default class StateType extends ObservableBasicType {
 
     coerce(value) {
 
-        if (value !== this.constructor.EMPTY_VALUE) {
-            value = this.constructor.stringify(value).toLowerCase() === "true";
+        if (value === this.constructor.EMPTY_VALUE) {
+            return false;
         }
 
-        return value;
+        return (/^true$/i).test(this.constructor.stringify(value));
 
     }
 
     write(value) {
         return super.write(this.coerce(value));
+    }
+
+    read() {
+        return Boolean(this.value);
     }
 
 }

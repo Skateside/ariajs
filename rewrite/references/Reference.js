@@ -1,9 +1,28 @@
 import Attribute from "~/attributes/Attribute.js";
 
+/**
+ * Wraps elements to add additional functionality as needed.
+ * @class Reference
+ */
 export default class Reference {
 
+    /**
+     * The default prefixed used when an ID is generated for the element.
+     * @type {String}
+     */
     static defaultPrefix = "aria-element-";
+
+    /**
+     * The counter for the generated IDs.
+     * @type {Number}
+     */
     static counter = 0;
+
+    /**
+     * A cache of elements to {@link Reference} instances so that a reference
+     * will always return the same instance.
+     * @type {WeakMap}
+     */
     static cache = new WeakMap();
 
     constructor(element) {

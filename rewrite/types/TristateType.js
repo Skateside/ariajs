@@ -5,9 +5,19 @@ export default class TristateType extends StateType {
     coerce(value) {
 
         return (
-            value === "mixed"
-            ? value
+            (/^mixed$/i).test(value)
+            ? "mixed"
             : super.coerce(value)
+        );
+
+    }
+
+    read() {
+
+        return (
+            this.value === "mixed"
+            ? "mixed"
+            : super.read()
         );
 
     }

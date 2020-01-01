@@ -21,7 +21,7 @@ describe("Attribute", () => {
 
         let errors = [
             randomString(5) + " " + randomString(5), // contains space
-            randomNumber(), // not a string
+            randomNumber() // not a string
         ];
 
         errors.forEach((error) => expect(() => new Attribute(error)).toThrow());

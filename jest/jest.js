@@ -18,3 +18,6 @@ import "./types/IntegerType.js";
 import "./types/ListType.js";
 import "./types/ReferenceType.js";
 import "./types/ReferenceListType.js";
+import "./types/StateType.js";
+import "./types/TristateType.js";
+import "./types/UndefinedStateType.js";
