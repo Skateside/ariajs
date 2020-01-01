@@ -1,29 +1,90 @@
 import Mediator from "./Mediator.js";
 
+/**
+ * Creates {@link Mediator} instances that combine a {@link Reference}, an
+ * {@link Attribute} and a {@link BasicType} (or sub-class).
+ * @class Factory
+ */
 export default class Factory {
 
+    /**
+     * A flag that can be passed to {@link Factory#add} to replace a factory.
+     * @constant
+     * @name OVERRIDE
+     * @type {Boolean}
+     */
     static get OVERRIDE() {
         return true;
     }
 
+    /**
+     * Gets an instance created as a singleton.
+     *
+     * @return {Factory}
+     *         Factory singleton.
+     */
     static get() {
 
         if (!this.instance) {
+
+            /**
+             * Factory singleton.
+             * @type {Factory}
+             */
             this.instance = new this();
+
         }
 
         return this.instance;
 
     }
 
+    /**
+     * @constructs Factory
+     */
     constructor() {
+
+        /**
+         * Factories that have been created.
+         * @type {[type]}
+         */
         this.factories = Object.create(null);
+
     }
 
+    /**
+     * Sets the observer that can be passed to factories.
+     *
+     * @param {Observer} observer
+     *        Observer to add.
+     */
     setObserver(observer) {
+
+        /**
+         * Observer that is passed to factories.
+         * @type {Observer}
+         */
         this.observer = observer;
+
     }
 
+    /**
+     * Creates a factory.
+     *
+     * @param  {String} name
+     *         Name of the factory to add.
+     * @param  {BasicType} Type
+     *         Type of value that will be used.
+     * @param  {Attribute} Attr
+     *         Attribute that will gain the type.
+     * @param  {Boolean} [override=false]
+     *         Optional flag for overriding an existing factory.
+     * @throws {TypeError}
+     *         The name must exist and cannot be empty.
+     * @throws {Error}
+     *         Factories cannot be overridden without the override flag being
+     *         passed as {@link Factory.OVERRIDE}.
+     */
     add(name, Type, Attr, override = false) {
 
         if (!name) {
@@ -49,10 +110,32 @@ export default class Factory {
 
     }
 
+    /**
+     * Finds a {@link Mediator} from {@link Factory#factories} that matches one
+     * of the given names. If no matches are found, undefined is returned.
+     *
+     * @param  {...String} names
+     *         Names to look for.
+     * @return {Mediator|undefined}
+     *         Either a matching Mediator or undefined if no matches are found.
+     */
     recognises(...names) {
         return names.find((name) => Boolean(this.factories[name]));
     }
 
+    /**
+     * Creates the factory that matches the given name and passes it the given
+     * reference.
+     *
+     * @param  {String} name
+     *         Name of the factory to create.
+     * @param  {Reference} reference
+     *         Reference to pass to the factory.
+     * @return {Mediator}
+     *         Created factory.
+     * @throws {ReferenceError}
+     *         The name must match an existing factory.
+     */
     create(name, reference) {
 
         let factory = this.factories[name];

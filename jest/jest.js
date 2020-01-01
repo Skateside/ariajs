@@ -1,6 +1,9 @@
 // Test all the things!
 
+// import "./Factory.js"; // TODO: Write these tests.
+// import "./Mediator.js"; // TODO: Write these tests.
 import "./Observer.js";
+// import "./Sandbox.js"; // TODO: Write these tests.
 
 // Attributes.
 import "./attributes/Attribute.js";

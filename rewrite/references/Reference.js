@@ -25,18 +25,49 @@ export default class Reference {
      */
     static cache = new WeakMap();
 
+    /**
+     * @constructs Reference
+     * @param      {Element} element
+     *             Wapped element.
+     */
     constructor(element) {
+
+        /**
+         * The wrapped element.
+         * @type {[type]}
+         */
         this.reference = element;
+
     }
 
+    /**
+     * Exposes {@link Reference#reference}.
+     *
+     * @return {Element}
+     *         Wrapped element.
+     */
     element() {
         return this.reference;
     }
 
+    /**
+     * When coercing into a string, the ID of {@link Reference#reference} is
+     * returned.
+     *
+     * @return {String}
+     *         ID of the wrapped element.
+     */
     toString() {
         return this.identify();
     }
 
+    /**
+     * Returns the ID of {@link Reference#reference}. If it doesn't have an ID,
+     * one is generated using {@link Reference.generateId}.
+     *
+     * @return {String}
+     *         ID of the wrapped element.
+     */
     identify() {
 
         let {
@@ -51,6 +82,11 @@ export default class Reference {
         if (!id) {
 
             id = Attribute.create("id");
+
+            /**
+             * {@link Attribute} instance for the "id" attribute.
+             * @type {Attribute}
+             */
             this.id = id;
 
         }
@@ -63,6 +99,15 @@ export default class Reference {
 
     }
 
+    /**
+     * Generates a unique ID. The ID will not exist on the page yet. The ID will
+     * be the given prefix and {@link Reference.counter} concatenated.
+     *
+     * @param  {String} [prefix=Reference.defaultPrefix]
+     *         The prefix for the ID.
+     * @return {String}
+     *         Unique ID.
+     */
     static generateId(prefix = this.defaultPrefix) {
 
         let id;
@@ -75,10 +120,29 @@ export default class Reference {
 
     }
 
+    /**
+     * Looks up an element based on the given ID.
+     *
+     * @param  {String} id
+     *         ID of the element to find.
+     * @return {Element|null}
+     *         Either the element or null if no element can be found.
+     */
     static lookup(id) {
         return document.getElementById(id);
     }
 
+    /**
+     * Converts the given value into a {@link Reference}. Instances are cached
+     * so the same value will always be interpretted as the same instance even
+     * if the values themselves are different (i.e. the element or the element's
+     * ID).
+     *
+     * @param  {?} value
+     *         Value to be interpretted.
+     * @return {Reference}
+     *         Generated Reference instance.
+     */
     static interpret(value) {
 
         let reference = null;
@@ -95,6 +159,7 @@ export default class Reference {
             reference = this.lookup(value);
         }
 
+        // null cannot be the key for a WeakMap so return a null version early.
         if (!reference) {
             return this.makeNull();
         }
@@ -103,16 +168,38 @@ export default class Reference {
 
     }
 
+    /**
+     * Returns a version of {@link Reference} that contains null.
+     *
+     * @return {Reference}
+     *         Null Reference.
+     */
     static makeNull() {
 
         if (!this.nullObject) {
+
+            /**
+             * Null version of {@link Reference}.
+             * @type {Reference}
+             */
             this.nullObject = new this(null);
+
         }
 
         return this.nullObject;
 
     }
 
+    /**
+     * Retrieves the cached version of {@link Reference} for the given
+     * reference. If the cache does not contain the given reference, the
+     * instance is created and cached before being returned.
+     *
+     * @param  {Element} reference
+     *         Element whose Reference should be returned.
+     * @return {Reference}
+     *         The Reference instance for the given reference.
+     */
     static makeCached(reference) {
 
         let cache = this.cache;
@@ -129,6 +216,14 @@ export default class Reference {
 
     }
 
+    /**
+     * Checks to see if the given object is an instance of {@link Reference}.
+     *
+     * @param  {Object} object
+     *         Object to test.
+     * @return {Boolean}
+     *         true if the given object is an instance of {@link Reference}.
+     */
     static isReference(object) {
         return object instanceof this;
     }

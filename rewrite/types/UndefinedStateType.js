@@ -1,7 +1,15 @@
 import StateType from "./StateType.js";
 
+/**
+ * Handles true/false/undefined states.
+ * @class UndefinedStateType
+ * @extends StateType
+ */
 export default class UndefinedStateType extends StateType {
 
+    /**
+     * @inheritDoc
+     */
     coerce(value) {
 
         return (
@@ -12,6 +20,9 @@ export default class UndefinedStateType extends StateType {
 
     }
 
+    /**
+     * @inheritDoc
+     */
     read() {
 
         return (

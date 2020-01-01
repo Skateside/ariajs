@@ -1,7 +1,15 @@
 import StateType from "./StateType.js";
 
+/**
+ * Handles true/false/"mixed" states.
+ * @class TristateType
+ * @extends StateType
+ */
 export default class TristateType extends StateType {
 
+    /**
+     * @inheritDoc
+     */
     coerce(value) {
 
         return (
@@ -12,6 +20,9 @@ export default class TristateType extends StateType {
 
     }
 
+    /**
+     * @inheritDoc
+     */
     read() {
 
         return (

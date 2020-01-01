@@ -1,15 +1,41 @@
 import BasicType from "./BasicType.js";
 
+/**
+ * Adds observer functionality to {@link BasicType}.
+ * @class ObservableBasicType
+ * @extends BasicType
+ */
 export default class ObservableBasicType extends BasicType {
 
+    /**
+     * The event triggered when a change occurs.
+     * @constant
+     * @name EVENT_UPDATED
+     * @type {String}
+     */
     static get EVENT_UPDATED() {
         return "updated";
     }
 
+    /**
+     * Sets {@link ObservableBasicType#observer} to the given observer.
+     *
+     * @param {Observer} observer
+     *        Observer that will look for changes to the current type.
+     */
     setObserver(observer) {
+
+        /**
+         * The observer for this type.
+         * @type {Observer}
+         */
         this.observer = observer;
+
     }
 
+    /**
+     * @inheritDoc
+     */
     write(value) {
 
         let written = super.write(value);
@@ -20,6 +46,9 @@ export default class ObservableBasicType extends BasicType {
 
     }
 
+    /**
+     * Triggers {@link ObservableBasicType.EVENT_UPDATED}.
+     */
     announceUpdate() {
 
         if (!this.observer) {
@@ -32,6 +61,12 @@ export default class ObservableBasicType extends BasicType {
 
     }
 
+    /**
+     * Adds a listener that will execute when this type is updated.
+     *
+     * @param {Function} listener
+     *        Listener to execute.
+     */
     observe(listener) {
 
         if (!this.observer) {
@@ -44,6 +79,15 @@ export default class ObservableBasicType extends BasicType {
 
     }
 
+    /**
+     * If the type detailed in the event is the current instance, the given
+     * listener is executed and passed the event.
+     *
+     * @param {CustomEvent} event
+     *        Event that was triggered.
+     * @param {Function} listener
+     *        Listener to execute.
+     */
     dispatchListener(event, listener) {
 
         if (event.detail.type === this) {

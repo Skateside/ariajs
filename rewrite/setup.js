@@ -139,20 +139,54 @@ sandbox.register({
 
 let previousAria = window.Aria;
 
+/**
+ * Returns the current version of Aria. If the restorePrevious parameter is
+ * true then the previous version is removed.
+ *
+ * @param  {Boolean} [restorePrevious=false]
+ *         true to remove the current version and restore the previous version.
+ * @return {Aria}
+ *         Current version of {@link Aria}.
+ */
 Aria.noConflict = (restorePrevious = false) => {
 
     if (restorePrevious) {
         window.Aria = previousAria;
     }
 
-    return previousAria;
+    return Aria;
 
 };
 
+/**
+ * A reference to {@link Sandbox.use}.
+ * @type {Function}
+ */
 Aria.plugin = Sandbox.use.bind(Sandbox);
+
+/**
+ * The register key for registering new modules for the sandbox.
+ * @memberof Aria
+ * @constant
+ * @name REGISTER
+ * @type {Symbol}
+ */
+Object.defineProperty(Aria, "REGISTER", {
+    configurable: false,
+    enumerable: true,
+    writable: false,
+    value: Sandbox.register
+});
 
 // Expose the version number (taken from package.json).
 
+/**
+ * The version of this library.
+ * @memberof Aria
+ * @constant
+ * @name VERSION
+ * @type {String}
+ */
 Object.defineProperty(Aria, "VERSION", {
     configurable: false,
     enumerable: true,
