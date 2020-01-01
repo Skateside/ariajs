@@ -44,9 +44,9 @@ describe("BasicType", () => {
 
     });
 
-    test("write() returns true if populated, false otherwise", () => {
+    test("write() returns true", () => {
 
-        expect(basic.write(BasicType.EMPTY_VALUE)).toBe(false);
+        expect(basic.write(BasicType.EMPTY_VALUE)).toBe(true);
         expect(basic.write(randomString())).toBe(true);
 
     });

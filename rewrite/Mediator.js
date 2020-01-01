@@ -55,13 +55,18 @@ export default class Mediator {
     /**
      * Writes the value to {@link Mediator#type} (see {@link BasicType#write}).
      *
-     * @param {?} value
-     *        Value to write.
+     * @param  {?} value
+     *         Value to write.
+     * @return {Boolean}
+     *         true
      */
     write(value) {
 
-        this.type.write(value);
+        let written = this.type.write(value);
+
         this.updateFromType();
+
+        return written;
 
     }
 

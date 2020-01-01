@@ -66,7 +66,7 @@ export default class ListType extends ObservableBasicType {
         this.add(...this.coerce(value));
         this.announceUpdate();
 
-        return !this.isEmpty();
+        return true;
 
     }
 
@@ -403,7 +403,7 @@ export default class ListType extends ObservableBasicType {
      * @inheritDoc
      */
     clear() {
-        this.write([]);
+        return this.write([]);
     }
 
 }

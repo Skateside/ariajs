@@ -55,13 +55,13 @@ export default class BasicType {
      * @param  {?} value
      *         Value to write.
      * @return {Boolean}
-     *         true if the value is not empty, false if it is.
+     *         true so that it can be used in Proxy set traps.
      */
     write(value) {
 
         this.value = value;
 
-        return !this.isEmpty();
+        return true;
 
     }
 

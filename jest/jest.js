@@ -1,3 +1,8 @@
+// Polyfill as necessary.
+
+import MutationObserver from "mutation-observer";
+global.MutationObserver = MutationObserver;
+
 // Test all the things!
 
 // import "./Factory.js"; // TODO: Write these tests.
@@ -11,7 +16,7 @@ import "./attributes/AriaAttribute.js";
 
 // References.
 import "./references/Reference.js";
-// import "./references/Aria.js"; // TODO: Write these tests.
+import "./references/Aria.js";
 
 // Types.
 import "./types/BasicType.js";
