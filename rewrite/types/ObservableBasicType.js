@@ -18,6 +18,16 @@ export default class ObservableBasicType extends BasicType {
     }
 
     /**
+     * A simple flag that allows a check for this type.
+     * @constant
+     * @name IS_OBSERVABLE
+     * @type {String}
+     */
+    static get IS_OBSERVABLE() {
+        return true;
+    }
+
+    /**
      * Sets {@link ObservableBasicType#observer} to the given observer.
      *
      * @param {Observer} observer

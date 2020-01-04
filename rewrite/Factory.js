@@ -1,7 +1,9 @@
 import Mediator from "./Mediator.js";
+import Aria from "./references/Aria.js";
+import ObservableBasicType from "./types/ObservableBasicType.js";
 
 /**
- * Creates {@link Mediator} instances that combine a {@link Reference}, an
+ * Creates {@link Mediator} instances that combine a {@link Aria}, an
  * {@link Attribute} and a {@link BasicType} (or sub-class).
  * @class Factory
  */
@@ -73,26 +75,34 @@ export default class Factory {
      *
      * @param  {String} name
      *         Name of the factory to add.
-     * @param  {BasicType} Type
-     *         Type of value that will be used.
+     * @param  {ObservableBasicType} Type
+     *         Type of value that will be used. The uninitialised class should
+     *         be passed.
      * @param  {Attribute} Attr
-     *         Attribute that will gain the type.
+     *         Attribute that will gain the type. The uninitialised class should
+     *         be passed.
      * @param  {Boolean} [override=false]
      *         Optional flag for overriding an existing factory.
      * @throws {TypeError}
-     *         The name must exist and cannot be empty.
+     *         The name must be a non-empty string.
      * @throws {Error}
      *         Factories cannot be overridden without the override flag being
      *         passed as {@link Factory.OVERRIDE}.
+     * @throws {TypeError}
+     *         Type given must inherit from {@link ObservableBasicType}.
      */
     add(name, Type, Attr, override = false) {
 
-        if (!name) {
+        if (typeof name !== "string" || !name) {
             throw new TypeError(`Invalid name '${name}'.`);
         }
 
         if (this.recognises(name) && override !== this.constructor.OVERRIDE) {
             throw new Error(`'${name}' factory already exists.`);
+        }
+
+        if (!Type.IS_OBSERVABLE) {
+            throw new TypeError("Type needs to be observable.");
         }
 
         this.factories[name] = (reference) => {
@@ -129,12 +139,14 @@ export default class Factory {
      *
      * @param  {String} name
      *         Name of the factory to create.
-     * @param  {Reference} reference
+     * @param  {Aria} reference
      *         Reference to pass to the factory.
      * @return {Mediator}
      *         Created factory.
      * @throws {ReferenceError}
      *         The name must match an existing factory.
+     * @throws {TypeError}
+     *         The reference must be an instance of Aria.
      */
     create(name, reference) {
 
@@ -142,6 +154,10 @@ export default class Factory {
 
         if (!factory) {
             throw new ReferenceError(`Unable to find the '${name}' factory.`);
+        }
+
+        if (!Aria.isAriaReference(reference)) {
+            throw new TypeError("Given reference must be an instance of Aria.");
         }
 
         return factory(reference);

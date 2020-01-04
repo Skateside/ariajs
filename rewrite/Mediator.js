@@ -1,6 +1,6 @@
 /**
- * Combines instances of {@link Reference}, {@link Attribute} and
- * {@link BasicType} (or sub-classes).
+ * Combines instances of {@link Aria}, {@link Attribute} and
+ * {@link ObservableBasicType} (or sub-classes).
  * @class Mediator
  */
 export default class Mediator {
@@ -9,18 +9,18 @@ export default class Mediator {
      * @constructs Mediator
      * @param      {Object} settings
      *             Settings for the Mediator.
-     * @param      {BasicType} settings.type
+     * @param      {ObservableBasicType} settings.type
      *             Type of value.
      * @param      {Attribute} settings.attribute
      *             Attribute on the element.
-     * @param      {Reference} settings.reference
+     * @param      {Aria} settings.reference
      *             Wrapped element.
      */
     constructor({ type, attribute, reference }) {
 
         /**
          * Type of value.
-         * @type {BasicType}
+         * @type {ObservableBasicType}
          */
         this.type = type;
 
@@ -32,12 +32,12 @@ export default class Mediator {
 
         /**
          * Wrapped elemet.
-         * @type {Reference}
+         * @type {Aria}
          */
         this.reference = reference
 
         /**
-         * A short-cut to the {@link Reference#element} value of
+         * A short-cut to the {@link Aria#element} value of
          * {@link Mediator#reference}.
          * @type {Element}
          */
@@ -53,7 +53,8 @@ export default class Mediator {
     }
 
     /**
-     * Writes the value to {@link Mediator#type} (see {@link BasicType#write}).
+     * Writes the value to {@link Mediator#type} (see
+     * {@link ObservableBasicType#write}).
      *
      * @param  {?} value
      *         Value to write.
@@ -71,7 +72,8 @@ export default class Mediator {
     }
 
     /**
-     * Reads the value from {@link Mediator#type} (see {@link BasicType#read}).
+     * Reads the value from {@link Mediator#type} (see
+     * {@link ObservableBasicType#read}).
      *
      * @return {?}
      *         Value of the attribute.
@@ -81,7 +83,8 @@ export default class Mediator {
     }
 
     /**
-     * Clears the value of {@link Mediator#type} (see {@link BasicType#clear}).
+     * Clears the value of {@link Mediator#type} (see
+     * {@link ObservableBasicType#clear}).
      *
      * @return {Boolean}
      *         true.
@@ -115,7 +118,8 @@ export default class Mediator {
 
     /**
      * Updates {@link Mediator#type} because {@link Mediator#attribute} has been
-     * updated. See {@link BasicType#write} for details about the return value.
+     * updated. See {@link ObservableBasicType#write} for details about the
+     * return value.
      *
      * @return {Boolean}
      *         Result of writing the value.

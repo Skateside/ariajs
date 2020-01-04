@@ -103,4 +103,17 @@ export default class Aria extends Reference {
         this.observations[attributeName] = handler;
     }
 
+    /**
+     * Checks to see if the given object is an instnace of {@link Aria}.
+     *
+     * @param  {Object} object
+     *         Object to test.
+     * @return {Boolean}
+     *         true if the given object is an instance of {@link Aria}, false
+     *         otherwise.
+     */
+    static isAriaReference(object) {
+        return object instanceof this;
+    }
+
 }

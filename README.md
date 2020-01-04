@@ -14,7 +14,8 @@ ARIA.js uses webpack to compile the files. There are 3 commands that you can use
 
 - `yarn build` builds the production (minified) version of aria.js in `dist/aria.js`.
 - `yarn build-dev` builds the development version of aria.js in `dist/aria.js` and includes a sourcemap in `dist/aria.js.map`.
-- `yarn test` runs the unit tests. Be sure to run `yarn build-dev` before running `yarn test`.
+- `yarn test` runs the unit tests.
+- `yarn test-build` is a short-cut for running `yarn build-dev` followed by `yarn test` - this allows the latest version of the compiled files to be tested.
 
 ## Browser Support
 
