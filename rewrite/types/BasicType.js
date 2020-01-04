@@ -15,6 +15,16 @@ export default class BasicType {
     }
 
     /**
+     * The event triggered when a change occurs.
+     * @constant
+     * @name EVENT_UPDATED
+     * @type {String}
+     */
+    static get EVENT_UPDATED() {
+        return "updated";
+    }
+
+    /**
      * Converts the given value into a string. Null and undefined will be
      * converted into an empty string.
      *
@@ -60,6 +70,7 @@ export default class BasicType {
     write(value) {
 
         this.value = value;
+        this.announceUpdate();
 
         return true;
 
@@ -104,6 +115,72 @@ export default class BasicType {
      */
     isEmpty() {
         return this.value === this.constructor.EMPTY_VALUE;
+    }
+
+    /**
+     * Sets {@link BasicType#observer} to the given observer.
+     *
+     * @param {Observer} observer
+     *        Observer that will look for changes to the current type.
+     */
+    setObserver(observer) {
+
+        /**
+         * The observer for this type.
+         * @type {Observer}
+         */
+        this.observer = observer;
+
+    }
+
+    /**
+     * Triggers {@link BasicType.EVENT_UPDATED}.
+     */
+    announceUpdate() {
+
+        if (!this.observer) {
+            return;
+        }
+
+        this.observer.dispatchEvent(this.constructor.EVENT_UPDATED, {
+            type: this
+        });
+
+    }
+
+    /**
+     * Adds a listener that will execute when this type is updated.
+     *
+     * @param {Function} listener
+     *        Listener to execute.
+     */
+    observe(listener) {
+
+        if (!this.observer) {
+            return;
+        }
+
+        this.observer.addEventListener(this.constructor.EVENT_UPDATED, (e) => {
+            this.dispatchListener(e, listener);
+        });
+
+    }
+
+    /**
+     * If the type detailed in the event is the current instance, the given
+     * listener is executed and passed the event.
+     *
+     * @param {CustomEvent} event
+     *        Event that was triggered.
+     * @param {Function} listener
+     *        Listener to execute.
+     */
+    dispatchListener(event, listener) {
+
+        if (event.detail.type === this) {
+            listener(event);
+        }
+
     }
 
 }

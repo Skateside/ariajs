@@ -1,11 +1,11 @@
-import ObservableBasicType from "./ObservableBasicType.js";
+import BasicType from "./BasicType.js";
 
 /**
  * Handles float values.
  * @class FloatType
- * @extends ObservableBasicType
+ * @extends BasicType
  */
-export default class FloatType extends ObservableBasicType {
+export default class FloatType extends BasicType {
 
     /**
      * If the given value is not numeric, the value is replaced with

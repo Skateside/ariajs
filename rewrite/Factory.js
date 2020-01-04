@@ -1,6 +1,6 @@
 import Mediator from "./Mediator.js";
 import Aria from "./references/Aria.js";
-import ObservableBasicType from "./types/ObservableBasicType.js";
+import BasicType from "./types/BasicType.js";
 
 /**
  * Creates {@link Mediator} instances that combine a {@link Aria}, an
@@ -75,7 +75,7 @@ export default class Factory {
      *
      * @param  {String} name
      *         Name of the factory to add.
-     * @param  {ObservableBasicType} Type
+     * @param  {BasicType} Type
      *         Type of value that will be used. The uninitialised class should
      *         be passed.
      * @param  {Attribute} Attr
@@ -88,8 +88,6 @@ export default class Factory {
      * @throws {Error}
      *         Factories cannot be overridden without the override flag being
      *         passed as {@link Factory.OVERRIDE}.
-     * @throws {TypeError}
-     *         Type given must inherit from {@link ObservableBasicType}.
      */
     add(name, Type, Attr, override = false) {
 
@@ -99,10 +97,6 @@ export default class Factory {
 
         if (this.recognises(name) && override !== this.constructor.OVERRIDE) {
             throw new Error(`'${name}' factory already exists.`);
-        }
-
-        if (!Type.IS_OBSERVABLE) {
-            throw new TypeError("Type needs to be observable.");
         }
 
         this.factories[name] = (reference) => {

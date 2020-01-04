@@ -1,6 +1,5 @@
 import Factory from "../rewrite/Factory.js";
 import BasicType from "../rewrite/types/BasicType.js";
-import ObservableBasicType from "../rewrite/types/ObservableBasicType.js";
 import FloatType from "../rewrite/types/FloatType.js";
 import Attribute from "../rewrite/attributes/Attribute.js";
 import Mediator from "../rewrite/Mediator.js";
@@ -38,7 +37,7 @@ describe("Factory", () => {
         fails.forEach((fail) => {
 
             expect(() => {
-                factory.add(fail, ObservableBasicType, Attributes);
+                factory.add(fail, BasicType, Attributes);
             }).toThrow();
 
         });
@@ -49,27 +48,13 @@ describe("Factory", () => {
 
         let name = randomString();
 
-        factory.add(name, ObservableBasicType, Attribute);
+        factory.add(name, BasicType, Attribute);
 
         expect(() => {
-            factory.add(name, ObservableBasicType, Attribute);
+            factory.add(name, BasicType, Attribute);
         }).toThrow();
         expect(() => {
-            factory.add(name, ObservableBasicType, Attribute, Factory.OVERRIDE);
-        }).not.toThrow();
-
-    });
-
-    test("add() will throw if Type does not inherit from ObservableBasicType", () => {
-
-        expect(() => {
-            factory.add(randomString(), BasicType, Attribute);
-        }).toThrow(TypeError);
-        expect(() => {
-            factory.add(randomString(), ObservableBasicType, Attribute);
-        }).not.toThrow();
-        expect(() => {
-            factory.add(randomString(), FloatType, Attribute);
+            factory.add(name, BasicType, Attribute, Factory.OVERRIDE);
         }).not.toThrow();
 
     });
@@ -78,7 +63,7 @@ describe("Factory", () => {
 
         let name = randomString();
 
-        factory.add(name, ObservableBasicType, Attribute);
+        factory.add(name, BasicType, Attribute);
 
         expect(factory.recognises(name)).toBe(name);
         expect(factory.recognises(randomString(), name)).toBe(name);
@@ -95,7 +80,7 @@ describe("Factory", () => {
         let name = randomString();
 
         factory.setObserver(new Observer());
-        factory.add(name, ObservableBasicType, Attribute);
+        factory.add(name, BasicType, Attribute);
 
         let mediator = factory.create(
             name,
@@ -122,7 +107,7 @@ describe("Factory", () => {
         let name = randomString();
 
         factory.setObserver(new Observer());
-        factory.add(name, ObservableBasicType, Attribute);
+        factory.add(name, BasicType, Attribute);
 
         expect(() => {
 

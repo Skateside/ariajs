@@ -1,4 +1,5 @@
 import BasicType from "~/types/BasicType.js";
+import Observer from "~/Observer.js";
 import {
     randomString,
     randomNumber
@@ -7,6 +8,7 @@ import {
 describe("BasicType", () => {
 
     let basic;
+    let observer;
     let values = [
         randomString(),
         randomNumber(),
@@ -20,7 +22,11 @@ describe("BasicType", () => {
     let allValues = [...values, ...empties];
 
     beforeEach(() => {
+
         basic = new BasicType();
+        observer = new Observer();
+        basic.setObserver(observer);
+
     });
 
     test("BasicType.stringify() will create a string", () => {
@@ -84,6 +90,60 @@ describe("BasicType", () => {
             basic.write(value);
             expect(basic.toString()).toBe(BasicType.stringify(value));
         });
+
+    });
+
+    test("writing a value should dispatch an event", () => {
+
+        let isFired = false;
+        let type;
+
+        observer.addEventListener(BasicType.EVENT_UPDATED, ({ detail }) => {
+
+            isFired = true;
+            type = detail.type;
+
+        });
+
+        basic.write(randomString());
+
+        expect(isFired).toBe(true);
+        expect(type).toBe(basic);
+
+    });
+
+    test("observe() should listen for changes", () => {
+
+        let isFired = false;
+        let type;
+
+        basic.observe(({ detail }) => {
+
+            isFired = true;
+            type = detail.type;
+
+        });
+
+        basic.write(randomString());
+
+        expect(isFired).toBe(true);
+        expect(type).toBe(basic);
+
+    });
+
+    test("observe() should only listen to its own changes", () => {
+
+        let isFired = false;
+        let isOtherFired = false;
+        let other = new BasicType();
+        other.setObserver(observer);
+
+        basic.observe(() => isFired = true);
+        other.observe(() => isOtherFired = true);
+        basic.write(randomString());
+
+        expect(isFired).toBe(true);
+        expect(isOtherFired).toBe(false);
 
     });
 

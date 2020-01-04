@@ -2,7 +2,7 @@
 import Attribute from "./attributes/Attribute.js";
 import AriaAttribute from "./attributes/AriaAttribute.js";
 // Import the types that define the attribute values.
-import ObservableBasicType from "./types/ObservableBasicType.js";
+import BasicType from "./types/BasicType.js";
 import FloatType from "./types/FloatType.js";
 import IntegerType from "./types/IntegerType.js";
 import ListType from "./types/ListType.js";
@@ -24,13 +24,12 @@ import Facade from "./facades/Facade.js";
 import ListFacade from "./facades/ListFacade.js";
 import MediatorFacade from "./facades/MediatorFacade.js";
 import Reference from "./references/Reference.js";
-import BasicType from "./types/BasicType.js";
 import Mediator from "./Mediator.js";
 
 // Set up the factory to create the attributes and types.
 
 let factoryEntries = [
-    [ObservableBasicType, [
+    [BasicType, [
         "autocomplete",
         "current",
         "haspopup",
@@ -114,7 +113,7 @@ let sandbox = new Sandbox();
 sandbox.register({
     Attribute,
     AriaAttribute,
-    ObservableBasicType,
+    BasicType,
     FloatType,
     IntegerType,
     ListType,
@@ -131,7 +130,6 @@ sandbox.register({
     ListFacade,
     MediatorFacade,
     Reference,
-    BasicType,
     Mediator
 });
 

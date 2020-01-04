@@ -1,6 +1,6 @@
 /**
  * Combines instances of {@link Aria}, {@link Attribute} and
- * {@link ObservableBasicType} (or sub-classes).
+ * {@link BasicType} (or sub-classes).
  * @class Mediator
  */
 export default class Mediator {
@@ -9,7 +9,7 @@ export default class Mediator {
      * @constructs Mediator
      * @param      {Object} settings
      *             Settings for the Mediator.
-     * @param      {ObservableBasicType} settings.type
+     * @param      {BasicType} settings.type
      *             Type of value.
      * @param      {Attribute} settings.attribute
      *             Attribute on the element.
@@ -20,7 +20,7 @@ export default class Mediator {
 
         /**
          * Type of value.
-         * @type {ObservableBasicType}
+         * @type {BasicType}
          */
         this.type = type;
 
@@ -53,8 +53,7 @@ export default class Mediator {
     }
 
     /**
-     * Writes the value to {@link Mediator#type} (see
-     * {@link ObservableBasicType#write}).
+     * Writes the value to {@link Mediator#type} (see {@link BasicType#write}).
      *
      * @param  {?} value
      *         Value to write.
@@ -72,8 +71,7 @@ export default class Mediator {
     }
 
     /**
-     * Reads the value from {@link Mediator#type} (see
-     * {@link ObservableBasicType#read}).
+     * Reads the value from {@link Mediator#type} (see {@link BasicType#read}).
      *
      * @return {?}
      *         Value of the attribute.
@@ -83,8 +81,7 @@ export default class Mediator {
     }
 
     /**
-     * Clears the value of {@link Mediator#type} (see
-     * {@link ObservableBasicType#clear}).
+     * Clears the value of {@link Mediator#type} (see {@link BasicType#clear}).
      *
      * @return {Boolean}
      *         true.
@@ -118,8 +115,7 @@ export default class Mediator {
 
     /**
      * Updates {@link Mediator#type} because {@link Mediator#attribute} has been
-     * updated. See {@link ObservableBasicType#write} for details about the
-     * return value.
+     * updated. See {@link BasicType#write} for details about the return value.
      *
      * @return {Boolean}
      *         Result of writing the value.

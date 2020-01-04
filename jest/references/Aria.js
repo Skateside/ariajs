@@ -1,7 +1,7 @@
 import Aria from "~/references/Aria.js";
 import Factory from "~/Factory.js";
 import Observer from "~/Observer.js";
-import ObservableBasicType from "~/types/ObservableBasicType.js";
+import BasicType from "~/types/BasicType.js";
 import Attribute from "~/attributes/Attribute.js";
 import {
     randomString
@@ -33,7 +33,7 @@ describe("Aria", () => {
             factory.setObserver(new Observer());
         }
 
-        factory.add(attribute, ObservableBasicType, Attribute);
+        factory.add(attribute, BasicType, Attribute);
         aria[attribute] = randomString();
         expect(fn).toHaveBeenCalled();
 

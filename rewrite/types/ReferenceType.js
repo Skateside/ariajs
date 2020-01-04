@@ -1,12 +1,12 @@
-import ObservableBasicType from "./ObservableBasicType.js";
+import BasicType from "./BasicType.js";
 import Reference from "~/references/Reference.js";
 
 /**
  * Handles references.
  * @class ReferenceType
- * @extends ObservableBasicType
+ * @extends BasicType
  */
-export default class ReferenceType extends ObservableBasicType {
+export default class ReferenceType extends BasicType {
 
     /**
      * @inheritDoc

@@ -1,11 +1,11 @@
-import ObservableBasicType from "./ObservableBasicType.js";
+import BasicType from "./BasicType.js";
 
 /**
  * Handles simple true/false states.
  * @class StateType
- * @extends ObservableBasicType
+ * @extends BasicType
  */
-export default class StateType extends ObservableBasicType {
+export default class StateType extends BasicType {
 
     /**
      * Coerces the given value into a boolean.

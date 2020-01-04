@@ -1,12 +1,12 @@
-import ObservableBasicType from "./ObservableBasicType.js";
+import BasicType from "./BasicType.js";
 import ListFacade from "~/facades/ListFacade.js";
 
 /**
  * Handles lists of values.
  * @class ListType
- * @extends ObservableBasicType
+ * @extends BasicType
  */
-export default class ListType extends ObservableBasicType {
+export default class ListType extends BasicType {
 
     /**
      * @inheritDoc
