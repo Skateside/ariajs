@@ -18,7 +18,7 @@ export default class Sandbox {
     static register = Symbol("register");
 
     /**
-     * Uses the sandbox.
+     * Uses the sandbox. This has the alias {@link Aria.plugin}.
      *
      * @param  {Function} plugin
      *         Function to execute with the sandbox.

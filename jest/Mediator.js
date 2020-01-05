@@ -3,11 +3,8 @@ import BasicType from "~/types/BasicType.js";
 import Attribute from "~/attributes/Attribute.js";
 import Aria from "~/references/Aria.js";
 import Observer from "~/Observer.js";
-// import Mediator from "~/Mediator.js";
-// import Reference from "~/references/Reference.js";
 import {
-    randomString,
-    randomNumber
+    randomString
 } from "~j/jest-common.js";
 
 describe("Mediator", () => {
