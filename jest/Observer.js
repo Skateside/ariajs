@@ -1,7 +1,7 @@
-import Observer from "../rewrite/Observer.js";
+import Observer from "~/Observer.js";
 import {
     randomString
-} from "./jest-common.js";
+} from "~j/jest-common.js";
 
 describe("Observer", () => {
 

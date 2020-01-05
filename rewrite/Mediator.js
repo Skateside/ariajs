@@ -87,7 +87,13 @@ export default class Mediator {
      *         true.
      */
     clear() {
-        return this.type.clear();
+
+        let cleared = this.type.clear();
+
+        this.updateFromType();
+
+        return cleared;
+
     }
 
     /**
@@ -129,10 +135,7 @@ export default class Mediator {
         } = this;
 
         if (attribute.isEmpty(element)) {
-
-            type.clear();
-            return true;
-
+            return type.clear();
         }
 
         return type.write(attribute.read(element));

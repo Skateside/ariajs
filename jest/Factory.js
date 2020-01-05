@@ -1,15 +1,14 @@
-import Factory from "../rewrite/Factory.js";
-import BasicType from "../rewrite/types/BasicType.js";
-import FloatType from "../rewrite/types/FloatType.js";
-import Attribute from "../rewrite/attributes/Attribute.js";
-import Mediator from "../rewrite/Mediator.js";
-import Reference from "../rewrite/references/Reference.js";
-import Aria from "../rewrite/references/Aria.js";
-import Observer from "../rewrite/Observer.js";
+import Factory from "~/Factory.js";
+import BasicType from "~/types/BasicType.js";
+import Attribute from "~/attributes/Attribute.js";
+import Mediator from "~/Mediator.js";
+import Reference from "~/references/Reference.js";
+import Aria from "~/references/Aria.js";
+import Observer from "~/Observer.js";
 import {
     randomString,
     randomNumber
-} from "./jest-common.js";
+} from "~j/jest-common.js";
 
 describe("Factory", () => {
 

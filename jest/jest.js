@@ -5,10 +5,10 @@ global.MutationObserver = MutationObserver;
 
 // Test all the things!
 
-console.warn("Awaiting tests for: Mediator, Sandbox, Aria");
+console.warn("Awaiting tests for: Sandbox, Aria");
 
 import "./Factory.js";
-// import "./Mediator.js"; // TODO: Write these tests.
+import "./Mediator.js";
 import "./Observer.js";
 // import "./Sandbox.js"; // TODO: Write these tests.
 
