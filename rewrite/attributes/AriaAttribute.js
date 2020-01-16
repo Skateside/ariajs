@@ -18,6 +18,12 @@ export default class AriaAttribute extends Attribute {
     }
 
     /**
+     * A cache of {@link Attribute} instances for the given attribute name.
+     * @type {Object}
+     */
+    static cache = Object.create(null);
+
+    /**
      * Prefixes the given attribute name with {@link AriaAttribute.PREFIX} if
      * necessary. The attribute name is validated using
      * {@link Attribute.validateName} before being prefixed.
@@ -31,7 +37,7 @@ export default class AriaAttribute extends Attribute {
 
         this.validateName(name);
 
-        let prefix = AriaAttribute.PREFIX;
+        let prefix = this.PREFIX;
 
         if (!name.startsWith(prefix)) {
             name = prefix + name;
@@ -55,7 +61,7 @@ export default class AriaAttribute extends Attribute {
 
         this.validateName(name);
 
-        let prefix = AriaAttribute.PREFIX;
+        let prefix = this.PREFIX;
 
         if (name.startsWith(prefix)) {
             name = name.slice(prefix.length);
@@ -69,13 +75,25 @@ export default class AriaAttribute extends Attribute {
      * Creates a cached version of {@link AriaAttribute}. The given name will be
      * automatically prefixed with {@link AriaAttribute.prefix}.
      *
-     * @param  {String} name
-     *         Name of the attribute.
+     * @param  {String} attribute
+     *         Attribute name.
      * @return {AriaAttribute}
      *         Cached version of AriaAttribute.
      */
-    static create(name) {
-        return super.create(this.prefix(name));
+    static create(attribute) {
+
+        let cached = this.cache[attribute];
+
+        if (!cached) {
+
+            cached = new this(this.prefix(attribute));
+            this.cache[attribute] = cached;
+
+        }
+
+        return cached;
+
+        // return Attribute.create.call(this, this.prefix(name));
     }
 
     /**

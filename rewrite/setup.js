@@ -110,7 +110,7 @@ factoryEntries.forEach(([Type, attributes, Attr = AriaAttribute]) => {
 
 let sandbox = new Sandbox();
 
-sandbox.register({
+sandbox[Sandbox.register]({
     Attribute,
     AriaAttribute,
     BasicType,

@@ -107,7 +107,7 @@ export default class Factory {
             return new Mediator({
                 reference,
                 type,
-                attribute: new Attr(name)
+                attribute: Attr.create(name)
             });
 
         };
