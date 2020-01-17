@@ -64,7 +64,6 @@ export default class ListType extends BasicType {
 
         this.value.length = 0;
         this.add(...this.coerce(value));
-        this.announceUpdate();
 
         return true;
 

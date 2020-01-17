@@ -43,6 +43,12 @@ export default class Mediator {
          */
         this.element = reference.element();
 
+        /**
+         * We set this flag when we're updating to prevent an updating loop.
+         * @type {Boolean}
+         */
+        this.isUpdating = false;
+
         type.observe(() => this.updateFromType());
         reference.observe(attribute.name(), () => this.updateFromAttribute());
 
@@ -61,13 +67,7 @@ export default class Mediator {
      *         true
      */
     write(value) {
-
-        let written = this.type.write(value);
-
-        this.updateFromType();
-
-        return written;
-
+        return this.type.write(value);
     }
 
     /**
@@ -111,11 +111,21 @@ export default class Mediator {
             element
         } = this;
 
+        if (this.isUpdating) {
+            return;
+        }
+
+        this.isUpdating = true;
+
         if (type.isEmpty()) {
             return attribute.clear(element);
         }
 
-        return attribute.write(element, type.toString());
+        let written = attribute.write(element, type.toString());
+
+        this.isUpdating = false;
+
+        return written;
 
     }
 
@@ -134,11 +144,21 @@ export default class Mediator {
             element
         } = this;
 
+        if (this.isUpdating) {
+            return;
+        }
+
+        this.isUpdating = true;
+
         if (attribute.isEmpty(element)) {
             return type.clear();
         }
 
-        return type.write(attribute.read(element));
+        let written = type.write(attribute.read(element));
+
+        this.isUpdating = false;
+
+        return written;
 
     }
 
