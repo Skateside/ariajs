@@ -18,12 +18,6 @@ export default class AriaAttribute extends Attribute {
     }
 
     /**
-     * A cache of {@link Attribute} instances for the given attribute name.
-     * @type {Object}
-     */
-    static cache = Object.create(null);
-
-    /**
      * Prefixes the given attribute name with {@link AriaAttribute.PREFIX} if
      * necessary. The attribute name is validated using
      * {@link Attribute.validateName} before being prefixed.
@@ -81,19 +75,7 @@ export default class AriaAttribute extends Attribute {
      *         Cached version of AriaAttribute.
      */
     static create(attribute) {
-
-        let cached = this.cache[attribute];
-
-        if (!cached) {
-
-            cached = new this(this.prefix(attribute));
-            this.cache[attribute] = cached;
-
-        }
-
-        return cached;
-
-        // return Attribute.create.call(this, this.prefix(name));
+        return super.create(this.prefix(attribute));
     }
 
     /**
