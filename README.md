@@ -2,6 +2,65 @@
 
 A helper library for working with WAI-ARIA attributes, designed to make manipulating them as simple as possible.
 
+## Usage
+
+Imagine you're creating a disclosure widget (even though [`<details>`/`<summary>` is the better solution](https://css-tricks.com/quick-reminder-that-details-summary-is-the-easiest-way-ever-to-make-an-accordion/)). The markup will be very basic.
+
+```html
+<div class="disclosure">
+    <button type="button">Toggle</button>
+    <div>
+        <p>Content</p>
+    </div>
+</div>
+```
+
+The functionality is also very easy to write.
+
+```js
+document.querySelectorAll(".disclosure").forEach((disclosure) => {
+
+    let button = disclosure.querySelector("button");
+    let content = disclosure.querySelector("div");
+
+    button.addEventListener("click", () => {
+        div.hidden = !div.hidden;
+    });
+
+});
+```
+
+**Aria.js** will simplify the process of adding and maintaining the WAI-ARIA attributes.
+
+```js
+document.querySelectorAll(".disclosure").forEach((disclosure) => {
+
+    let button = disclosure.querySelector("button");
+    let content = disclosure.querySelector("div");
+
+    button.aria = new Aria(button); // There's a plugin to do this automatically.
+    button.aria.controls = content;
+    button.aria.expanded = !content.hidden;
+
+    button.addEventListener("click", () => {
+        content.hidden = !content.hidden;
+        button.aria.expanded = !content.hidden;
+    });
+
+});
+```
+
+The markup has now been updated:
+
+```html
+<div class="disclosure">
+    <button type="button" aria-controls="aria-element-0" aria-expanded="true">Toggle</button>
+    <div id="aria-element-0">
+        <p>Content</p>
+    </div>
+</div>
+```
+
 ## Documentation
 
 The documentation for this library can be found in [the Wiki](https://github.com/Skateside/ariajs/wiki).
