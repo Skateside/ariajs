@@ -69,7 +69,7 @@ _NOTE: the documentation is for the old version of the library!_
 
 ## Building
 
-ARIA.js uses webpack to compile the files. There are 3 commands that you can use:
+ARIA.js uses webpack to compile the files. There are 4 commands that you can use:
 
 - `yarn build` builds the production (minified) version of aria.js in `dist/aria.js`.
 - `yarn build-dev` builds the development version of aria.js in `dist/aria.js` and includes a sourcemap in `dist/aria.js.map`.
