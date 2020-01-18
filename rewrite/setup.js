@@ -176,22 +176,6 @@ Object.defineProperty(Aria, "REGISTER", {
     value: Sandbox.register
 });
 
-// Expose the version number (taken from package.json).
-
-/**
- * The version of this library.
- * @memberof Aria
- * @constant
- * @name VERSION
- * @type {String}
- */
-Object.defineProperty(Aria, "VERSION", {
-    configurable: false,
-    enumerable: true,
-    writable: false,
-    value: "[AIV]{version}[/AIV]"
-});
-
 // Expose global Aria.
 
 window.Aria = Aria;

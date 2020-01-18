@@ -1,5 +1,4 @@
 let path = require("path");
-let WebpackAutoInject = require("webpack-auto-inject-version");
 
 let config = {
     mode: "production",
@@ -10,13 +9,6 @@ let config = {
         path: path.resolve(__dirname, "dist"),
         filename: "[name].js"
     },
-    plugins: [
-        new WebpackAutoInject({
-            components: {
-                AutoIncreaseVersion: false
-            }
-        })
-    ],
     module: {
         rules: [
             {
@@ -39,8 +31,7 @@ let config = {
     },
     resolve: {
         alias: {
-            "~": path.resolve(__dirname + "/rewrite"),
-            "~j": path.resolve(__dirname + "/jest")
+            "~": path.resolve(__dirname + "/rewrite")
         }
     }
 };
@@ -52,6 +43,7 @@ module.exports = (env, argv) => {
         config.mode = "development";
         config.devtool = "source-map";
         config.entry.jest = "./jest/jest.js";
+        config.resolve.alias["~j"] = path.resolve(__dirname + "/jest");
 
     }
 
