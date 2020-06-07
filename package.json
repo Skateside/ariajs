@@ -1,6 +1,6 @@
 {
     "name": "ariajs",
-    "version": "0.3.0",
+    "version": "0.4.0",
     "description": "Helper library for working with WAI-ARIA attributes",
     "main": "dist/aria.js",
     "author": "James \"Skateside\" Long",
@@ -19,16 +19,31 @@
     "bugs": {
         "url": "https://github.com/Skateside/ariajs/issues"
     },
-    "dependencies": {
-        "gulp": "^3.9.1",
-        "gulp-concat-util": "^0.5.5",
-        "gulp-minify": "^3.1.0",
-        "gulp-sourcemaps": "^2.6.4"
+    "jest": {
+        "presets": [
+            "@babel/preset-env"
+        ],
+        "transform": {
+            "^.+\\.js$": "babel-jest"
+        }
+    },
+    "scripts": {
+        "build": "webpack",
+        "build-dev": "webpack --mode=development",
+        "test": "jest",
+        "test-build": "webpack --mode=development; jest"
     },
     "devDependencies": {
-        "chai": "^4.2.0",
-        "gulp-mocha-phantomjs": "^0.12.2",
-        "mocha": "^5.2.0",
-        "weakmap-polyfill": "^2.0.0"
+        "@babel/core": "^7.6.2",
+        "@babel/plugin-proposal-class-properties": "^7.5.5",
+        "@babel/preset-env": "^7.6.2",
+        "babel-jest": "^24.9.0",
+        "babel-loader": "^8.0.6",
+        "core-js": "3",
+        "jest": "^24.9.0",
+        "mutation-observer": "^1.0.3",
+        "regenerator-runtime": "^0.13.3",
+        "webpack": "^4.41.0",
+        "webpack-cli": "^3.3.9"
     }
 }
