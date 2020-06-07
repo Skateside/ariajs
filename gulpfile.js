@@ -182,13 +182,13 @@ gulp.task("test:watch", function () {
     gulp.watch(["./tests/**/*.js"], ["test"]);
 });
 
-gulp.task("watch", [
+gulp.task("watch", gulp.series(
     "js:watch",
     "plugins:watch",
     // "test:watch"
-]);
+));
 
-gulp.task("build", ["js", "plugins"], function () {
+gulp.task("build", gulp.series("js", "plugins", function () {
 
     var args = readArgs(process.argv);
     var plugins = (args.p || args.plugins || "").trim().split(/\s+/);
@@ -249,4 +249,4 @@ gulp.task("build", ["js", "plugins"], function () {
         }))
         .pipe(gulp.dest("./dist/"));
 
-});
+}));
