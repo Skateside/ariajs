@@ -1,51 +1,52 @@
-export default class Aria {
+function Aria(element) {
 
-    static types = {};
+    this.element = element;
 
-    static prefix(property) {
+    return this.makeMagicProperties(this);
 
-        let prefixed = (
-            (property === null || property === undefined)
-            ? ""
-            : String(property)
-        ).toLowerCase();
+}
 
-        return (
-            prefixed.startsWith("aria-")
-            ? prefixed
-            : ("aria-" + prefixed)
-        );
+Object.defineProperty(Aria, "VERSION", {
+    get: function () {
+        return "<%= version %>";
+    }
+});
 
+Aria.types = {};
+
+Aria.prefix = function (property) {
+
+    var prefixed = interpretString(property).toLowerCase();
+
+    return (
+        prefixed.startsWith("aria-")
+        ? prefixed
+        : ("aria-" + prefixed)
+    );
+
+};
+
+Aria.addType = function (property, type, attribute) {
+
+    if (attribute === undefined) {
+        attribute = this.prefix(property);
     }
 
-    static addType(property, type, attribute = null) {
+    this.types[property] = extend(type, {
+        name: attribute
+    });
 
-        if (attribute === null) {
-            attribute = this.prefix(property);
-        }
+};
 
-        this.types[property] = {
-            ...type,
-            name: attribute
-        };
+Aria.prototype = {
 
-    }
-
-    constructor(element) {
-
-        this.element = element;
-
-        return this.makeMagicProperties(this);
-
-    }
-
-    makeMagicProperties(context) {
+    makeMagicProperties: function (context) {
 
         return new Proxy(context, {
 
-            get(target, property) {
+            get: function (target, property) {
 
-                let type = context.getType(property);
+                var type = context.getType(property);
 
                 if (type) {
                     return target.read(type);
@@ -55,9 +56,9 @@ export default class Aria {
 
             },
 
-            set(target, property, value) {
+            set: function (target, property, value) {
 
-                let type = context.getType(property);
+                var type = context.getType(property);
 
                 if (type) {
                     target.write(value, type);
@@ -69,9 +70,9 @@ export default class Aria {
 
             },
 
-            delete(target, property) {
+            delete: function (target, property) {
 
-                let type = context.getType(property);
+                var type = context.getType(property);
 
                 if (type) {
                     target.delete(type);
@@ -85,19 +86,19 @@ export default class Aria {
 
         });
 
-    }
+    },
 
-    getType(property) {
-        return this.constructor.types[property];
-    }
+    getType: function (property) {
+        return Aria.types[property];
+    },
 
-    read(type) {
+    read: function (type) {
         return type.read(this.element.getAttribute(type.name));
-    }
+    },
 
-    write(value, type) {
+    write: function (value, type) {
 
-        let writable = type.write(value);
+        var writable = type.write(value);
 
         if (writable) {
             this.element.setAttribute(type.name, writable);
@@ -105,10 +106,12 @@ export default class Aria {
             this.delete(type);
         }
 
-    }
+    },
 
-    delete(type) {
+    delete: function (type) {
         this.element.removeAttribute(type.name);
     }
 
 }
+
+globalVariable.Aria = Aria;

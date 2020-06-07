@@ -1,17 +1,4 @@
-import Aria from "./Aria.js";
-import {
-    basicType,
-    floatType,
-    integerType,
-    stateType,
-    tristateType,
-    undefinedStateType,
-    referenceType,
-    listType,
-    referenceListType
-} from "./types.js";
-
-let factoryEntries = [
+var factoryEntries = [
     [basicType, [
         "autocomplete",
         "current",
@@ -83,22 +70,23 @@ let factoryEntries = [
     }]
 ];
 
-factoryEntries.forEach(([type, properties]) => {
+factoryEntries.forEach(function (entry) {
+
+    var type = entry[0];
+    var properties = entry[1];
 
     if (Array.isArray(properties)) {
 
-        properties.forEach((property) => {
+        properties.forEach(function (property) {
             Aria.addType(property, type);
         });
 
     } else if (properties && typeof properties === "object") {
 
-        Object.entries(properties).forEach(([property, attribute]) => {
-            Aria.addType(property, type, attribute);
+        Object.entries(properties).forEach(function (propEntry) {
+            Aria.addType(propEntry[0], type, propEntry[1]);
         });
 
     }
 
 });
-
-window.Aria = Aria;

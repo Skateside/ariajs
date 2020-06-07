@@ -2,40 +2,31 @@
  * The base type from which all types come.
  * @type {Object}
  */
-export let basicType = {
+var basicType = {
 
     /**
-     * Coerces the given value to make sure it's a string. null and undefined
-     * are converted into an empty string.
+     * Coerces the given value to make sure it's a string. null and
+     * undefined are converted into an empty string.
      *
      * @param  {?} value
      *         Value to coerce.
      * @return {String}
      *         String based on the given value.
      */
-    coerce(value) {
-
-        if (value === null || value === undefined) {
-            return "";
-        }
-
-        if (typeof value === "string") {
-            return value;
-        }
-
-        return String(value);
-
+    coerce: function (value) {
+        return interpretString(value);
     },
 
     /**
-     * Reads the value from the element's attribute and coerces it as necessary.
+     * Reads the value from the element's attribute and coerces it as
+     * necessary.
      *
      * @param  {String|null} value
      *         The element's attribute value.
      * @return {String}
      *         The coerced value.
      */
-    read(value) {
+    read: function (value) {
         return this.coerce(value);
     },
 
@@ -47,39 +38,53 @@ export let basicType = {
      * @return {String}
      *         The value to write to the element's attribute.
      */
-    write(value) {
+    write: function (value) {
         return this.coerce(value);
     }
 
 };
 
-export let floatType = {
+/**
+ * The float type handles numbers with decimals.
+ * @type {Object}
+ * @extends basicType
+ */
+var floatType = extend(basicType, {
 
-    ...basicType,
-
-    read(value) {
+    /**
+     * [description]
+     * @param  {[type]} value [description]
+     * @return {[type]}       [description]
+     */
+    read: function (value) {
         return Number(basicType.read(value));
+    },
+
+    write: function (value) {
+
+        return (
+            Number.isNaN(Number(value))
+            ? ""
+            : value
+        );
+
     }
 
-};
+});
 
-export let integerType = {
+var integerType = extend(floatType, {
 
-    ...floatType,
-
-    read(value) {
+    read: function (value) {
         return Math.floor(floatType.read(value));
     }
 
-};
+});
 
-export let stateType = {
+var stateType = extend(basicType, {
 
-    ...basicType,
+    coerce: function (value) {
 
-    coerce(value) {
-
-        let coerced = basicType.coerce(value);
+        var coerced = basicType.coerce(value);
 
         if (coerced === "") {
             return false;
@@ -89,11 +94,11 @@ export let stateType = {
 
     },
 
-    read(value) {
+    read: function (value) {
         return this.coerce(value);
     },
 
-    write(value) {
+    write: function (value) {
 
         if (value === "") {
             return value;
@@ -107,15 +112,13 @@ export let stateType = {
 
     }
 
-};
+});
 
-export let tristateType = {
+var tristateType = extend(stateType, {
 
-    ...stateType,
+    read: function (value) {
 
-    read(value) {
-
-        let coerced = this.coerce(value);
+        var coerced = this.coerce(value);
 
         return (
             coerced === "mixed"
@@ -125,7 +128,7 @@ export let tristateType = {
 
     },
 
-    write(value) {
+    write: function (value) {
 
         return (
             value === "mixed"
@@ -135,13 +138,11 @@ export let tristateType = {
 
     }
 
-};
+});
 
-export let undefinedStateType = {
+var undefinedStateType = extend(stateType, {
 
-    ...stateType,
-
-    coerce(value) {
+    coerce: function (value) {
 
         return (
             (value === "" || (/^undefined$/i).test(value))
@@ -151,21 +152,19 @@ export let undefinedStateType = {
 
     },
 
-    read(value) {
+    read: function (value) {
         return this.coerce(value);
     }
 
-};
+});
 
-export let referenceType = {
+var referenceType = extend(basicType, {
 
-    ...basicType,
-
-    read(value) {
+    read: function (value) {
         return document.getElementById(basicType.read(value));
     },
 
-    write(value) {
+    write: function (value) {
 
         if (this.isElement(value)) {
             value = this.identify(value);
@@ -175,15 +174,15 @@ export let referenceType = {
 
     },
 
-    isElement(object) {
+    isElement: function (object) {
         return (object instanceof Element);
     },
 
     counter: 0,
 
-    identify(element) {
+    identify: function (element) {
 
-        let id = element.id;
+        var id = element.id;
 
         if (id) {
             return id;
@@ -202,19 +201,28 @@ export let referenceType = {
 
     }
 
-};
+});
 
-export let listType = {
-
-    ...basicType,
+var listType = extend(basicType, {
 
     type: basicType,
 
-    read(value) {
-        return value.trim().split(/\s+/).map((item) => this.type.read(item));
+    read: function (value) {
+
+        var that = this;
+
+        return value
+            .trim()
+            .split(/\s+/)
+            .map(function (item) {
+                return that.type.read(item);
+            });
+
     },
 
-    write(value) {
+    write: function (value) {
+
+        var that = this;
 
         if (typeof value === "string") {
             return value;
@@ -222,19 +230,21 @@ export let listType = {
 
         return this
             .asArray(value)
-            .map((item) => this.type.write(item))
+            .map(function (item) {
+                return that.type.write(item);
+            })
             .join(" ");
 
     },
 
-    asArray(value) {
+    asArray: function (value) {
 
         if (
             value
             && typeof value.length === "number"
             && typeof value !== "string"
         ) {
-            return [...value];
+            return spread(value);
         }
 
         if (!value) {
@@ -245,12 +255,8 @@ export let listType = {
 
     }
 
-};
+});
 
-export let referenceListType = {
-
-    ...listType,
-
+var referenceListType = extend(listType, {
     type: referenceType
-
-};
+});
