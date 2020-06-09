@@ -76,6 +76,10 @@ var integerType = extend(floatType, {
 
     read: function (value) {
         return Math.floor(floatType.read(value));
+    },
+
+    write: function (value) {
+        return floatType.write(Math.floor(value));
     }
 
 });
@@ -210,9 +214,13 @@ var listType = extend(basicType, {
     read: function (value) {
 
         var that = this;
+        var coerced = basicType.coerce(value).trim();
 
-        return value
-            .trim()
+        if (coerced === "") {
+            return [];
+        }
+
+        return coerced
             .split(/\s+/)
             .map(function (item) {
                 return that.type.read(item);

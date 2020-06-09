@@ -19,7 +19,7 @@ describe("basicType", function () {
             var value = randomString();
 
             aria[PROPERTY] = value;
-            chai.assert.equal(aria[PROPERTY], value);
+            chai.assert.strictEqual(aria[PROPERTY], value);
 
         });
 
@@ -28,7 +28,7 @@ describe("basicType", function () {
             var value = randomString();
 
             aria[PROPERTY] = value;
-            chai.assert.equal(element.getAttribute(ATTRIBUTE), value);
+            chai.assert.strictEqual(element.getAttribute(ATTRIBUTE), value);
 
         });
 
@@ -41,8 +41,8 @@ describe("basicType", function () {
             var value = randomString();
 
             aria[PROPERTY] = value;
-            chai.assert.equal(aria[PROPERTY], value);
-            chai.assert.equal(element.getAttribute(ATTRIBUTE), value);
+            chai.assert.strictEqual(aria[PROPERTY], value);
+            chai.assert.strictEqual(element.getAttribute(ATTRIBUTE), value);
 
         });
 
@@ -51,20 +51,21 @@ describe("basicType", function () {
             var value = randomString();
 
             element.setAttribute(ATTRIBUTE, value);
-            chai.assert.equal(element.getAttribute(ATTRIBUTE), value);
-            chai.assert.equal(aria[PROPERTY], value);
+            chai.assert.strictEqual(element.getAttribute(ATTRIBUTE), value);
+            chai.assert.strictEqual(aria[PROPERTY], value);
 
         });
 
         it("should return an empty string if the element doesn't have the attribute", function () {
 
             chai.assert.isFalse(element.hasAttribute(ATTRIBUTE));
-            chai.assert.equal(aria[PROPERTY], "");
+            chai.assert.strictEqual(aria[PROPERTY], "");
 
         });
 
     });
 
+    // NOTE: this is testing Aria, not specifically basicType
     describe("deleting", function () {
 
         it("should delete the attribute if the value is \"\"", function () {

@@ -67,7 +67,8 @@ This library has been tested in the latest browsers as well as IE11, but it may 
 - `Object.entries()`
 - `Array.from()`
 - `String.prototype.startsWith()`
-- `Proxy`
+- `Number.isNaN`
+- `Proxy` (see note below)
 
 Please be aware that this library uses the `deleteProperty` trap and some polyfills will throw an error because that trap cannot be polyfilled. If you need to support IE11 (or another browser that doesn't understand `Proxy`) we recommend that you include the "no-proxy" plugin and either remove the attribute (`element.removeAttribute`) or set the value to an empty string (`aria.property = ""`) to delete the property.
 

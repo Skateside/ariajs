@@ -1,5 +1,11 @@
 function randomNumber(max) {
+
+    if (max === undefined) {
+        max = 1;
+    }
+
     return Math.random() * max;
+
 }
 
 function randomInteger(max) {
