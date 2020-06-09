@@ -42,7 +42,7 @@ assign(Aria, {
 
     getTrap: function (target, property) {
 
-        var type = context.getType(property);
+        var type = target.getType(property);
 
         if (type) {
             return target.read(type);
@@ -54,7 +54,7 @@ assign(Aria, {
 
     setTrap: function (target, property, value) {
 
-        var type = context.getType(property);
+        var type = target.getType(property);
 
         if (type) {
             target.write(value, type);
@@ -68,7 +68,7 @@ assign(Aria, {
 
     deletePropertyTrap: function (target, property) {
 
-        var type = context.getType(property);
+        var type = target.getType(property);
 
         if (type) {
             target.delete(type);
@@ -97,7 +97,7 @@ Aria.prototype = {
             },
 
             deleteProperty: function (target, property) {
-                return Aris.deletePropertyTrap(target, property);
+                return Aria.deletePropertyTrap(target, property);
             }
 
         });
@@ -116,7 +116,7 @@ Aria.prototype = {
 
         var writable = type.write(value);
 
-        if (writable) {
+        if (writable !== "") {
             this.element.setAttribute(type.name, writable);
         } else {
             this.delete(type);

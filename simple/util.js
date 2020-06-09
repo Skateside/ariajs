@@ -12,13 +12,24 @@ function spread(arrayLike) {
     return Array.from(arrayLike);
 }
 
-
+/**
+ * A wrapper for Object.assign() which extends the given object.
+ *
+ * @private
+ * @param   {Object} object
+ *          The base object to extend.
+ * @param   {...Object} arguments
+ *          Objects that will extend the base object.
+ * @return  {Object}
+ *          Extended base object.
+ */
 function assign(object) {
     return Object.assign.apply(Object, [object].concat(spread(arguments)));
 }
 
 /**
- * A wrapper for Object.assign() which also extends an empty object.
+ * A version of {@link assign} which clones base before extending it, so that
+ * the base object isn't modified.
  *
  * @private
  * @param   {Object} base

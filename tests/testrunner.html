@@ -10,10 +10,17 @@
 
 <script>
 // Used for testing getPrevious and restorePrevious
-var ARIA = {};
-var previousARIA = ARIA;
+// var ARIA = {};
+// var previousARIA = ARIA;
 </script>
 <script src="../dist/aria.min.js"></script>
+<script>
+if (!window.Proxy) {
+    // Include the no-proxy plugin because PhantomJS can't handle Proxy and the
+    // polyfill will throw an error if we define deleteProperty.
+    document.writeln('<scr'+'ipt src="../dist/plugins/no-proxy.min.js"></scr' + 'ipt>');
+}
+</script>
 
 </head>
 <body>

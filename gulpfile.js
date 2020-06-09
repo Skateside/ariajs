@@ -3,7 +3,6 @@ var mochaPhantomJS  = require("gulp-mocha-phantomjs");
 var concat          = require("gulp-concat-util");
 var minify          = require("gulp-minify");
 var sourcemaps      = require("gulp-sourcemaps");
-// var jest            = require("gulp-jest").default;
 var fs              = require("fs");
 var pkgJson         = JSON.parse(fs.readFileSync("./package.json"))
 // var pluginMeta      = JSON.parse(fs.readFileSync("./plugins.json"));
@@ -87,28 +86,37 @@ gulp.task("js", function () {
 });
 
 gulp.task("js:watch", function () {
-    gulp.watch(["./simple/**/*.js"], ["js"]);
+    gulp.watch(["./simple/*.js"], ["js"]);
 });
 
-// gulp.task("jest", function () {
-//
-//     return gulp.src("./jest/**/*.js")
-//         .pipe(jest({
-//             clearMocks: true,
-//             coverageDirectory: "coverage",
-//             // testMatch: [
-//             //     // "**/jest/**/*.js"
-//             //     "**/dist/jest.js"
-//             //     //   "**/__tests__/**/*.[jt]s?(x)",
-//             //     //   "**/?(*.)+(spec|test).[tj]s?(x)"
-//             // ],
-//         }));
-//
-// });
+gulp.task("plugins", function () {
+
+    return gulp.src("./simple/plugins/**/*.js")
+        .pipe(sourcemaps.init())
+        .pipe(minify({
+            ext: {
+                min: ".min.js"
+            },
+            preserveComments: function (node, comment) {
+                return comment.value.startsWith("!");
+            }
+        }))
+        .pipe(sourcemaps.write("./", {
+            sourceMappingURL: function (file) {
+                return file.relative + ".map";
+            }
+        }))
+        .pipe(gulp.dest("./dist/plugins/"));
+
+});
+
+gulp.task("plugins:watch", function () {
+    gulp.watch(["./simple/plugins/**/*.js"], ["plugins"]);
+});
 
 gulp.task("test", function () {
 
-    gulp.src("./tests/testrunner.html")
+    return gulp.src("./tests/testrunner.html")
         .pipe(mochaPhantomJS({
             reporter: "spec",
             phantomjs: {
@@ -119,10 +127,11 @@ gulp.task("test", function () {
 });
 
 gulp.task("test:watch", function () {
-    gulp.watch(["./tests/**/*.js"], ["test"]);
+    return gulp.watch(["./tests/**/*.js"], ["test"]);
 });
 
 gulp.task("watch", gulp.parallel(
     "js:watch",
+    "plugins:watch",
     // "test:watch"
 ));
