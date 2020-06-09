@@ -56,6 +56,13 @@ describe("basicType", function () {
 
         });
 
+        it("should return an empty string if the element doesn't have the attribute", function () {
+
+            chai.assert.isFalse(element.hasAttribute(ATTRIBUTE));
+            chai.assert.equal(aria[PROPERTY], "");
+
+        });
+
     });
 
     describe("deleting", function () {
