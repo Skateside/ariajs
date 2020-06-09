@@ -12,31 +12,75 @@ Object.defineProperty(Aria, "VERSION", {
     }
 });
 
-Aria.types = {};
+assign(Aria, {
 
-Aria.prefix = function (property) {
+    types: {},
 
-    var prefixed = interpretString(property).toLowerCase();
+    prefix: function (property) {
 
-    return (
-        prefixed.startsWith("aria-")
-        ? prefixed
-        : ("aria-" + prefixed)
-    );
+        var prefixed = interpretString(property).toLowerCase();
 
-};
+        return (
+            prefixed.startsWith("aria-")
+            ? prefixed
+            : ("aria-" + prefixed)
+        );
 
-Aria.addType = function (property, type, attribute) {
+    },
 
-    if (attribute === undefined) {
-        attribute = this.prefix(property);
+    addType: function (property, type, attribute) {
+
+        if (attribute === undefined) {
+            attribute = this.prefix(property);
+        }
+
+        this.types[property] = extend(type, {
+            name: attribute
+        });
+
+    },
+
+    getTrap: function (target, property) {
+
+        var type = context.getType(property);
+
+        if (type) {
+            return target.read(type);
+        }
+
+        return target[property];
+
+    },
+
+    setTrap: function (target, property, value) {
+
+        var type = context.getType(property);
+
+        if (type) {
+            target.write(value, type);
+        } else {
+            target[property] = value;
+        }
+
+        return true;
+
+    },
+
+    deletePropertyTrap: function (target, property) {
+
+        var type = context.getType(property);
+
+        if (type) {
+            target.delete(type);
+        }
+
+        delete target[property];
+
+        return true;
+
     }
 
-    this.types[property] = extend(type, {
-        name: attribute
-    });
-
-};
+});
 
 Aria.prototype = {
 
@@ -45,43 +89,15 @@ Aria.prototype = {
         return new Proxy(context, {
 
             get: function (target, property) {
-
-                var type = context.getType(property);
-
-                if (type) {
-                    return target.read(type);
-                }
-
-                return target[property];
-
+                return Aria.getTrap(target, property);
             },
 
             set: function (target, property, value) {
-
-                var type = context.getType(property);
-
-                if (type) {
-                    target.write(value, type);
-                } else {
-                    target[property] = value;
-                }
-
-                return true;
-
+                return Aria.setTrap(target, property, value);
             },
 
-            delete: function (target, property) {
-
-                var type = context.getType(property);
-
-                if (type) {
-                    target.delete(type);
-                }
-
-                delete target[property];
-
-                return true;
-
+            deleteProperty: function (target, property) {
+                return Aris.deletePropertyTrap(target, property);
             }
 
         });

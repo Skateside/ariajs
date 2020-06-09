@@ -1,8 +1,9 @@
 var gulp            = require("gulp");
-// var mochaPhantomJS  = require("gulp-mocha-phantomjs");
+var mochaPhantomJS  = require("gulp-mocha-phantomjs");
 var concat          = require("gulp-concat-util");
 var minify          = require("gulp-minify");
 var sourcemaps      = require("gulp-sourcemaps");
+// var jest            = require("gulp-jest").default;
 var fs              = require("fs");
 var pkgJson         = JSON.parse(fs.readFileSync("./package.json"))
 // var pluginMeta      = JSON.parse(fs.readFileSync("./plugins.json"));
@@ -88,3 +89,40 @@ gulp.task("js", function () {
 gulp.task("js:watch", function () {
     gulp.watch(["./simple/**/*.js"], ["js"]);
 });
+
+// gulp.task("jest", function () {
+//
+//     return gulp.src("./jest/**/*.js")
+//         .pipe(jest({
+//             clearMocks: true,
+//             coverageDirectory: "coverage",
+//             // testMatch: [
+//             //     // "**/jest/**/*.js"
+//             //     "**/dist/jest.js"
+//             //     //   "**/__tests__/**/*.[jt]s?(x)",
+//             //     //   "**/?(*.)+(spec|test).[tj]s?(x)"
+//             // ],
+//         }));
+//
+// });
+
+gulp.task("test", function () {
+
+    gulp.src("./tests/testrunner.html")
+        .pipe(mochaPhantomJS({
+            reporter: "spec",
+            phantomjs: {
+                useColors: true
+            }
+        }));
+
+});
+
+gulp.task("test:watch", function () {
+    gulp.watch(["./tests/**/*.js"], ["test"]);
+});
+
+gulp.task("watch", gulp.parallel(
+    "js:watch",
+    // "test:watch"
+));

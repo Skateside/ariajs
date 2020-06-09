@@ -1,19 +1,4 @@
 /**
- * A wrapper for Object.assign() which also extends an empty object.
- *
- * @private
- * @param   {Object} base
- *          Base object to extend.
- * @param   {Object} object
- *          Object that will extend the base.
- * @return  {Object}
- *          New object, based on the base and object.
- */
-function extend(base, object) {
-    return Object.assign({}, base, object);
-}
-
-/**
  * A wrpper for Array.from() that's supposed to simulate ES6's array spread
  * operator.
  *
@@ -25,6 +10,26 @@ function extend(base, object) {
  */
 function spread(arrayLike) {
     return Array.from(arrayLike);
+}
+
+
+function assign(object) {
+    return Object.assign.apply(Object, [object].concat(spread(arguments)));
+}
+
+/**
+ * A wrapper for Object.assign() which also extends an empty object.
+ *
+ * @private
+ * @param   {Object} base
+ *          Base object to extend.
+ * @param   {Object} object
+ *          Object that will extend the base.
+ * @return  {Object}
+ *          New object, based on the base and object.
+ */
+function extend(base, object) {
+    return assign({}, base, object);
 }
 
 /**
