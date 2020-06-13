@@ -73,14 +73,14 @@ describe("floatType", function () {
 
         });
 
-        it("should read a non numeric value as 0", function () {
+        it("should read a non numeric value as NaN", function () {
 
             var value = randomString("abc");
 
             element.setAttribute(ATTRIBUTE, value);
             chai.assert.strictEqual(element.getAttribute(ATTRIBUTE), value);
             chai.assert.notStrictEqual(element.getAttribute(ATTRIBUTE), 0);
-            chai.assert.strictEqual(aria[PROPERTY], 0);
+            chai.assert.isNaN(aria[PROPERTY]);
 
         });
 

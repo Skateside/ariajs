@@ -52,9 +52,13 @@ var basicType = {
 var floatType = extend(basicType, {
 
     /**
-     * [description]
-     * @param  {[type]} value [description]
-     * @return {[type]}       [description]
+     * Read the float value from the attribute.
+     *
+     * @param  {String} value
+     *         Attribute balue to convert.
+     * @return {Number}
+     *         Converted float. This may be NaN if the attribute doesn't convert
+     *         into a number correctly.
      */
     read: function (value) {
         return Number(basicType.read(value));
@@ -120,6 +124,16 @@ var stateType = extend(basicType, {
 
 var tristateType = extend(stateType, {
 
+    coerce: function (value) {
+
+        return (
+            value === "mixed"
+            ? value
+            : stateType.coerce(value)
+        );
+
+    },
+
     read: function (value) {
 
         var coerced = this.coerce(value);
@@ -148,8 +162,10 @@ var undefinedStateType = extend(stateType, {
 
     coerce: function (value) {
 
+        // Coerce null to undefined because getAttribute() will return null if
+        // the attribute isn't set.
         return (
-            (value === "" || (/^undefined$/i).test(value))
+            (value === "" || (/^undefined$/i).test(value) || value === null)
             ? undefined
             : stateType.coerce(value)
         );
@@ -158,6 +174,16 @@ var undefinedStateType = extend(stateType, {
 
     read: function (value) {
         return this.coerce(value);
+    },
+
+    write: function (value) {
+
+        return (
+            (value === undefined || value === "undefined")
+            ? "undefined"
+            : stateType.write(value)
+        );
+
     }
 
 });

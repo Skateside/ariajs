@@ -2,21 +2,28 @@
 
 A helper library for working with WAI-ARIA attributes, designed to make manipulating them as simple as possible.
 
-## Open for Beta
+## Browser Support
 
-`aria.js` is now open for beta testing. If you notice an issue, [please open an issue](https://github.com/Skateside/ariajs/issues). If you want to be really awesome, you can always create a pull request. I'm looking for certain things during this beta test:
+This library has been tested in the latest browsers as well as IE11, but it may require these parts to be polyfilled:
 
-- Does this library create any noticeable performance hits?
-- Do all features work as expected?
-- Is [the documentation](https://github.com/Skateside/ariajs/wiki) easy to follow?
+- `Object.assign()`
+- `Object.entries()`
+- `Array.from()`
+- `String.prototype.startsWith()`
+- `Number.isNaN`
+- `Proxy` (see note below)
 
-This library _should_ be intuitive and the documentation _should_ be easy to understand. If this isn't the case, please let me know.
+Please be aware that this library uses the `deleteProperty` trap and some polyfills will throw an error because that trap cannot be polyfilled. If you need to support IE11 (or another browser that doesn't understand `Proxy`) we recommend that you include the "no-proxy" plugin and either remove the attribute (`element.removeAttribute`) or set the value to an empty string (`aria.property = ""`) to delete the property.
 
-If you want to contact me without raising an issue, you can find me on Twitter: [@Skateside](https://twitter.com/Skateside). I'd love to see how you're using this library or whether you (dis)like any features of it.
+## Unit Test Troubleshooting
 
-## Documentation
+PhantomJS currently doesn't understand `Proxy`, which AriaJS uses. If you run `gulp test`, you may see this error:
 
-The documentation for this library can be found in [the Wiki](https://github.com/Skateside/ariajs/wiki).
+> Can't find variable: Proxy
+
+This will happen because the no-proxy plugin hasn't been loaded. Run `gulp plugins` to make sure the file has been written, then `gulp test` will work correctly.
+
+---
 
 ## Building ARIA.js
 
@@ -58,19 +65,6 @@ gulp js
 # Create ./plugins/dist/*, minified versions and maps.
 gulp plugins
 ```
-
-## Browser Support
-
-This library has been tested in the latest browsers as well as IE11, but it may require these parts to be polyfilled:
-
-- `Object.assign()`
-- `Object.entries()`
-- `Array.from()`
-- `String.prototype.startsWith()`
-- `Number.isNaN`
-- `Proxy` (see note below)
-
-Please be aware that this library uses the `deleteProperty` trap and some polyfills will throw an error because that trap cannot be polyfilled. If you need to support IE11 (or another browser that doesn't understand `Proxy`) we recommend that you include the "no-proxy" plugin and either remove the attribute (`element.removeAttribute`) or set the value to an empty string (`aria.property = ""`) to delete the property.
 
 ## Gulp tasks
 

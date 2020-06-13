@@ -12,7 +12,7 @@ function randomInteger(max) {
     return Math.floor(randomNumber(max));
 }
 
-function randomString(length, prefix) {
+function randomString(prefix, length) {
 
     var start = (
         prefix === undefined
@@ -38,6 +38,6 @@ function randomString(length, prefix) {
 
     }
 
-    return random;
+    return start + random;
 
 }

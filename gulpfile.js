@@ -130,6 +130,8 @@ gulp.task("test:watch", function () {
     return gulp.watch(["./tests/**/*.js"], ["test"]);
 });
 
+gulp.task("build", gulp.series(gulp.parallel("js", "plugins"), "test"));
+
 gulp.task("watch", gulp.parallel(
     "js:watch",
     "plugins:watch",
