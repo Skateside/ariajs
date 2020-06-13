@@ -84,7 +84,7 @@ describe("basicType", function () {
         // line, even if it passes in an up-to-date browser.
         if (window.Proxy) {
 
-            it("should delete the attribute if the property is deleted", function () {
+            it("should delete the attribute if the property is deleted (requires Proxy)", function () {
 
                 var value = randomString();
 
