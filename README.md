@@ -2,6 +2,71 @@
 
 A helper library for working with WAI-ARIA attributes, designed to make manipulating them as simple as possible.
 
+## Usage
+
+Imagine you're creating a disclosure widget (even though [`<details>`/`<summary>` is the better solution](https://css-tricks.com/quick-reminder-that-details-summary-is-the-easiest-way-ever-to-make-an-accordion/)). The markup will be very basic.
+
+```html
+<div class="disclosure">
+    <button type="button">Toggle</button>
+    <div>
+        <p>Content</p>
+    </div>
+</div>
+```
+
+The functionality is also very easy to write.
+
+```js
+document.querySelectorAll(".disclosure").forEach(function (disclosure) {
+
+    var button = disclosure.querySelector("button");
+    var content = disclosure.querySelector("div");
+
+    button.addEventListener("click", function () {
+        div.hidden = !div.hidden;
+    });
+
+});
+```
+
+**Aria.js** will simplify the process of adding and maintaining the WAI-ARIA attributes.
+
+```js
+document.querySelectorAll(".disclosure").forEach(function (disclosure) {
+
+    var button = disclosure.querySelector("button");
+    var content = disclosure.querySelector("div");
+    var aria = new Aria(button);
+
+    aria.controls = content;
+    aria.expanded = !content.hidden;
+
+    button.addEventListener("click", function () {
+        content.hidden = !content.hidden;
+        aria.expanded = !content.hidden;
+    });
+
+});
+```
+
+The markup has now been updated:
+
+```html
+<div class="disclosure">
+    <button type="button" aria-controls="aria-element-0" aria-expanded="true">Toggle</button>
+    <div id="aria-element-0">
+        <p>Content</p>
+    </div>
+</div>
+```
+
+## Documentation
+
+The documentation for this library can be found in [the Wiki](https://github.com/Skateside/ariajs/wiki).
+
+_NOTE: the documentation is for the old version of the library!_
+
 ## Browser Support
 
 This library has been tested in the latest browsers as well as IE11, but it may require these parts to be polyfilled:
@@ -11,9 +76,36 @@ This library has been tested in the latest browsers as well as IE11, but it may 
 - `Array.from()`
 - `String.prototype.startsWith()`
 - `Number.isNaN`
-- `Proxy` (see note below)
+- `Proxy`
 
-Please be aware that this library uses the `deleteProperty` trap and some polyfills will throw an error because that trap cannot be polyfilled. If you need to support IE11 (or another browser that doesn't understand `Proxy`) we recommend that you include the "no-proxy" plugin and either remove the attribute (`element.removeAttribute`) or set the value to an empty string (`aria.property = ""`) to delete the property.
+### A Note About `Proxy`
+
+AriaJS uses the set, get and deleteProperty traps from `Proxy`. This allows you to simply work with the `aria` object and the markup will be automatically updated. For example, the attribute can be removed like this:
+
+```js
+// <button type="button" aria-expanded="true">Toggle</button>
+var aria = new Aria(document.querySelector("button"));
+delete aria.expanded;
+// <button type="button">Toggle</button>
+```
+
+If you need to support IE11, or another browser that doesn't understand `Proxy`, the `delete` keyword won't work. Because the deleteProperty trap cannot be polyfilled, some polyfills will throw an error if it's used. To get around that, you can add the "no-proxy" plugin. To remove the attribute with that plugin enabled, either use `element.removeAttribute` or set the property to an empty string.
+
+```js
+// <button type="button" aria-expanded="true">Toggle</button>
+var aria = new Aria(document.querySelector("button"));
+aria.expanded = "";
+// <button type="button">Toggle</button>
+```
+
+For `listType` and `referenceListType` properties, the attribute can be removed by setting the value to an empty array as well.
+
+```js
+// <button type="button" controls="element-id">Toggle</button>
+var aria = new Aria(document.querySelector("button"));
+aria.controls = [];
+// <button type="button">Toggle</button>
+```
 
 ## Unit Test Troubleshooting
 
