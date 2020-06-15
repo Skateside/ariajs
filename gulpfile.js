@@ -268,12 +268,13 @@ gulp.task("custom", function () {
 
     });
 
+    // TODO: correct the sourcemaps - compile aria.js as well?
     return gulp.src(files)
         .pipe(concat.header(
             "/*! " + simpleFileNames.join(", ") + " */\n"
         ))
         .pipe(concat("aria.custom.js"))
-        .pipe(sourcemaps.init())
+        // .pipe(sourcemaps.init())
         .pipe(minify({
             ext: {
                 min: ".min.js"
@@ -282,11 +283,11 @@ gulp.task("custom", function () {
                 return comment.value.startsWith("!");
             }
         }))
-        .pipe(sourcemaps.write("./", {
-            sourceMappingURL: function (file) {
-                return file.relative + ".map";
-            }
-        }))
+        // .pipe(sourcemaps.write("./", {
+        //     sourceMappingURL: function (file) {
+        //         return file.relative + ".map";
+        //     }
+        // }))
         .pipe(gulp.dest("./dist/"));
 
 });

@@ -63,12 +63,25 @@
 
         var aria;
         var result;
+        var that = this;
 
         // Check for arguments.length rather than undefined because undefined is
         // a valid value to pass.
         if (arguments.length === 1) {
 
-            aria = getAria(this[0]);
+            // Check to see if we've been passed an object for setting a lot of
+            // WAI-ARIA attributes at the same time.
+            if ($.isPlainObject(property)) {
+
+                $.each(property, function (key, val) {
+                    that.aria(key, val);
+                });
+
+                return that;
+                
+            }
+
+            aria = getAria(that[0]);
             result = aria[property];
 
             // This check will catch a result that's an Element or an Array.
@@ -81,7 +94,7 @@
 
         }
 
-        return this.each(function () {
+        return that.each(function () {
 
             // If the user passed a jQuery object value to a referenceType
             // property, get the first item because that's probably the
