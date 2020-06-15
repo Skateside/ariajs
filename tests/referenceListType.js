@@ -2,6 +2,7 @@ describe("referenceListType", function () {
 
     var element;
     var others;
+    var container;
     var aria;
     var PROPERTY = "controls";
     var ATTRIBUTE = "aria-" + PROPERTY;
@@ -9,6 +10,7 @@ describe("referenceListType", function () {
     beforeEach(function () {
 
         element = document.createElement("div");
+        container = document.createElement("div");
         others = [
             document.createElement("div"),
             document.createElement("div"),
@@ -16,17 +18,19 @@ describe("referenceListType", function () {
         ];
         aria = new Aria(element);
 
-        others.concat(element).forEach(function (item) {
-            document.body.appendChild(item);
+        others.forEach(function (other) {
+            container.appendChild(other);
         });
+
+        document.body.appendChild(element);
+        document.body.appendChild(container);
 
     });
 
     afterEach(function () {
 
-        others.concat(element).forEach(function (item) {
-            document.body.removeChild(item);
-        });
+        document.body.removeChild(element);
+        document.body.removeChild(container);
 
     });
 
@@ -50,6 +54,16 @@ describe("referenceListType", function () {
             }).join(" ");
             chai.assert.strictEqual(element.getAttribute(ATTRIBUTE), idString);
 
+        });
+
+        it("should be able to write a NodeList", function () {
+
+            aria[PROPERTY] = container.querySelectorAll(others[0].nodeName);
+            var idString = others.map(function (other) {
+                return other.id;
+            }).join(" ");
+            chai.assert.strictEqual(element.getAttribute(ATTRIBUTE), idString);
+            
         });
 
         it("should be able to add an array of elements and IDs", function () {

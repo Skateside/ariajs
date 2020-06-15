@@ -38,21 +38,14 @@ describe("listType", function () {
 
         it("should be able to write an array-like object", function () {
 
-            var valuesArray = [
+            var values = [
                 randomString(),
                 randomString(),
                 randomString()
             ];
-            var valuesObject = valuesArray.reduce(function (object, item, i) {
 
-                object[i] = item;
-                return object;
-
-            }, {});
-
-            valuesObject.length = valuesArray.length;
-            aria[PROPERTY] = valuesObject;
-            chai.assert.equal(element.getAttribute(ATTRIBUTE), valuesArray.join(" "));
+            aria[PROPERTY] = makeArrayLike(values);
+            chai.assert.equal(element.getAttribute(ATTRIBUTE), values.join(" "));
 
         });
 

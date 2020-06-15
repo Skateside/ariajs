@@ -4,8 +4,83 @@ var concat          = require("gulp-concat-util");
 var minify          = require("gulp-minify");
 var sourcemaps      = require("gulp-sourcemaps");
 var fs              = require("fs");
-var pkgJson         = JSON.parse(fs.readFileSync("./package.json"))
-// var pluginMeta      = JSON.parse(fs.readFileSync("./plugins.json"));
+var pkgJson         = JSON.parse(fs.readFileSync("./package.json"));
+var colors          = require('ansi-colors');
+var supportsColor   = require('color-support');
+
+// Taken from ./node_modules/gulp-cli/lib/shared/ansi.js
+var hasColors = colorize();
+var ansi = {
+    red: hasColors ? colors.red : noColor,
+    green: hasColors ? colors.green : noColor,
+    blue: hasColors ? colors.blue : noColor,
+    magenta: hasColors ? colors.magenta : noColor,
+    cyan: hasColors ? colors.cyan : noColor,
+    white: hasColors ? colors.white : noColor,
+    gray: hasColors ? colors.gray : noColor,
+    bgred: hasColors ? colors.bgred : noColor,
+    bold: hasColors ? colors.bold : noColor,
+    yellow: hasColors ? colors.yellow : noColor,
+};
+function noColor(message) {
+    return message;
+}
+function hasFlag(flag) {
+    return (process.argv.indexOf('--' + flag) !== -1);
+}
+function colorize() {
+
+    if (hasFlag('no-color')) {
+        return false;
+    }
+
+    /* istanbul ignore if */
+    if (hasFlag('color')) {
+        return true;
+    }
+
+    return supportsColor();
+
+}
+
+/**
+ * Reads the arguments passed to a gulp task.
+ *
+ * @param  {Array} args
+ *         The results of process.argv
+ * @return {Object}
+ *         Arguments passed to the gulp task.
+ */
+var readArgs = function (args) {
+
+    var read = {};
+    var i = 3;
+    var il = args.length;
+    var arg;
+    var prop;
+    var value;
+
+    while (i < il) {
+
+        arg = args[i];
+
+        if (arg.indexOf("--") === 0) {
+
+            prop = arg.slice(2);
+            value = true;
+
+        } else {
+            value = arg;
+        }
+
+        read[prop] = value;
+        i += 1;
+
+    }
+
+    return read;
+
+};
 
 /**
  * Gets today's date as a string.
@@ -86,7 +161,7 @@ gulp.task("js", function () {
 });
 
 gulp.task("js:watch", function () {
-    gulp.watch(["./simple/*.js"], ["js"]);
+    return gulp.watch(["./simple/*.js"], ["js"]);
 });
 
 gulp.task("plugins", function () {
@@ -111,7 +186,24 @@ gulp.task("plugins", function () {
 });
 
 gulp.task("plugins:watch", function () {
-    gulp.watch(["./simple/plugins/**/*.js"], ["plugins"]);
+    return gulp.watch(["./simple/plugins/**/*.js"], ["plugins"]);
+});
+
+gulp.task("plugins:list", function (done) {
+
+    fs.readdir("./simple/plugins/", function (error, files) {
+
+        console.log("\nAvailable plugins:");
+
+        files.forEach(function (file) {
+            console.log("- " + ansi.blue(file.replace(/\.js$/, "")));
+        });
+
+        console.log("\n");
+        done();
+
+    });
+
 });
 
 gulp.task("test", function () {
@@ -130,10 +222,73 @@ gulp.task("test:watch", function () {
     return gulp.watch(["./tests/**/*.js"], ["test"]);
 });
 
-gulp.task("build", gulp.series(gulp.parallel("js", "plugins"), "test"));
+gulp.task("full", gulp.series(gulp.parallel("js", "plugins"), "test"));
 
 gulp.task("watch", gulp.parallel(
     "js:watch",
     "plugins:watch",
     // "test:watch"
 ));
+
+gulp.task("custom", function () {
+
+    var args = readArgs(process.argv);
+    var plugins = (args.p || args.plugins || "").trim().split(/\s+/);
+    var files = [
+        "./dist/aria.js"
+    ];
+    var simpleFileNames = [];
+
+    if (plugins.length === 1 && plugins[0] === "all") {
+
+        plugins = [];
+        fs.readdirSync("./simple/plugins/").forEach(function (file) {
+            plugins.push(file.replace(/\.js$/, ""));
+        });
+
+    }
+
+    plugins.forEach(function (name) {
+
+        var fileName = "./simple/plugins/" + name + ".js";
+
+        if (fs.existsSync(fileName)) {
+            files.push(fileName);
+        } else {
+            console.log("\nWARNING: Unable to find '" + name + "' plugin\n");
+        }
+
+    });
+
+    simpleFileNames = files.map(function (fileName) {
+
+        return fileName
+            .slice(fileName.lastIndexOf("/") + 1)
+            .replace(/\.js$/, "");
+
+    });
+
+    return gulp.src(files)
+        .pipe(concat.header(
+            "/*! " + simpleFileNames.join(", ") + " */\n"
+        ))
+        .pipe(concat("aria.custom.js"))
+        .pipe(sourcemaps.init())
+        .pipe(minify({
+            ext: {
+                min: ".min.js"
+            },
+            preserveComments: function (node, comment) {
+                return comment.value.startsWith("!");
+            }
+        }))
+        .pipe(sourcemaps.write("./", {
+            sourceMappingURL: function (file) {
+                return file.relative + ".map";
+            }
+        }))
+        .pipe(gulp.dest("./dist/"));
+
+});
+
+gulp.task("build", gulp.series("js", "custom"));

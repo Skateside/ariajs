@@ -41,3 +41,18 @@ function randomString(prefix, length) {
     return start + random;
 
 }
+
+function makeArrayLike(array) {
+
+    var arrayLike = array.reduce(function (object, item, i) {
+
+        object[i] = item;
+        return object;
+
+    }, {});
+
+    arrayLike.length = array.length;
+
+    return arrayLike;
+
+}
