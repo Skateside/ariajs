@@ -382,7 +382,7 @@ var referenceType = extend(basicType, /** @lends referenceType */{
 
         do {
 
-            id = "anonymous-element-" + this.counter;
+            id = "ariajs-" + this.counter;
             this.counter += 1;
 
         } while (document.getElementById(id));
