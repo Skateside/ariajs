@@ -2,70 +2,9 @@
 
 A helper library for working with WAI-ARIA attributes, designed to make manipulating them as simple as possible.
 
-## Usage
-
-Imagine you're creating a disclosure widget (even though [`<details>`/`<summary>` is the better solution](https://css-tricks.com/quick-reminder-that-details-summary-is-the-easiest-way-ever-to-make-an-accordion/)). The markup will be very basic.
-
-```html
-<div class="disclosure">
-    <button type="button">Toggle</button>
-    <div>
-        <p>Content</p>
-    </div>
-</div>
-```
-
-The functionality is also very easy to write.
-
-```js
-document.querySelectorAll(".disclosure").forEach(function (disclosure) {
-
-    var button = disclosure.querySelector("button");
-    var content = disclosure.querySelector("div");
-
-    button.addEventListener("click", function () {
-        div.hidden = !div.hidden;
-    });
-
-});
-```
-
-**Aria.js** will simplify the process of adding and maintaining the WAI-ARIA attributes.
-
-```js
-document.querySelectorAll(".disclosure").forEach(function (disclosure) {
-
-    var button = disclosure.querySelector("button");
-    var content = disclosure.querySelector("div");
-    var aria = new Aria(button);
-
-    aria.controls = content;
-    aria.expanded = !content.hidden;
-
-    button.addEventListener("click", function () {
-        content.hidden = !content.hidden;
-        aria.expanded = !content.hidden;
-    });
-
-});
-```
-
-The markup has now been updated:
-
-```html
-<div class="disclosure">
-    <button type="button" aria-controls="aria-element-0" aria-expanded="true">Toggle</button>
-    <div id="aria-element-0">
-        <p>Content</p>
-    </div>
-</div>
-```
-
 ## Documentation
 
-The documentation for this library can be found in [the Wiki](https://github.com/Skateside/ariajs/wiki).
-
-_NOTE: the documentation is for the old version of the library!_
+The documentation for this library can be found in [the docs](docs/overview.md).
 
 ## Browser Support
 
@@ -107,6 +46,8 @@ aria.controls = [];
 // <button type="button">Toggle</button>
 ```
 
+You can use the [no-proxy plugin](docs/plugins.md#no-proxy-plugin) if you need to support older browsers.
+
 ## Unit Test Troubleshooting
 
 PhantomJS currently doesn't understand `Proxy`, which AriaJS uses. If you run `gulp test`, you may see this error:
@@ -115,55 +56,64 @@ PhantomJS currently doesn't understand `Proxy`, which AriaJS uses. If you run `g
 
 This will happen because the no-proxy plugin hasn't been loaded. Run `gulp plugins` to make sure the file has been written, then `gulp test` will work correctly.
 
----
+## Building Aria.js
 
-## Building ARIA.js
+Aria.js compiles using gulp. There are a number of gulp tasks available for developing and compiling Aria.js
 
-To build `aria.js` from the source files, simply run a gulp task:
+### `gulp js`
+
+The command `gulp js` will compile the base Aria.js file into the "dist" folder, along with a minified version and sourcemaps. These files are called:
+
+- `aria.js` - the compiled Aria.js file.
+- `aria.js.map` - the source map for `aria.js`.
+- `aria.min.js` - the minified version of `aria.js`.
+- `aria.min.js.map` - the source map for `aria.min.js`.
+
+There's also a variant called `gulp js:watch` which will watch for file changes and re-compile the files.
+
+### `gulp plugins`
+
+The `gulp plugins` command will compile and minify the plugin files into the "dist/plugins" folder. They can either be added separately or concatenated using the [`gulp build`](#gulp-build) command.
+
+There's a veriant called `gulp plugins:watch` which will watch for changes to the plugin files and will re-compile them.
+
+You can see a list of all the plugins using `gulp plugins:list`.
+
+### `gulp test`
+
+The `gulp test` command will run the unit tests and show their results. THe `gulp test:watch` command will watch for any file changes and re-run the tests. Because the files and plugins need to be compiled before testing, the [`gulp full`](#gulp-full) command will do all of them.
+
+### `gulp full`
+
+The `gulp full` command will execute [`gulp js`](#gulp-js) and [`gulp plugins`](#gulp-plugins) commands before the [`gulp test`](#gulp-test). It's a simple way of testing.
+
+### `gulp watch`
+
+The `gulp watch` command executes both the [`gulp js:watch`](#gulp-js) and the [`gulp test:watch`](#gulp-test) commands.
+
+### `gulp custom`
+
+The `gulp custom` command will create a custom version of Aria.js which includes any plugins that you wish to include. You can define the plugins using the `--plugins` argument and give it a space-separated list of plugins to include. For example, this command will create a version of Aria.js that includes the no-proxy and extend-node plugins:
 
 ```bash
-gulp build
+$ gulp custom --plugins "no-proxy extend-node"
 ```
 
-This will create a "dist" folder containing `aria.custom.js` (and a minified version and maps of both).
-
-You can add and [official plugins](https://github.com/Skateside/ariajs/wiki/Plugins) using the optional `--plugins` option (which has the alias `--p`). Just pass the name of the plugin without the leading "aria." or the trailing ".js" (e.g. "tokens" instead of "aria.tokens.js").
+You can also use the value "all" to include all the plugins.
 
 ```bash
-gulp build --plugins extendNode
-
-# Shorter version:
-gulp build --p extendNode
+$ gulp custom --plugins "all"
 ```
 
-You will now have a version of `aria.js` which also includes the [aria.extendNode.js](https://github.com/Skateside/ariajs/wiki/aria.extendNode.js) plugin. The `--plugins` option can also be a space-separated string of plugins.
+The list of available plugins can be found by using the [`gulp plugins:list`](#gulp-plugins) command and they're all detailed on the [plugins page](docs/plugins.md).
 
-```bash
-gulp build --plugins "extendNode focus"
-```
+The `gulp custom` command will create 2 files in the "dist" folder:
 
-If you want to include all plugins, you can set the value of the `--plugins` option to "all".
+- `aria.custom.js` - the concatentated file with the plugins.
+- `aria.custom.min.js` - the minified version of `aria.custom.js`.
 
-```bash
-gulp build --plugins all
-```
+The `gulp custom` command needs the [`gulp js`](#gulp-js) command to have executed. The [`gulp build`](#gulp-build) command will execute both.
 
-If you just want `aria.js`, you can use the `gulp js` task. You can also compile all the plugins by running `gulp plugins`.
+### `gulp build`
 
-```bash
-# Create ./dist/aria.js, minified version and maps.
-gulp js
-
-# Create ./plugins/dist/*, minified versions and maps.
-gulp plugins
-```
-
-## Gulp tasks
-
-Gulp task | Description | Watch version
----|---|---
-`gulp build` | Builds `aria.custom.js`. This is the main task you'll use. | (none)
-`gulp js` | Creates `aria.js` from the source files in `./src/`. | `gulp js:watch`
-`gulp plugins` | Creates the plugins from their source files in `./plugins/src/` | `gulp plugins:watch`
-`gulp test` | Runs the unit tests for `aria.js`. You will need to run `gulp js` first. | `gulp test:watch`
-`gulp watch` | Runs `gulp js:watch`, `gulp plugins:watch` and `gulp test:watch` | (none)
+The `gulp build` command executes [`gulp js`](#gulp-js) and then the [`gulp custom`](#gulp-custom) command. It can also take a `--plugins` argument.
