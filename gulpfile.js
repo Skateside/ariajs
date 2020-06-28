@@ -110,8 +110,8 @@ gulp.task("js", function () {
 
     return gulp.src([
             "./simple/util.js",
-            "./simple/types.js",
             "./simple/Aria.js",
+            "./simple/types.js",
             "./simple/setup.js"
         ])
         .pipe(concat("aria.js", {
@@ -161,7 +161,7 @@ gulp.task("js", function () {
 });
 
 gulp.task("js:watch", function () {
-    return gulp.watch(["./simple/*.js"], ["js"]);
+    return gulp.watch(["./simple/*.js"], gulp.series("js"));
 });
 
 gulp.task("plugins", function () {
@@ -186,7 +186,7 @@ gulp.task("plugins", function () {
 });
 
 gulp.task("plugins:watch", function () {
-    return gulp.watch(["./simple/plugins/**/*.js"], ["plugins"]);
+    return gulp.watch(["./simple/plugins/**/*.js"], gulp.series("plugins"));
 });
 
 gulp.task("plugins:list", function (done) {
@@ -219,7 +219,7 @@ gulp.task("test", function () {
 });
 
 gulp.task("test:watch", function () {
-    return gulp.watch(["./tests/**/*.js"], ["test"]);
+    return gulp.watch(["./tests/**/*.js"], gulp.series("test"));
 });
 
 gulp.task("full", gulp.series(gulp.parallel("js", "plugins"), "test"));

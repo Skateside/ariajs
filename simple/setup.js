@@ -1,5 +1,6 @@
+var types = Aria.types;
 var factoryEntries = [
-    [basicType, [
+    [types.basic, [
         "autocomplete",
         "current",
         "haspopup",
@@ -13,19 +14,19 @@ var factoryEntries = [
         "sort",
         "valuetext"
     ]],
-    [referenceType, [
+    [types.reference, [
         "activedescendant",
         "details",
         "errormessage"
     ]],
-    [referenceListType, [
+    [types.referenceList, [
         "controls",
         "describedby",
         "flowto",
         "labelledby",
         "owns"
     ]],
-    [stateType, [
+    [types.state, [
         "atomic",
         "busy",
         "disabled",
@@ -35,17 +36,17 @@ var factoryEntries = [
         "readonly",
         "required"
     ]],
-    [tristateType, [
+    [types.tristate, [
         "checked",
         "pressed"
     ]],
-    [undefinedStateType, [
+    [types.undefinedState, [
         "expanded",
         "grabbed",
         "hidden",
         "selected"
     ]],
-    [integerType, [
+    [types.integer, [
         "colcount",
         "colindex",
         "colspan",
@@ -56,16 +57,16 @@ var factoryEntries = [
         "rowspan",
         "setsize"
     ]],
-    [floatType, [
+    [types.float, [
         "valuemax",
         "valuemin",
         "valuenow"
     ]],
-    [listType, [
+    [types.list, [
         "dropeffect",
         "relevant"
     ]],
-    [listType, {
+    [types.list, {
         role: "role"
     }]
 ];
@@ -78,13 +79,13 @@ factoryEntries.forEach(function (entry) {
     if (Array.isArray(properties)) {
 
         properties.forEach(function (property) {
-            Aria.addType(property, type);
+            Aria.addProperty(property, type);
         });
 
     } else if (properties && typeof properties === "object") {
 
         Object.entries(properties).forEach(function (propEntry) {
-            Aria.addType(propEntry[0], type, propEntry[1]);
+            Aria.addProperty(propEntry[0], type, propEntry[1]);
         });
 
     }

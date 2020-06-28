@@ -1,3 +1,5 @@
+var addType = Aria.addType.bind(Aria);
+
 /**
  * The base type from which all types come.
  * @type {Object}
@@ -44,6 +46,8 @@ var basicType = {
 
 };
 
+addType("basic", basicType);
+
 /**
  * The float type handles numbers with decimals.
  * @type {Object}
@@ -84,6 +88,8 @@ var floatType = extend(basicType, /** @lends floatType */{
 
 });
 
+addType("float", floatType);
+
 /**
  * A version of {@link floatType} that will drop the decimal.
  * @type {Object}
@@ -117,6 +123,8 @@ var integerType = extend(floatType, /** @lends integerType */{
     }
 
 });
+
+addType("integer", integerType);
 
 /**
  * Handles boolean values.
@@ -180,6 +188,8 @@ var stateType = extend(basicType, /** @lends stateType */{
     }
 
 });
+
+addType("state", stateType);
 
 /**
  * true, false or "mixed".
@@ -246,6 +256,8 @@ var tristateType = extend(stateType, /** @lends tristateType */{
 
 });
 
+addType("tristate", tristateType);
+
 /**
  * true, false or undefined
  * @extends stateType
@@ -304,6 +316,8 @@ var undefinedStateType = extend(stateType, /** @lends undefinedStateType */{
     }
 
 });
+
+addType("undefinedState", undefinedStateType);
 
 /**
  * Handles references to other elements.
@@ -395,6 +409,8 @@ var referenceType = extend(basicType, /** @lends referenceType */{
 
 });
 
+addType("reference", referenceType);
+
 /**
  * A list type, that handles a space-separated attribute value.
  * @extends basicType
@@ -406,7 +422,7 @@ var listType = extend(basicType, /** @lends listType */{
      * The type that will understand each entry in the space-separated value.
      * @type {Object}
      */
-    type: basicType,
+    type: Aria.types.basic,
 
     /**
      * Reads the attribute value as an array.
@@ -489,6 +505,8 @@ var listType = extend(basicType, /** @lends listType */{
 
 });
 
+addType("list", listType);
+
 /**
  * Handles a list of references.
  * @extends listType
@@ -499,6 +517,8 @@ var referenceListType = extend(listType, /** @lends referenceListType */{
     /**
      * @inheritDoc
      */
-    type: referenceType
+    type: Aria.types.reference
 
 });
+
+addType("referenceList", referenceListType);

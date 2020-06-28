@@ -1,20 +1,11 @@
 /**
- * Creates the WAI-ARIA properties for the given element.
+ * Creates the WAI-ARIA properties for the given element. See {@link Aria#init}
+ * for the signature.
  *
  * @constructor
- * @param       {Element} element
- *              Element whose WAI-ARIA attributes should be handled.
  */
-function Aria(element) {
-
-    /**
-     * Element that this instance is affecting.
-     * @type {Element}
-     */
-    this.element = element;
-
-    return this.makeMagicProperties(this);
-
+function Aria() {
+    return this.init.apply(this, arguments);
 }
 
 /**
@@ -32,10 +23,16 @@ Object.defineProperty(Aria, "VERSION", {
 assign(Aria, /** @lends Aria */{
 
     /**
-     * Information for each of the properties that the instance will use.
+     * Each of the types that can be used.
      * @type {Object}
      */
     types: {},
+
+    /**
+     * Information for each of the properties that the instance will use.
+     * @type {Object}
+     */
+    properties: {},
 
     /**
      * Prefixes the given property so that it starts with "aria-".
@@ -58,6 +55,18 @@ assign(Aria, /** @lends Aria */{
     },
 
     /**
+     * Adds the given type to {@link Aria.types}.
+     *
+     * @param {String} name
+     *        Name of the type to add.
+     * @param {Object} type
+     *        Type to add.
+     */
+    addType: function (name, type) {
+        this.types[name] = type;
+    },
+
+    /**
      * Adds the property type.
      *
      * @param {String} property
@@ -68,23 +77,24 @@ assign(Aria, /** @lends Aria */{
      *        Optional attribute name. If ommitted, the property name is passed
      *        to {@link Aria.prefix} and that result is used.
      */
-    addType: function (property, type, attribute) {
+    addProperty: function (property, type, attribute) {
 
         if (attribute === undefined) {
             attribute = this.prefix(property);
         }
 
-        this.types[property] = extend(type, {
+        this.properties[property] = {
+            type: type,
             name: attribute
-        });
+        };
 
     },
 
     /**
      * The get trap that Proxy will use. If the property is recognised as a type
-     * (see {@link Aria#getType}) then it's passed to {@link Aria#read}. If the
-     * property isn't recognised, the target's property is returned (which may
-     * be undefined).
+     * (see {@link Aria#getProperty}) then it's passed to {@link Aria#read}. If
+     * the property isn't recognised, the target's property is returned (which
+     * may be undefined).
      *
      * @param  {Object} target
      *         Instance whose property should be accessed.
@@ -95,7 +105,7 @@ assign(Aria, /** @lends Aria */{
      */
     getTrap: function (target, property) {
 
-        var type = target.getType(property);
+        var type = target.getProperty(property);
 
         if (type) {
             return target.read(type);
@@ -107,7 +117,7 @@ assign(Aria, /** @lends Aria */{
 
     /**
      * The set trap that Proxy will use. If the property is recognised as a type
-     * (see {@link Aria#getType}) then the value is passed to
+     * (see {@link Aria#getProperty}) then the value is passed to
      * {@link Aria#write}. If the property isn't recognised, it's simply set on
      * the target.
      *
@@ -122,7 +132,7 @@ assign(Aria, /** @lends Aria */{
      */
     setTrap: function (target, property, value) {
 
-        var type = target.getType(property);
+        var type = target.getProperty(property);
 
         if (type) {
             target.write(type, value);
@@ -136,9 +146,9 @@ assign(Aria, /** @lends Aria */{
 
     /**
      * The deleteProperty trap that Proxy will use. If the property is
-     * recognised as a type (see {@link Aria#getType}) then {@link Aria#delete}
-     * is called. If the property is not recognised then the property is deleted
-     * from the given target.
+     * recognised as a type (see {@link Aria#getProperty}) then
+     * {@link Aria#delete} is called. If the property is not recognised then the
+     * property is deleted from the given target.
      *
      * @param  {Object} target
      *         Instance whose property should be deleted.
@@ -149,7 +159,7 @@ assign(Aria, /** @lends Aria */{
      */
     deletePropertyTrap: function (target, property) {
 
-        var type = target.getType(property);
+        var type = target.getProperty(property);
 
         if (type) {
             target.delete(type);
@@ -164,6 +174,25 @@ assign(Aria, /** @lends Aria */{
 });
 
 Aria.prototype = {
+
+    /**
+     * Constructs {@link Aria}.
+     *
+     * @constructs Aria
+     * @param      {Element} element
+     *             Element whose WAI-ARIA attributes should be handled.
+     */
+    init: function (element) {
+
+        /**
+         * Element that this instance is affecting.
+         * @type {Element}
+         */
+        this.element = element;
+
+        return this.makeMagicProperties(this);
+
+    },
 
     /**
      * Creates the magic properties for this instance.
@@ -194,63 +223,63 @@ Aria.prototype = {
     },
 
     /**
-     * Gets the property from {@link Aria.types}.
+     * Gets the property from {@link Aria.properties}.
      *
      * @param  {String} property
      *         Property to access.
      * @return {Object|undefined}
      *         Property type or undefined if the type doesn't exist.
      */
-    getType: function (property) {
-        return Aria.types[property];
+    getProperty: function (property) {
+        return Aria.properties[property];
     },
 
     /**
-     * Passes the attribute's value to the given type's read method. The value
-     * will be null if the attribute isn't set on {@link Aria#element}.
+     * Passes the attribute's value to the given property's read method. The
+     * value will be null if the attribute isn't set on {@link Aria#element}.
      *
-     * @param  {Object} type
-     *         Property type that will read the attribute's value and define the
+     * @param  {Object} property
+     *         Property that will read the attribute's value and define the
      *         attribute's name.
      * @return {?}
      *         Result of reading the property.
      */
-    read: function (type) {
-        return type.read(this.element.getAttribute(type.name));
+    read: function (property) {
+        return property.type.read(this.element.getAttribute(property.name));
     },
 
     /**
-     * Writes the attribute's value after passing it to the given type's write
-     * method. If the result from the type's write method is an empty string,
-     * the type is passed to {@link Aria#delete}; if not, the attribute is set
-     * on {@link Aria#element}.
+     * Writes the attribute's value after passing it to the given property's
+     * write method. If the result from the property's write method is an empty
+     * string, the property is passed to {@link Aria#delete}; if not, the
+     * attribute is set on {@link Aria#element}.
      *
-     * @param {Object} type
-     *        Property type that will write the attribute's value and define the
+     * @param {Object} property
+     *        Property that will write the attribute's value and define the
      *        attribute's name.
      * @param {?} value
      *        Value to write.
      */
-    write: function (type, value) {
+    write: function (property, value) {
 
-        var writable = type.write(value);
+        var writable = property.type.write(value);
 
         if (writable !== "") {
-            this.element.setAttribute(type.name, writable);
+            this.element.setAttribute(property.name, writable);
         } else {
-            this.delete(type);
+            this.delete(property);
         }
 
     },
 
     /**
-     * Removes the type's attribute from {@link Aria#element}.
+     * Removes the property's attribute from {@link Aria#element}.
      *
-     * @param {Object} type
+     * @param {Object} property
      *        Type that will define the attribute name to remove.
      */
-    delete: function (type) {
-        this.element.removeAttribute(type.name);
+    delete: function (property) {
+        this.element.removeAttribute(property.name);
     }
 
 }

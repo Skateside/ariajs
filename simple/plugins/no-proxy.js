@@ -10,7 +10,7 @@
 
         var that = this;
 
-        Object.entries(Aria.types).forEach(function (entry) {
+        Object.entries(Aria.properties).forEach(function (entry) {
 
             var property = entry[0];
             var data = entry[1];
