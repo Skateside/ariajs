@@ -1,8 +1,11 @@
 var addType = Aria.addType.bind(Aria);
+var types = Aria.types;
 
 /**
  * The base type from which all types come.
  * @type {Object}
+ * @name basic
+ * @memberof Aria.types
  */
 var basicType = {
 
@@ -51,7 +54,9 @@ addType("basic", basicType);
 /**
  * The float type handles numbers with decimals.
  * @type {Object}
- * @extends basicType
+ * @extends Aria.types.basic
+ * @name float
+ * @memberof Aria.types
  */
 var floatType = extend(basicType, /** @lends floatType */{
 
@@ -65,7 +70,7 @@ var floatType = extend(basicType, /** @lends floatType */{
      *         into a number correctly.
      */
     read: function (value) {
-        return Number(basicType.read(value));
+        return Number(types.basic.read(value));
     },
 
     /**
@@ -93,7 +98,9 @@ addType("float", floatType);
 /**
  * A version of {@link floatType} that will drop the decimal.
  * @type {Object}
- * @extends floatType
+ * @extends Aria.types.float
+ * @name integer
+ * @memberof Aria.types
  */
 var integerType = extend(floatType, /** @lends integerType */{
 
@@ -106,7 +113,7 @@ var integerType = extend(floatType, /** @lends integerType */{
      *         Numeric version of the value.
      */
     read: function (value) {
-        return Math.floor(floatType.read(value));
+        return Math.floor(types.float.read(value));
     },
 
     /**
@@ -119,7 +126,7 @@ var integerType = extend(floatType, /** @lends integerType */{
      *         Numeric string.
      */
     write: function (value) {
-        return floatType.write(Math.floor(value));
+        return types.float.write(Math.floor(value));
     }
 
 });
@@ -129,7 +136,9 @@ addType("integer", integerType);
 /**
  * Handles boolean values.
  * @type {Object}
- * @extends basicType
+ * @extends Aria.types.basic
+ * @name state
+ * @memberof Aria.types
  */
 var stateType = extend(basicType, /** @lends stateType */{
 
@@ -143,7 +152,7 @@ var stateType = extend(basicType, /** @lends stateType */{
      */
     coerce: function (value) {
 
-        var coerced = basicType.coerce(value);
+        var coerced = types.basic.coerce(value);
 
         if (coerced === "") {
             return false;
@@ -193,8 +202,10 @@ addType("state", stateType);
 
 /**
  * true, false or "mixed".
- * @extends stateType
+ * @extends Aria.types.state
  * @type {Object}
+ * @name tristate
+ * @memberof Aria.types
  */
 var tristateType = extend(stateType, /** @lends tristateType */{
 
@@ -211,7 +222,7 @@ var tristateType = extend(stateType, /** @lends tristateType */{
         return (
             value === "mixed"
             ? value
-            : stateType.coerce(value)
+            : types.state.coerce(value)
         );
 
     },
@@ -231,7 +242,7 @@ var tristateType = extend(stateType, /** @lends tristateType */{
         return (
             coerced === "mixed"
             ? coerced
-            : stateType.read(value)
+            : types.state.read(value)
         );
 
     },
@@ -249,7 +260,7 @@ var tristateType = extend(stateType, /** @lends tristateType */{
         return (
             value === "mixed"
             ? value
-            : stateType.write(value)
+            : types.state.write(value)
         );
 
     }
@@ -260,8 +271,10 @@ addType("tristate", tristateType);
 
 /**
  * true, false or undefined
- * @extends stateType
+ * @extends Aria.types.state
  * @type {Object}
+ * @name undefinedState
+ * @memberof Aria.types
  */
 var undefinedStateType = extend(stateType, /** @lends undefinedStateType */{
 
@@ -280,7 +293,7 @@ var undefinedStateType = extend(stateType, /** @lends undefinedStateType */{
             // if the attribute isn't set.
             (value === "" || (/^undefined$/i).test(value) || value === null)
             ? undefined
-            : stateType.coerce(value)
+            : types.state.coerce(value)
         );
 
     },
@@ -310,7 +323,7 @@ var undefinedStateType = extend(stateType, /** @lends undefinedStateType */{
         return (
             (value === undefined || value === "undefined")
             ? "undefined"
-            : stateType.write(value)
+            : types.state.write(value)
         );
 
     }
@@ -321,8 +334,10 @@ addType("undefinedState", undefinedStateType);
 
 /**
  * Handles references to other elements.
- * @extends basicType
+ * @extends Aria.types.basic
  * @type {Object}
+ * @name reference
+ * @memberof Aria.types
  */
 var referenceType = extend(basicType, /** @lends referenceType */{
 
@@ -335,7 +350,7 @@ var referenceType = extend(basicType, /** @lends referenceType */{
      *         Either the reference or null if the element cannot be found.
      */
     read: function (value) {
-        return document.getElementById(basicType.read(value));
+        return document.getElementById(types.basic.read(value));
     },
 
     /**
@@ -354,7 +369,7 @@ var referenceType = extend(basicType, /** @lends referenceType */{
             value = this.identify(value);
         }
 
-        return basicType.write(value);
+        return types.basic.write(value);
 
     },
 
@@ -413,8 +428,10 @@ addType("reference", referenceType);
 
 /**
  * A list type, that handles a space-separated attribute value.
- * @extends basicType
+ * @extends Aria.types.basic
  * @type {Object}
+ * @name list
+ * @memberof Aria.types
  */
 var listType = extend(basicType, /** @lends listType */{
 
@@ -452,15 +469,12 @@ var listType = extend(basicType, /** @lends listType */{
      */
     write: function (value) {
 
-        if (typeof value === "string") {
-            return value;
-        }
-
         return this
             .asArray(value)
             .map(function (item) {
                 return this.type.write(item);
             }, this)
+            .filter(Boolean)
             .join(" ");
 
     },
@@ -509,8 +523,10 @@ addType("list", listType);
 
 /**
  * Handles a list of references.
- * @extends listType
+ * @extends Aria.types.list
  * @type {Object}
+ * @name referenceList
+ * @memberof Aria.types
  */
 var referenceListType = extend(listType, /** @lends referenceListType */{
 

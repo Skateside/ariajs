@@ -10,11 +10,17 @@
     // Work out all the referenceType properties so we can check for and work
     // around a simple gotcha later on.
     var referenceProperties = [];
+    var referenceListProperties = [];
+    var types = Aria.types;
+    var referenceType = types.reference;
+    var referenceListType = types.referenceList;
 
-    $.each(Aria.types, function (property, type) {
+    $.each(Aria.properties, function (property, data) {
 
-        if (type.identify) {
+        if (data.type === referenceType) {
             referenceProperties.push(property);
+        } else if (data.type === referenceListType) {
+            referenceListProperties.push(property);
         }
 
     });
@@ -78,15 +84,18 @@
                 });
 
                 return that;
-                
+
             }
 
             aria = getAria(that[0]);
             result = aria[property];
 
-            // This check will catch a result that's an Element or an Array.
-            // Both should be returned as a jQuery object.
-            if (result && typeof result === "object") {
+            // If the result is supposed to be a reference or reference list,
+            // wrap it in a jQuery object before returning it.
+            if (
+                $.inArray(property, referenceProperties) > -1
+                || $.inArray(property, referenceListProperties) > -1
+            ) {
                 result = $(result);
             }
 
@@ -94,13 +103,24 @@
 
         }
 
-        return that.each(function () {
+        return that.each(function (index, element) {
 
             // If the user passed a jQuery object value to a referenceType
             // property, get the first item because that's probably the
             // intention.
-            if ($.isArray(property, referenceProperties) > -1 && value.length) {
+            if ($.inArray(property, referenceProperties) > -1 && value.length) {
                 value = value[0];
+            }
+
+            // A function should resolve the way it would for jQuery's attr().
+            if ($.isFunction(value)) {
+
+                value = value.call(
+                    element,
+                    index,
+                    element.getAttribute(Aria.properties[property].name)
+                );
+
             }
 
             getAria(this)[property] = value;
@@ -124,13 +144,11 @@
      */
     $.fn.role = function (value) {
 
-        if (arguments.length === 0) {
-            return getAria(this[0]).role;
-        }
-
-        return this.each(function () {
-            getAria(this).role = value;
-        });
+        return (
+            arguments.length === 0
+            ? this.aria("role")
+            : this.aria("role", value)
+        );
 
     };
 

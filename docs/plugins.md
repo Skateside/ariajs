@@ -7,6 +7,7 @@ There are a few pre-built plugins which you can chose to add if you like:
 - [Extend Node](#extend-node-plugin)
 - [jQuery](#jquery-plugin)
 - [No Proxy](#no-proxy-plugin)
+- [Tokens](#tokens-plugin)
 
 ## Extend Node Plugin
 
@@ -73,3 +74,29 @@ jQbutton.aria("controls"); // -> jQuery[<div id="ariajs-0"></div>]
 ## No Proxy Plugin
 
 Aria.js relies on `Proxy` but older browsers don't understand it. Polyfills tend to throw an error if the `deleteProperty` trap is used, which Aria.js does. To get around that, the `no-proxy` plugin replaces the functionality that uses it with `Object.defineProperty`, at the cost of the `delete` keyword not working.
+
+## Tokens Plugin
+
+WAI-ARIA attributes can be a "token" or a "token list" - attributes that only allow certain values. By default, Aria.js doesn't validate the values and just allows the developer to enter any value they live. The `tokens` plugin prevents invalid entries from being added. If the developer tries, a warning will be added to the console and the value will not be added. **Be warned** that passing an invalid token can cause the library to remove the attribute.
+
+```js
+var div = document.querySelector("div");
+var aria = new Aria(div);
+
+aria.orientation = undefined;
+// <div aria-orientation="undefined"></div>
+
+aria.orientation = "abc";
+// Warns:
+// Aria.js: The aria-orientation attribute can not accept the value "abc"
+// <div></div>
+```
+
+For token lists, each entry is validated and only the invalid entries are removed. Again, be aware that if all entries are invalid then the attribute will be removed.
+
+```js
+aria.role = "button abc heading";
+// Warns:
+// Aria.js: The role attribute can not accept the value "abc"
+// <div role="button heading"></div>
+```
