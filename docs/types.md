@@ -1,5 +1,15 @@
 # Types
 
+Aria.js properties will be one of a few types.
+
+---
+- [Overview](overview.md)
+- **Property types**
+- [Plugins](plugins.md)
+- [Gulp tasks](gulp.md)
+---
+
+
 There are 9 types that Aria.js understands:
 
 - [Basic](#basic-type)
@@ -11,8 +21,6 @@ There are 9 types that Aria.js understands:
 - [Reference](#reference-type)
 - [List](#list-type)
 - [Reference List](#reference-list-type)
-
-To see how to use the types generally, see the [overview](overview.md). You can also see [the plugins to extend Aria.js](plugins.md).
 
 ## Basic Type
 

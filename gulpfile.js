@@ -227,7 +227,7 @@ gulp.task("full", gulp.series(gulp.parallel("js", "plugins"), "test"));
 gulp.task("watch", gulp.parallel(
     "js:watch",
     "plugins:watch",
-    // "test:watch"
+    "test:watch"
 ));
 
 gulp.task("custom", function () {

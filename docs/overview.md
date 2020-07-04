@@ -2,6 +2,13 @@
 
 Working with WAI-ARIA attributes isn't complicated, but Aria.js will make it even easier.
 
+---
+- **Overview**
+- [Property types](types.md)
+- [Plugins](plugins.md)
+- [Gulp tasks](gulp.md)
+---
+
 For example, consider a simple disclose widget: a button that toggles a related div's visibility.
 
 ```html

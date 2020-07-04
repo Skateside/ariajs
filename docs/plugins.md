@@ -2,6 +2,14 @@
 
 Aria.js is a simple library, designed to have a small filesize and simple interface, but it's also designed to be easily modified. This allows Aria.js to be extended using plugins, adding or replacing functionality.
 
+---
+- [Overview](overview.md)
+- [Property types](types.md)
+- **Plugins**
+- [Gulp tasks](gulp.md)
+---
+
+
 There are a few pre-built plugins which you can chose to add if you like:
 
 - [Extend Node](#extend-node-plugin)
@@ -38,7 +46,7 @@ It also creates a short-cut for the `role` attribute.
 var button = document.querySelector("button");
 button.role = "button";
 // <button type="button" role="button"></button>
-button.role; // -> ["role"]
+button.role; // -> ["button"]
 ```
 
 ## jQuery Plugin
