@@ -1,6 +1,5 @@
 var gulp            = require("gulp");
 var mochaPhantomJS  = require("gulp-mocha-phantomjs");
-// var concat          = require("gulp-concat-util");
 var concat          = require("gulp-concat");
 var replace         = require("gulp-string-replace");
 var header          = require("gulp-header");
@@ -142,33 +141,6 @@ gulp.task("js", function () {
             }
         ))
         .pipe(footer("}(window));"))
-        // .pipe(concat("aria.js", {
-        //     process: function (source) {
-        //
-        //         return (
-        //             source
-        //                 .replace(/<%=\s*(\w+)\s*%>/g, function (ignore, k) {
-        //
-        //                     return (
-        //                         typeof pkgJson[k] === "string"
-        //                         ? pkgJson[k]
-        //                         : k
-        //                     );
-        //
-        //                 })
-        //         );
-        //
-        //     }
-        // }))
-        // .pipe(concat.header(
-        //     `/*! ${pkgJson.name} - ` +
-        //     `v${pkgJson.version} - ${pkgJson.license} license - ` +
-        //     `${pkgJson.homepage} - ${getToday()} */\n` +
-        //     `(function (globalVariable) {\n` +
-        //     `    "use strict";\n\n`
-        //
-        // ))
-        // .pipe(concat.footer('}(window));'))
         .pipe(gulp.dest("./dist/"))
         .pipe(sourcemaps.init())
         .pipe(minify({
