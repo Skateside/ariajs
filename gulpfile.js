@@ -1,6 +1,10 @@
 var gulp            = require("gulp");
 var mochaPhantomJS  = require("gulp-mocha-phantomjs");
-var concat          = require("gulp-concat-util");
+// var concat          = require("gulp-concat-util");
+var concat          = require("gulp-concat");
+var replace         = require("gulp-string-replace");
+var header          = require("gulp-header");
+var footer          = require("gulp-footer");
 var minify          = require("gulp-minify");
 var sourcemaps      = require("gulp-sourcemaps");
 var fs              = require("fs");
@@ -114,33 +118,57 @@ gulp.task("js", function () {
             "./simple/types.js",
             "./simple/setup.js"
         ])
-        .pipe(concat("aria.js", {
-            process: function (source) {
+        .pipe(concat("aria.js"))
+        .pipe(replace(/<%=\s*(\w+)\s*%>/g, function (ignore, k) {
 
-                return (
-                    source
-                        .replace(/<%=\s*(\w+)\s*%>/g, function (ignore, k) {
+            return (
+                typeof pkgJson[k] === "string"
+                ? pkgJson[k]
+                : k
+            );
 
-                            return (
-                                typeof pkgJson[k] === "string"
-                                ? pkgJson[k]
-                                : k
-                            );
-
-                        })
-                );
-
-            }
         }))
-        .pipe(concat.header(
-            `/*! ${pkgJson.name} - ` +
-            `v${pkgJson.version} - ${pkgJson.license} license - ` +
-            `${pkgJson.homepage} - ${getToday()} */\n` +
-            `(function (globalVariable) {\n` +
-            `    "use strict";\n\n`
-
+        .pipe(header(
+            [
+                "/*! <%= pkgJson.name %> - ",
+                "v<%= pkgJson.version %> - <%= pkgJson.license %> license - ",
+                "<%= pkgJson.homepage %> - <%= today %> */\n",
+                "(function (globalVariable) {\n",
+                "    \"use strict\";\n\n"
+            ].join(""),
+            {
+                pkgJson: pkgJson,
+                today: getToday()
+            }
         ))
-        .pipe(concat.footer('}(window));'))
+        .pipe(footer("}(window));"))
+        // .pipe(concat("aria.js", {
+        //     process: function (source) {
+        //
+        //         return (
+        //             source
+        //                 .replace(/<%=\s*(\w+)\s*%>/g, function (ignore, k) {
+        //
+        //                     return (
+        //                         typeof pkgJson[k] === "string"
+        //                         ? pkgJson[k]
+        //                         : k
+        //                     );
+        //
+        //                 })
+        //         );
+        //
+        //     }
+        // }))
+        // .pipe(concat.header(
+        //     `/*! ${pkgJson.name} - ` +
+        //     `v${pkgJson.version} - ${pkgJson.license} license - ` +
+        //     `${pkgJson.homepage} - ${getToday()} */\n` +
+        //     `(function (globalVariable) {\n` +
+        //     `    "use strict";\n\n`
+        //
+        // ))
+        // .pipe(concat.footer('}(window));'))
         .pipe(gulp.dest("./dist/"))
         .pipe(sourcemaps.init())
         .pipe(minify({

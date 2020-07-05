@@ -22,9 +22,12 @@
     "scripts": {},
     "dependencies": {
         "gulp": "^4.0.2",
-        "gulp-concat-util": "^0.5.5",
+        "gulp-concat": "^2.6.1",
+        "gulp-footer": "^2.0.2",
+        "gulp-header": "^2.0.9",
         "gulp-minify": "^3.1.0",
-        "gulp-sourcemaps": "^2.6.5"
+        "gulp-sourcemaps": "^2.6.5",
+        "gulp-string-replace": "^1.1.2"
     },
     "devDependencies": {
         "chai": "^4.2.0",
