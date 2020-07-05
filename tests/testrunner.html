@@ -6,20 +6,21 @@
 <title>ARIA.js Mocha Tests</title>
 <link rel="stylesheet" href="../node_modules/mocha/mocha.css" />
 <script src="./common.js"></script>
-
-<script>
-// Polyfills for command-line Mocha and other older environments.
-if (!window.WeakMap) {
-    document.write("<scr" + "ipt src=\"../node_modules/weakmap-polyfill/weakmap-polyfill.min.js\"></scr" + "ipt>");
-}
-</script>
+<script src="./polyfill.js"></script>
 
 <script>
 // Used for testing getPrevious and restorePrevious
-var ARIA = {};
-var previousARIA = ARIA;
+// var ARIA = {};
+// var previousARIA = ARIA;
 </script>
 <script src="../dist/aria.min.js"></script>
+<script>
+if (!window.Proxy) {
+    // Include the no-proxy plugin because PhantomJS can't handle Proxy and the
+    // polyfill will throw an error if we define deleteProperty.
+    document.writeln('<scr'+'ipt src="../dist/plugins/no-proxy.min.js"></scr' + 'ipt>');
+}
+</script>
 
 </head>
 <body>
@@ -40,18 +41,15 @@ mocha.setup({
 </script>
 
 <!-- Private -->
-<script src="./ARIA.js"></script>
-<script src="./ARIA.Observer.js"></script>
-<script src="./ARIA.Property.js"></script>
-<script src="./ARIA.Number.js"></script>
-<script src="./ARIA.Integer.js"></script>
-<script src="./ARIA.State.js"></script>
-<script src="./ARIA.UndefinedState.js"></script>
-<script src="./ARIA.Tristate.js"></script>
-<script src="./ARIA.List.js"></script>
-<script src="./ARIA.Reference.js"></script>
-<script src="./ARIA.ReferenceList.js"></script>
-<script src="./ARIA.Element.js"></script>
+<script src="./basicType.js"></script>
+<script src="./floatType.js"></script>
+<script src="./integerType.js"></script>
+<script src="./stateType.js"></script>
+<script src="./tristateType.js"></script>
+<script src="./undefinedStateType.js"></script>
+<script src="./referenceType.js"></script>
+<script src="./listType.js"></script>
+<script src="./referenceListType.js"></script>
 
 <script>
 // Only tests run in real browser, injected script run if options.run == true

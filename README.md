@@ -1,74 +1,75 @@
-# ARIA.js
+# Aria.js
 
 A helper library for working with WAI-ARIA attributes, designed to make manipulating them as simple as possible.
 
-## Open for Beta
+## How it Works
 
-`aria.js` is now open for beta testing. If you notice an issue, [please open an issue](https://github.com/Skateside/ariajs/issues). If you want to be really awesome, you can always create a pull request. I'm looking for certain things during this beta test:
+1. Pass an element to the `Aria` function.
 
-- Does this library create any noticeable performance hits?
-- Do all features work as expected?
-- Is [the documentation](https://github.com/Skateside/ariajs/wiki) easy to follow?
+    ```js
+    // <button type="button">Click me</button>
+    var button = document.querySelector("button");
+    var aria = new Aria(button);
+    ```
 
-This library _should_ be intuitive and the documentation _should_ be easy to understand. If this isn't the case, please let me know.
+    (You can use the [extend-node plugin](docs/plugins.md#extend-node-plugin.md) to skip this step.)
 
-If you want to contact me without raising an issue, you can find me on Twitter: [@Skateside](https://twitter.com/Skateside). I'd love to see how you're using this library or whether you (dis)like any features of it.
+2. Your new `aria` object will help manage the WAI-ARIA attributes.
+
+    ```js
+    aria.label = "Lorem ipsum";
+    // <button type="button"
+    //      aria-label="Lorem ipsum">Click me</button>
+    aria.valuenow = 12;
+    // <button type="button"
+    //      aria-label="Lorem ipsum"
+    //      aria-valuenow="21">Click me</button>
+    aria.controls = document.querySelector("div");
+    // <button type="button"
+    //      aria-label="Lorem ipsum"
+    //      aria-valuenow="21"
+    //      aria-controls="ariajs-0">Click me</button>
+    // <div id="aria-js"></div>
+    ```
+
+    You can access these properties to get useful values, rather than simply strings.
+
+    ```js
+    aria.label; // -> "Lorem ipsum"
+    aria.valuenow; // -> 12
+    aria.controls; // -> [<div id="ariajs-0">]
+    ```
+
+You can see all the options in the documentation.
 
 ## Documentation
 
-The documentation for this library can be found in [the Wiki](https://github.com/Skateside/ariajs/wiki).
+The documentation for this library can be found in [the docs](docs/overview.md). The documentation is broken down into a few pages:
 
-## Building ARIA.js
+- [Overview](docs/overview.md)
+- [Property types](docs/types.md)
+- [Plugins](docs/plugins.md)
+- [Gulps tasks](docs/gulp.md)
 
-To build `aria.js` from the source files, simply run a gulp task:
+## Building Aria.js
 
-```bash
-gulp build
-```
-
-This will create a "dist" folder containing `aria.custom.js` (and a minified version and maps of both).
-
-You can add and [official plugins](https://github.com/Skateside/ariajs/wiki/Plugins) using the optional `--plugins` option (which has the alias `--p`). Just pass the name of the plugin without the leading "aria." or the trailing ".js" (e.g. "tokens" instead of "aria.tokens.js").
+Aria.js uses [gulp](#) to compile. You can use the `js` command to compile the files:
 
 ```bash
-gulp build --plugins extendNode
-
-# Shorter version:
-gulp build --p extendNode
+$ gulp js
 ```
 
-You will now have a version of `aria.js` which also includes the [aria.extendNode.js](https://github.com/Skateside/ariajs/wiki/aria.extendNode.js) plugin. The `--plugins` option can also be a space-separated string of plugins.
-
-```bash
-gulp build --plugins "extendNode focus"
-```
-
-If you want to include all plugins, you can set the value of the `--plugins` option to "all".
-
-```bash
-gulp build --plugins all
-```
-
-If you just want `aria.js`, you can use the `gulp js` task. You can also compile all the plugins by running `gulp plugins`.
-
-```bash
-# Create ./dist/aria.js, minified version and maps.
-gulp js
-
-# Create ./plugins/dist/*, minified versions and maps.
-gulp plugins
-```
+You can also compile plugins or concatenate plugins with the overall file - check [the gulp documentation](docs/gulp.md) or [the plugin notes](docs/plugins.md) for full details.
 
 ## Browser Support
 
-This library has been tested in the latest browsers as well as IE11.
+Aria.js works in all modern browsers, but it may need some polyfills for older browsers. Specifically, you may need to polyfill these methods:
 
-## Gulp tasks
+- `Object.assign`
+- `Object.entries`
+- `Array.from`
+- `String.prototype.startsWith`
+- `Number.isNaN`
+- `Proxy`
 
-Gulp task | Description | Watch version
----|---|---
-`gulp build` | Builds `aria.custom.js`. This is the main task you'll use. | (none)
-`gulp js` | Creates `aria.js` from the source files in `./src/`. | `gulp js:watch`
-`gulp plugins` | Creates the plugins from their source files in `./plugins/src/` | `gulp plugins:watch`
-`gulp test` | Runs the unit tests for `aria.js`. You will need to run `gulp js` first. | `gulp test:watch`
-`gulp watch` | Runs `gulp js:watch`, `gulp plugins:watch` and `gulp test:watch` | (none)
+You can avoid the `Proxy` polyfill using [the no-proxy plugin](docs/plugins.md#no-proxy-plugin), which can be handy because some `Proxy` ployfills will throw an error when using the delete property trap (which Aria.js does).

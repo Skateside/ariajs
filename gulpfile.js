@@ -4,8 +4,44 @@ var concat          = require("gulp-concat-util");
 var minify          = require("gulp-minify");
 var sourcemaps      = require("gulp-sourcemaps");
 var fs              = require("fs");
-var pkgJson         = JSON.parse(fs.readFileSync("./package.json"))
-var pluginMeta      = JSON.parse(fs.readFileSync("./plugins.json"));
+var pkgJson         = JSON.parse(fs.readFileSync("./package.json"));
+var colors          = require('ansi-colors');
+var supportsColor   = require('color-support');
+
+// Taken from ./node_modules/gulp-cli/lib/shared/ansi.js
+var hasColors = colorize();
+var ansi = {
+    red: hasColors ? colors.red : noColor,
+    green: hasColors ? colors.green : noColor,
+    blue: hasColors ? colors.blue : noColor,
+    magenta: hasColors ? colors.magenta : noColor,
+    cyan: hasColors ? colors.cyan : noColor,
+    white: hasColors ? colors.white : noColor,
+    gray: hasColors ? colors.gray : noColor,
+    bgred: hasColors ? colors.bgred : noColor,
+    bold: hasColors ? colors.bold : noColor,
+    yellow: hasColors ? colors.yellow : noColor,
+};
+function noColor(message) {
+    return message;
+}
+function hasFlag(flag) {
+    return (process.argv.indexOf('--' + flag) !== -1);
+}
+function colorize() {
+
+    if (hasFlag('no-color')) {
+        return false;
+    }
+
+    /* istanbul ignore if */
+    if (hasFlag('color')) {
+        return true;
+    }
+
+    return supportsColor();
+
+}
 
 /**
  * Reads the arguments passed to a gulp task.
@@ -73,23 +109,10 @@ var getToday = function () {
 gulp.task("js", function () {
 
     return gulp.src([
-            "./src/util.js",
-            "./src/ARIA.js",
-            "./src/ARIA-prefix.js",
-            "./src/ARIA.createClass.js",
-            "./src/ARIA-dom.js",
-            "./src/ARIA.Observer.js",
-            "./src/ARIA.Property.js",
-            "./src/ARIA.Number.js",
-            "./src/ARIA.Integer.js",
-            "./src/ARIA.State.js",
-            "./src/ARIA.UndefinedState.js",
-            "./src/ARIA.Tristate.js",
-            "./src/ARIA.List.js",
-            "./src/ARIA.Reference.js",
-            "./src/ARIA.ReferenceList.js",
-            "./src/ARIA.Element.js",
-            "./src/ARIA-factories.js"
+            "./simple/util.js",
+            "./simple/Aria.js",
+            "./simple/types.js",
+            "./simple/setup.js"
         ])
         .pipe(concat("aria.js", {
             process: function (source) {
@@ -138,12 +161,12 @@ gulp.task("js", function () {
 });
 
 gulp.task("js:watch", function () {
-    gulp.watch(["./src/**/*.js"], ["js"]);
+    return gulp.watch(["./simple/*.js"], gulp.series("js"));
 });
 
 gulp.task("plugins", function () {
 
-    gulp.src("./plugins/src/*.js")
+    return gulp.src("./simple/plugins/**/*.js")
         .pipe(sourcemaps.init())
         .pipe(minify({
             ext: {
@@ -158,17 +181,34 @@ gulp.task("plugins", function () {
                 return file.relative + ".map";
             }
         }))
-        .pipe(gulp.dest("./plugins/dist/"));
+        .pipe(gulp.dest("./dist/plugins/"));
 
 });
 
 gulp.task("plugins:watch", function () {
-    gulp.watch(["./plugins/src/*.js"], ["plugins"]);
+    return gulp.watch(["./simple/plugins/**/*.js"], gulp.series("plugins"));
+});
+
+gulp.task("plugins:list", function (done) {
+
+    fs.readdir("./simple/plugins/", function (error, files) {
+
+        console.log("\nAvailable plugins:");
+
+        files.forEach(function (file) {
+            console.log("- " + ansi.blue(file.replace(/\.js$/, "")));
+        });
+
+        console.log("\n");
+        done();
+
+    });
+
 });
 
 gulp.task("test", function () {
 
-    gulp.src("./tests/testrunner.html")
+    return gulp.src("./tests/testrunner.html")
         .pipe(mochaPhantomJS({
             reporter: "spec",
             phantomjs: {
@@ -179,61 +219,62 @@ gulp.task("test", function () {
 });
 
 gulp.task("test:watch", function () {
-    gulp.watch(["./tests/**/*.js"], ["test"]);
+    return gulp.watch(["./tests/**/*.js"], gulp.series("test"));
 });
 
-gulp.task("watch", gulp.series(
+gulp.task("full", gulp.series(gulp.parallel("js", "plugins"), "test"));
+
+gulp.task("watch", gulp.parallel(
     "js:watch",
     "plugins:watch",
-    // "test:watch"
+    "test:watch"
 ));
 
-gulp.task("build", gulp.series("js", "plugins", function () {
+gulp.task("custom", function () {
 
     var args = readArgs(process.argv);
     var plugins = (args.p || args.plugins || "").trim().split(/\s+/);
-    var rawRequires = [];
-    var requireKeys = {};
     var files = [
         "./dist/aria.js"
     ];
+    var simpleFileNames = [];
 
     if (plugins.length === 1 && plugins[0] === "all") {
-        plugins = Object.keys(pluginMeta);
+
+        plugins = [];
+        fs.readdirSync("./simple/plugins/").forEach(function (file) {
+            plugins.push(file.replace(/\.js$/, ""));
+        });
+
     }
 
-    plugins.forEach(function (plugin) {
+    plugins.forEach(function (name) {
 
-        var meta = pluginMeta[plugin];
+        var fileName = "./simple/plugins/" + name + ".js";
 
-        if (meta) {
-
-            if (meta.requires) {
-                rawRequires = [].concat(meta.requires, rawRequires);
-            }
-
-            rawRequires.push(plugin);
-
+        if (fs.existsSync(fileName)) {
+            files.push(fileName);
         } else {
-            console.log("\nWARNING: Unable to find '" + plugin + "' plugin\n");
+            console.log("\nWARNING: Unable to find '" + name + "' plugin\n");
         }
 
     });
 
-    rawRequires.forEach(function (raw) {
-        requireKeys[raw] = true;
+    simpleFileNames = files.map(function (fileName) {
+
+        return fileName
+            .slice(fileName.lastIndexOf("/") + 1)
+            .replace(/\.js$/, "");
+
     });
 
-    Object.keys(requireKeys).forEach(function (ref) {
-        files.push("./plugins/src/aria." + ref + ".js");
-    });
-
-    gulp.src(files)
+    // TODO: correct the sourcemaps - compile aria.js as well?
+    return gulp.src(files)
         .pipe(concat.header(
-            "/*! " + files.join(", ") + " */\n"
+            "/*! " + simpleFileNames.join(", ") + " */\n"
         ))
         .pipe(concat("aria.custom.js"))
-        .pipe(sourcemaps.init())
+        // .pipe(sourcemaps.init())
         .pipe(minify({
             ext: {
                 min: ".min.js"
@@ -242,11 +283,13 @@ gulp.task("build", gulp.series("js", "plugins", function () {
                 return comment.value.startsWith("!");
             }
         }))
-        .pipe(sourcemaps.write("./", {
-            sourceMappingURL: function (file) {
-                return file.relative + ".map";
-            }
-        }))
+        // .pipe(sourcemaps.write("./", {
+        //     sourceMappingURL: function (file) {
+        //         return file.relative + ".map";
+        //     }
+        // }))
         .pipe(gulp.dest("./dist/"));
 
-}));
+});
+
+gulp.task("build", gulp.series("js", "custom"));

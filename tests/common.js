@@ -1,58 +1,58 @@
-/**
- * Generates a random integer between start and end.
- *
- * @param  {Number} [start=0]
- *         Minimum value.
- * @param  {Number} end
- *         Maximum value.
- * @return {Number}
- *         Random number.
- */
-function rnd(start, end) {
+function randomNumber(max) {
 
-    if (end === undefined) {
+    if (max === undefined) {
+        max = 1;
+    }
 
-        end = start;
-        start = 0;
+    return Math.random() * max;
+
+}
+
+function randomInteger(max) {
+    return Math.floor(randomNumber(max));
+}
+
+function randomString(prefix, length) {
+
+    var start = (
+        prefix === undefined
+        ? ""
+        : String(prefix)
+    );
+    var size = (
+        length === undefined
+        ? 10
+        : (Number(length) || 0)
+    );
+    var characters = (
+        "abcdefghijklmnopqrstuvwxyz" +
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZ" +
+        "1234567890"
+    );
+    var random = "";
+
+    while (size > 0) {
+
+        random += characters[randomInteger(characters.length)];
+        size -= 1;
 
     }
 
-    return Math.floor(Math.random() * end) + start;
+    return start + random;
 
 }
 
-/**
- * Generates a unique string - used for testing against IDs.
- *
- * @return {String}
- *         Random string.
- */
-function makeUniqueId() {
-    return "id-" + rnd(Date.now());
-}
+function makeArrayLike(array) {
 
-/**
- * Gets a string snap-shot of an element.
- *
- * @param  {Element} element
- *         Element to stringify.
- * @return {String}
- *         Stringified element.
- */
-function stringifyElement(element) {
+    var arrayLike = array.reduce(function (object, item, i) {
 
-    var string = "<" + element.nodeName.toLowerCase();
+        object[i] = item;
+        return object;
 
-    Array.prototype.forEach.call(element.attributes, function (attr) {
+    }, {});
 
-        string += " " + attr.name;
+    arrayLike.length = array.length;
 
-        if (attr.value) {
-            string += "=\"" + attr.value + "\"";
-        }
-
-    });
-
-    return string + ">";
+    return arrayLike;
 
 }
