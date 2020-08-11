@@ -73,9 +73,10 @@
             "descending",
             "other"
         ],
-        // "Authors MUST NOT use abstract roles in content."
-        // https://www.w3.org/TR/wai-aria-1.1/#abstract_roles
         "role": [
+
+            // "Authors MUST NOT use abstract roles in content."
+            // https://www.w3.org/TR/wai-aria-1.1/#abstract_roles
             "alert",
             "alertdialog",
             "application",
@@ -154,9 +155,51 @@
             "tooltip",
             "tree",
             "treegrid",
-            "treeitem"
+            "treeitem",
             // "widget", // (abstract)
             // "window", // (abstract)
+
+            // https://www.w3.org/TR/dpub-aria-1.0/
+            "doc-abstract",
+            "doc-acknowledgments",
+            "doc-afterword",
+            "doc-appendix",
+            "doc-backlink",
+            "doc-biblioentry",
+            "doc-bibliography",
+            "doc-biblioref",
+            "doc-chapter",
+            "doc-colophon",
+            "doc-conclusion",
+            "doc-cover",
+            "doc-credit",
+            "doc-credits",
+            "doc-dedication",
+            "doc-endnote",
+            "doc-endnotes",
+            "doc-epigraph",
+            "doc-epilogue",
+            "doc-errata",
+            "doc-example",
+            "doc-footnote",
+            "doc-foreword",
+            "doc-glossary",
+            "doc-glossref",
+            "doc-index",
+            "doc-introduction",
+            "doc-noteref",
+            "doc-notice",
+            "doc-pagebreak",
+            "doc-pagelist",
+            "doc-part",
+            "doc-preface",
+            "doc-prologue",
+            "doc-pullquote",
+            "doc-qna",
+            "doc-subtitle",
+            "doc-tip",
+            "doc-toc"
+
         ]
     };
 
