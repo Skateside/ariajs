@@ -29,7 +29,7 @@ A helper library for working with WAI-ARIA attributes, designed to make manipula
     //      aria-label="Lorem ipsum"
     //      aria-valuenow="21"
     //      aria-controls="ariajs-0">Click me</button>
-    // <div id="aria-js"></div>
+    // <div id="ariajs-0"></div>
     ```
 
     You can access these properties to get useful values, rather than simply strings.
