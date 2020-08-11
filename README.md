@@ -8,6 +8,7 @@ A helper library for working with WAI-ARIA attributes, designed to make manipula
 
     ```js
     // <button type="button">Click me</button>
+    // <div></div>
     var button = document.querySelector("button");
     var aria = new Aria(button);
     ```
@@ -20,10 +21,12 @@ A helper library for working with WAI-ARIA attributes, designed to make manipula
     aria.label = "Lorem ipsum";
     // <button type="button"
     //      aria-label="Lorem ipsum">Click me</button>
+    // <div></div>
     aria.valuenow = 12;
     // <button type="button"
     //      aria-label="Lorem ipsum"
     //      aria-valuenow="21">Click me</button>
+    // <div></div>
     aria.controls = document.querySelector("div");
     // <button type="button"
     //      aria-label="Lorem ipsum"
