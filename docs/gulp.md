@@ -113,14 +113,6 @@ $ gulp test:watch
 
 You may get an error when you run this command if the main JavaScript files haven't been created. Be sure to run the [`gulp js`](#gulp-js) and [`gulp plugins`](#gulp-plugins) commands before you run `gulp test` to avoid these issues. There's a helper command for this: [`gulp full`](#gulp-full).
 
-## `gulp full`
-
-This is a helper function for running the the [`gulp js`](#gulp-js) and [`gulp plugins`](#gulp-plugins) commands before running the [`gulp test`](#gulp-test) command.
-
-```bash
-$ gulp full
-```
-
 ## `gulp watch`
 
 This is simply a helper command which combines the watch version of [`gulp js`](#gulp-js), [`gulp plugins`](#gulp-plugins) and [`gulp test`](#gulp-test).

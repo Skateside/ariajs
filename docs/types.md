@@ -169,7 +169,7 @@ aria.checked; // -> false
 aria.checked = "mixed";
 // <div id="tristate" aria-checked="mixed"></div>
 // Getting a value:
-aria.checked; // -> true
+aria.checked; // -> "mixed"
 ```
 
 ## Undefined State Type
