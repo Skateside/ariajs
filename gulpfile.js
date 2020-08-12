@@ -270,7 +270,7 @@ gulp.task("custom", function () {
 
     // TODO: correct the sourcemaps - compile aria.js as well?
     return gulp.src(files)
-        .pipe(concat.header(
+        .pipe(header(
             "/*! " + simpleFileNames.join(", ") + " */\n"
         ))
         .pipe(concat("aria.custom.js"))

@@ -7,35 +7,17 @@
         return;
     }
 
-    // Work out all the referenceType properties so we can check for and work
-    // around a simple gotcha later on.
-    var referenceProperties = [];
-    var referenceListProperties = [];
-    var types = Aria.types;
-    var referenceType = types.reference;
-    var referenceListType = types.referenceList;
-
-    $.each(Aria.properties, function (property, data) {
-
-        if (data.type === referenceType) {
-            referenceProperties.push(property);
-        } else if (data.type === referenceListType) {
-            referenceListProperties.push(property);
-        }
-
-    });
-
     /**
      * Gets the Aria instance for the given element. If that instance hasn't
      * created yet, it's created before being returned.
      *
-     * @private
-     * @param   {Element} element
-     *          Element whose Aria instance should be returned.
-     * @return  {Aria}
-     *          Aria instance for the given element.
+     * @memberof jQuery
+     * @param    {Element} element
+     *           Element whose Aria instance should be returned.
+     * @return   {Aria}
+     *           Aria instance for the given element.
      */
-    function getAria(element) {
+    $.aria = function (element) {
 
         var aria = $.data(element, "aria");
 
@@ -48,7 +30,60 @@
 
         return aria;
 
-    }
+    };
+
+    /**
+     * Aria hooks - get and set hooks for modifying the return or accepted
+     * values. These are based on {@link jQuery.attrHooks}.
+     * @memberof jQuery
+     * @type     {Object}
+     */
+    $.ariaHooks = {};
+
+    $.each({
+        reference: [
+            "activedescendant",
+            "details",
+            "errormessage",
+        ],
+        referenceList: [
+            "controls",
+            "describedby",
+            "flowto",
+            "labelledby",
+            "owns"
+        ]
+    }, function (type, properties) {
+
+        $.each(properties, function (ignore, property) {
+
+            var hook = {
+
+                get: function (element) {
+                    return $($.aria(element)[property]);
+                }
+
+            };
+
+            if (type === "reference") {
+
+                hook.set = function (element, value) {
+
+                    if (value && value.length && typeof value !== "string") {
+                        value = value[0];
+                    }
+
+                    $.aria(element)[property] = value;
+
+                };
+
+            }
+
+            $.ariaHooks[property] = hook;
+
+        });
+
+    });
 
     /**
      * Either sets the values of the property (if the property is passed) or
@@ -87,16 +122,15 @@
 
             }
 
-            aria = getAria(that[0]);
-            result = aria[property];
+            var hook = $.ariaHooks[property];
 
-            // If the result is supposed to be a reference or reference list,
-            // wrap it in a jQuery object before returning it.
-            if (
-                $.inArray(property, referenceProperties) > -1
-                || $.inArray(property, referenceListProperties) > -1
-            ) {
-                result = $(result);
+            if (hook && hook.get) {
+                result = hook.get(that[0]);
+            } else {
+
+                aria = $.aria(that[0]);
+                result = aria[property];
+
             }
 
             return result;
@@ -105,25 +139,22 @@
 
         return that.each(function (index, element) {
 
-            // If the user passed a jQuery object value to a referenceType
-            // property, get the first item because that's probably the
-            // intention.
-            if ($.inArray(property, referenceProperties) > -1 && value.length) {
-                value = value[0];
-            }
+            var attributeValue = element.getAttribute(
+                Aria.properties[property].name
+            )
 
             // A function should resolve the way it would for jQuery's attr().
             if ($.isFunction(value)) {
-
-                value = value.call(
-                    element,
-                    index,
-                    element.getAttribute(Aria.properties[property].name)
-                );
-
+                value = value.call(element, index, attributeValue);
             }
 
-            getAria(this)[property] = value;
+            var hook = $.ariaHooks[property];
+
+            if (hook && hook.set) {
+                value = hook.set(element, value, attributeValue);
+            } else {
+                $.aria(element)[property] = value;
+            }
 
         });
 

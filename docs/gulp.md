@@ -83,14 +83,14 @@ $ gulp custom --plugins "all"
 
 ### Troubleshooting
 
-You may get an error when running this command because the main Aria.js file hasn't been created yet. To get around that, be sure to run the [`gulp js`](#gulp-js) before `gulp custom`. There's also a helper function for this: [`gulp full`](#gulp-full).
+You may get an error when running this command because the main Aria.js file hasn't been created yet. To get around that, be sure to run the [`gulp js`](#gulp-js) before `gulp custom`. There's also a helper function for this: [`gulp build`](#gulp-build).
 
-## `gulp full`
+## `gulp build`
 
 This is a helper function for running [`gulp js`](#gulp-js) and then [`gulp custom`](#gulp-custom). It also uses the same `--plugins` argument.
 
 ```bash
-$ gulp full --plugins "extend-node no-proxy"
+$ gulp build --plugins "extend-node no-proxy"
 ```
 
 Check the [`gulp custom`](#gulp-custom) section for more details and the [`gulp plugins`](#gulp-plugins) section to find out how to see all available plugins.
@@ -112,6 +112,14 @@ $ gulp test:watch
 ### Troubleshooting
 
 You may get an error when you run this command if the main JavaScript files haven't been created. Be sure to run the [`gulp js`](#gulp-js) and [`gulp plugins`](#gulp-plugins) commands before you run `gulp test` to avoid these issues. There's a helper command for this: [`gulp full`](#gulp-full).
+
+## `gulp full`
+
+A helper function that runs the [`gulp js`](#gulp-js) and [`gulp plugins`](#gulp-plugins) commands before running [`gulp test`](#gulp-test).
+
+```bash
+$ gulp full
+```
 
 ## `gulp watch`
 
