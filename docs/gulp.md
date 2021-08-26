@@ -5,6 +5,7 @@ Aria.js uses Gulp to compile. This document will show you some of the commands a
 ---
 - [Overview](overview.md)
 - [Property types](types.md)
+- [Utilities](utilities.md)
 - [Plugins](plugins.md)
 - **Gulps tasks**
 ---
@@ -20,9 +21,7 @@ $ gulp js
 This will create the following files:
 
 - dist/aria.js
-- dist/aria.js.map
 - dist/aria.min.js
-- dist/aria.min.js.map
 
 If you're developing Aria.js, you can use a watch command for file changes and compile as changes are made.
 
@@ -32,16 +31,14 @@ $ gulp js:watch
 
 ## `gulp plugins`
 
-This command will compile the plugins. For each plugin, 4 files will be created:
+This command will compile the plugins. For each plugin, 2 files will be created:
 
 ```bash
 $ gulp plugins
 ```
 
 - dist/plugins/(plugin name).js
-- dist/plugins/(plugin name).js.map
 - dist/plugins/(plugin name).min.js
-- dist/plugins/(plugin name).min.js.map
 
 If you're developing Aria.js, you can use a watch command for file changes and compile as changes are made.
 
@@ -56,7 +53,7 @@ $ gulp plugins:list
 # Available plugins:
 # - extend-node
 # - jquery
-# - no-proxy
+# - proxy
 # - tokens
 ```
 
@@ -72,8 +69,6 @@ This will create 2 files, which will be a combination of the main Aria.js file a
 
 - dist/aria.custom.js
 - dist/aria.custom.min.js
-
-(In the future, sourcemaps may also be included.)
 
 You can also use the keyword "all" to get all plugins.
 
@@ -109,6 +104,13 @@ This will run the unit tests and display the results in the console. There's als
 $ gulp test:watch
 ```
 
+You can test the plugins using the `test:plugins` command. This can be watched using `test:plugins:watch`.
+
+```bash
+$ gulp test:plugins
+$ gulp test:plugins:watch
+```
+
 ### Troubleshooting
 
 You may get an error when you run this command if the main JavaScript files haven't been created. Be sure to run the [`gulp js`](#gulp-js) and [`gulp plugins`](#gulp-plugins) commands before you run `gulp test` to avoid these issues. There's a helper command for this: [`gulp full`](#gulp-full).
@@ -128,3 +130,5 @@ This is simply a helper command which combines the watch version of [`gulp js`](
 ```bash
 $ gulp watch
 ```
+
+Another version called `gulp watch:test` will watch the core and plugins, compiling them and then running their tests afterwards.

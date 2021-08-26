@@ -1,4 +1,4 @@
-describe("listType", function () {
+describe("list type", function () {
 
     var element;
     var aria;

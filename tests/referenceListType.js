@@ -1,4 +1,4 @@
-describe("referenceListType", function () {
+describe("referenceList type", function () {
 
     var element;
     var others;
@@ -63,7 +63,7 @@ describe("referenceListType", function () {
                 return other.id;
             }).join(" ");
             chai.assert.strictEqual(element.getAttribute(ATTRIBUTE), idString);
-            
+
         });
 
         it("should be able to add an array of elements and IDs", function () {

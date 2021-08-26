@@ -8,7 +8,12 @@
 <script src="./common.js"></script>
 <script src="./polyfill.js"></script>
 
+<script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
 <script src="../dist/aria.min.js"></script>
+<script src="../dist/plugins/extend-node.min.js"></script>
+<script src="../dist/plugins/jquery.min.js"></script>
+<script src="../dist/plugins/proxy.min.js"></script>
+<script src="../dist/plugins/tokens.min.js"></script>
 
 </head>
 <body>
@@ -28,16 +33,11 @@ mocha.setup({
 </script>
 
 <!-- Private -->
-<script src="./basicType.js"></script>
-<script src="./floatType.js"></script>
-<script src="./integerType.js"></script>
-<script src="./stateType.js"></script>
-<script src="./tristateType.js"></script>
-<script src="./undefinedStateType.js"></script>
-<script src="./referenceType.js"></script>
-<script src="./listType.js"></script>
-<script src="./referenceListType.js"></script>
-<script src="./utilities.js"></script>
+<script src="./plugins/extend-node.js"></script>
+<script src="./plugins/jquery.js"></script>
+<script src="./plugins/proxy.js"></script>
+<script src="./plugins/tokens.js"></script>
+
 
 <script>
 if (window.mochaPhantomJS) {

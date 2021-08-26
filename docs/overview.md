@@ -5,6 +5,7 @@ Working with WAI-ARIA attributes isn't complicated, but Aria.js will make it eve
 ---
 - **Overview**
 - [Property types](types.md)
+- [Utilities](utilities.md)
 - [Plugins](plugins.md)
 - [Gulp tasks](gulp.md)
 ---
@@ -125,7 +126,7 @@ aria.expanded; // -> false
 </script>
 ```
 
-Attributes can be removed by either setting the value to an empty string or by using the `delete` keyword. Be aware that `delete` requires `Proxy` so it may not work in older browsers.
+Attributes can be removed by setting the value to an empty string.
 
 ```html
 <button aria-expanded="true">Button</button>
@@ -133,7 +134,7 @@ Attributes can be removed by either setting the value to an empty string or by u
 <script>
 var button = document.querySelector("button");
 var aria = new Aria(button);
-delete aria.expanded;
+aria.expanded = "";
 button; // -> <button>Button</button>
 </script>
 ```

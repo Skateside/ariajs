@@ -1,4 +1,4 @@
-describe("stateType", function () {
+describe("state type", function () {
 
     var element;
     var aria;

@@ -354,9 +354,8 @@ var referenceType = extend(basicType, /** @lends referenceType */{
     },
 
     /**
-     * Writes the value to the attribute. If the value is an element (see
-     * {@link referenceType.isElement}) then it's passed through
-     * {@link referenceType.identify}.
+     * Writes the value to the attribute. If the value is an element then it's
+     * passed through {@link Aria.identify}.
      *
      * @param  {?} value
                Value to write.
@@ -365,60 +364,11 @@ var referenceType = extend(basicType, /** @lends referenceType */{
      */
     write: function (value) {
 
-        if (this.isElement(value)) {
-            value = this.identify(value);
+        if (value instanceof Element) {
+            value = Aria.identify(value);
         }
 
         return types.basic.write(value);
-
-    },
-
-    /**
-     * Checks to see if the given object is an Element.
-     *
-     * @param  {?} object
-     *         Object to test.
-     * @return {Boolean}
-     *         true if the object is an Element, false otherwise.
-     */
-    isElement: function (object) {
-        return (object instanceof Element);
-    },
-
-    /**
-     * An expando that will ensure that {@link referenceType.identify} can
-     * generate a unique ID.
-     * @type {Number}
-     */
-    counter: 0,
-
-    /**
-     * Returns the give element's ID. If the element doesn't have an ID, a
-     * unique one is generated and assigned before being returned.
-     *
-     * @param  {Element} element
-     *         Element whose ID should be returned.
-     * @return {String}
-     *         Element's ID.
-     */
-    identify: function (element) {
-
-        var id = element.id;
-
-        if (id) {
-            return id;
-        }
-
-        do {
-
-            id = "ariajs-" + this.counter;
-            this.counter += 1;
-
-        } while (document.getElementById(id));
-
-        element.id = id;
-
-        return id;
 
     }
 

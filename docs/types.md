@@ -5,10 +5,10 @@ Aria.js properties will be one of a few types.
 ---
 - [Overview](overview.md)
 - **Property types**
+- [Utilities](utilities.md)
 - [Plugins](plugins.md)
 - [Gulp tasks](gulp.md)
 ---
-
 
 There are 9 types that Aria.js understands:
 
@@ -58,7 +58,7 @@ aria.label; // -> "Lorem ipsum"
 
 ## Float Type
 
-The float type will coerce any given value into a number, it will also return a number. If the value being set isn't numeric, the attribute will be remove. If the attribute isn't set, 0 is returned.
+The float type will coerce any given value into a number, it will also return a number. If the value being set isn't numeric, the attribute will be removed. If the attribute isn't set, 0 is returned.
 
 Here are the properties that use the float type:
 

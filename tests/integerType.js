@@ -1,4 +1,4 @@
-describe("integerType", function () {
+describe("integer type", function () {
 
     var element;
     var aria;

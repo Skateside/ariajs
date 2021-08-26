@@ -20,6 +20,14 @@ Object.defineProperty(Aria, "VERSION", {
     }
 });
 
+/**
+ * A counter that ensures that all ID's created by {@link Aria.identify} are
+ * unique.
+ * @private
+ * @type {Number}
+ */
+var identifyCounter = 0;
+
 assign(Aria, /** @lends Aria */{
 
     /**
@@ -45,11 +53,33 @@ assign(Aria, /** @lends Aria */{
     prefix: function (property) {
 
         var prefixed = interpretString(property).toLowerCase();
+        var prefix = "aria-";
 
         return (
-            prefixed.startsWith("aria-")
+            prefixed.startsWith(prefix)
             ? prefixed
-            : ("aria-" + prefixed)
+            : (prefix + prefixed)
+        );
+
+    },
+
+    /**
+     * Removes the "aria-" prefix from the given property.
+     *
+     * @param  {String} property
+     *         Property whose prefix should be removed.
+     * @return {String}
+     *         Property without the prefix.
+     */
+    unprefix: function (property) {
+
+        var unprefixed = interpretString(property).toLowerCase();
+        var prefix = "aria-";
+
+        return (
+            unprefixed.startsWith(prefix)
+            ? unprefixed.slice(prefix.length)
+            : unprefixed
         );
 
     },
@@ -87,6 +117,58 @@ assign(Aria, /** @lends Aria */{
             type: type,
             name: attribute
         };
+        this.duplicateProperty(property);
+
+    },
+
+    /**
+     * Duplicates the property in {@link Aria.properties} so that both a
+     * prefixed and unprefixed version exist. This allow the either to be used.
+     *
+     * This method is only necessary in builds that don't include the proxy
+     * plugin and environments that understand Proxy.
+     *
+     * @param {String} property
+     *        Property in {@link Aria.properties} that should be duplicated.
+     */
+    duplicateProperty: function (property) {
+
+        var prefixed = this.prefix(property);
+        var unprefixed = this.unprefix(property);
+        var source = this.properties[property];
+
+        this.properties[prefixed] = source;
+        this.properties[unprefixed] = source;
+
+    },
+
+    /**
+     * Returns the give element's ID. If the element doesn't have an ID, a
+     * unique one is generated and assigned before being returned.
+     *
+     * @param  {Element} element
+     *         Element whose ID should be returned.
+     * @return {String}
+     *         Element's ID.
+     */
+    identify: function (element) {
+
+        var id = element.id;
+
+        if (id) {
+            return id;
+        }
+
+        do {
+
+            id = "ariajs-" + identifyCounter;
+            identifyCounter += 1;
+
+        } while (document.getElementById(id));
+
+        element.id = id;
+
+        return id;
 
     },
 
@@ -142,33 +224,6 @@ assign(Aria, /** @lends Aria */{
 
         return true;
 
-    },
-
-    /**
-     * The deleteProperty trap that Proxy will use. If the property is
-     * recognised as a type (see {@link Aria#getProperty}) then
-     * {@link Aria#delete} is called. If the property is not recognised then the
-     * property is deleted from the given target.
-     *
-     * @param  {Object} target
-     *         Instance whose property should be deleted.
-     * @param  {String} property
-     *         Property to delete.
-     * @return {Boolean}
-     *         true.
-     */
-    deletePropertyTrap: function (target, property) {
-
-        var type = target.getProperty(property);
-
-        if (type) {
-            target.delete(type);
-        }
-
-        delete target[property];
-
-        return true;
-
     }
 
 });
@@ -190,35 +245,41 @@ Aria.prototype = {
          */
         this.element = element;
 
-        return this.makeMagicProperties(this);
+        return this.makeProperties(this);
 
     },
 
     /**
-     * Creates the magic properties for this instance.
+     * Creates the properties for this instance.
      *
      * @param  {Aria} context
-     *         Instance that will gain the magic properties.
-     * @return {Proxy}
-     *         Version of the instance with magic properties.
+     *         Instance that will gain the properties.
+     * @return {Aria}
+     *         The instance that gained the properties.
      */
-    makeMagicProperties: function (context) {
+    makeProperties: function (context) {
 
-        return new Proxy(context, {
+        var properties = Aria.properties;
 
-            get: function (target, property) {
-                return Aria.getTrap(target, property);
-            },
+        Object.keys(properties).forEach(function (property) {
 
-            set: function (target, property, value) {
-                return Aria.setTrap(target, property, value);
-            },
+            var data = properties[property];
 
-            deleteProperty: function (target, property) {
-                return Aria.deletePropertyTrap(target, property);
-            }
+            Object.defineProperty(context, property, {
+
+                get: function () {
+                    return Aria.getTrap(context, property);
+                },
+
+                set: function (value) {
+                    return Aria.setTrap(context, property, value);
+                }
+
+            });
 
         });
+
+        return context;
 
     },
 

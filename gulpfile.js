@@ -5,7 +5,6 @@ var replace         = require("gulp-string-replace");
 var header          = require("gulp-header");
 var footer          = require("gulp-footer");
 var minify          = require("gulp-minify");
-var sourcemaps      = require("gulp-sourcemaps");
 var fs              = require("fs");
 var pkgJson         = JSON.parse(fs.readFileSync("./package.json"));
 var colors          = require('ansi-colors');
@@ -142,18 +141,12 @@ gulp.task("js", function () {
         ))
         .pipe(footer("}(window));"))
         .pipe(gulp.dest("./dist/"))
-        .pipe(sourcemaps.init())
         .pipe(minify({
             ext: {
                 min: ".min.js"
             },
             preserveComments: function (node, comment) {
                 return comment.value.startsWith("!");
-            }
-        }))
-        .pipe(sourcemaps.write("./", {
-            sourceMappingURL: function (file) {
-                return file.relative + ".map";
             }
         }))
         .pipe(gulp.dest("./dist/"));
@@ -167,18 +160,12 @@ gulp.task("js:watch", function () {
 gulp.task("plugins", function () {
 
     return gulp.src("./simple/plugins/**/*.js")
-        .pipe(sourcemaps.init())
         .pipe(minify({
             ext: {
                 min: ".min.js"
             },
             preserveComments: function (node, comment) {
                 return comment.value.startsWith("!");
-            }
-        }))
-        .pipe(sourcemaps.write("./", {
-            sourceMappingURL: function (file) {
-                return file.relative + ".map";
             }
         }))
         .pipe(gulp.dest("./dist/plugins/"));
@@ -218,16 +205,36 @@ gulp.task("test", function () {
 
 });
 
-gulp.task("test:watch", function () {
-    return gulp.watch(["./tests/**/*.js"], gulp.series("test"));
+gulp.task("test:plugins", function () {
+
+    return gulp.src("./tests/plugins.html")
+        .pipe(mochaPhantomJS({
+            reporter: "spec",
+            phantomjs: {
+                useColors: true
+            }
+        }));
+
 });
 
-gulp.task("full", gulp.series(gulp.parallel("js", "plugins"), "test"));
+gulp.task("test:watch", function () {
+    return gulp.watch(["./tests/*.js"], gulp.series("test"));
+});
 
-gulp.task("watch", gulp.parallel(
-    "js:watch",
-    "plugins:watch",
-    "test:watch"
+gulp.task("test:plugins:watch", function () {
+    return gulp.watch(["./tests/plugins/*.js"], gulp.series("test:plugins"));
+});
+
+gulp.task("full", gulp.series(
+    gulp.series("js", "test"),
+    gulp.series("plugins", "test:plugins"),
+));
+
+gulp.task("watch", gulp.parallel("js:watch", "plugins:watch"));
+
+gulp.task("watch:test", gulp.parallel(
+    gulp.series("js:watch", "test:watch"),
+    gulp.series("plugins:watch", "test:plugins:watch")
 ));
 
 gulp.task("custom", function () {
@@ -268,13 +275,11 @@ gulp.task("custom", function () {
 
     });
 
-    // TODO: correct the sourcemaps - compile aria.js as well?
     return gulp.src(files)
         .pipe(header(
             "/*! " + simpleFileNames.join(", ") + " */\n"
         ))
         .pipe(concat("aria.custom.js"))
-        // .pipe(sourcemaps.init())
         .pipe(minify({
             ext: {
                 min: ".min.js"
@@ -283,11 +288,6 @@ gulp.task("custom", function () {
                 return comment.value.startsWith("!");
             }
         }))
-        // .pipe(sourcemaps.write("./", {
-        //     sourceMappingURL: function (file) {
-        //         return file.relative + ".map";
-        //     }
-        // }))
         .pipe(gulp.dest("./dist/"));
 
 });

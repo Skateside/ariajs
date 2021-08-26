@@ -1,4 +1,4 @@
-describe("referenceType", function () {
+describe("reference type", function () {
 
     var element;
     var other;

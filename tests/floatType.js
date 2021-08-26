@@ -1,4 +1,4 @@
-describe("floatType", function () {
+describe("float type", function () {
 
     var element;
     var aria;

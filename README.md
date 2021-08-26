@@ -1,6 +1,11 @@
 # Aria.js
 
-A helper library for working with WAI-ARIA attributes, designed to make manipulating them as simple as possible.
+```js
+// Aria.js and its extend-node plugin:
+button.aria.controls = div;
+```
+
+Aria.js is a helper library for working with WAI-ARIA attributes, designed to make manipulating them as easy as possible. It's designed to be both simple and small, weighing less than 2KB when minified and gzipped.
 
 ## How it Works
 
@@ -51,28 +56,16 @@ The documentation for this library can be found in [the docs](docs/overview.md).
 
 - [Overview](docs/overview.md)
 - [Property types](docs/types.md)
+- [Utilities](docs/utilities.md)
 - [Plugins](docs/plugins.md)
 - [Gulps tasks](docs/gulp.md)
 
-## Building Aria.js
-
-Aria.js uses [gulp](#) to compile. You can use the `js` command to compile the files:
-
-```bash
-$ gulp js
-```
-
-You can also compile plugins or concatenate plugins with the overall file - check [the gulp documentation](docs/gulp.md) or [the plugin notes](docs/plugins.md) for full details.
-
 ## Browser Support
 
-Aria.js works in all modern browsers, but it may need some polyfills for older browsers. Specifically, you may need to polyfill these methods:
+Aria.js works in all modern browsers but has been written in ES5 so it can work in older browsers without the need for transpiling (and increasing the file size). If you wish to use Aria.js in an older browser, you may need to polyfill these methods:
 
 - `Object.assign`
 - `Object.entries`
 - `Array.from`
 - `String.prototype.startsWith`
 - `Number.isNaN`
-- `Proxy`
-
-You can avoid the `Proxy` polyfill using [the no-proxy plugin](docs/plugins.md#no-proxy-plugin), which can be handy because some `Proxy` ployfills will throw an error when using the delete property trap (which Aria.js does).

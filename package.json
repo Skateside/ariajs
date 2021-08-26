@@ -1,6 +1,6 @@
 {
     "name": "ariajs",
-    "version": "0.4.0",
+    "version": "0.5.0",
     "description": "Helper library for working with WAI-ARIA attributes",
     "main": "dist/aria.js",
     "author": "James \"Skateside\" Long",
@@ -20,18 +20,16 @@
         "url": "https://github.com/Skateside/ariajs/issues"
     },
     "scripts": {},
-    "dependencies": {
+    "dependencies": {},
+    "devDependencies": {
+        "chai": "^4.2.0",
         "gulp": "^4.0.2",
         "gulp-concat": "^2.6.1",
         "gulp-footer": "^2.0.2",
         "gulp-header": "^2.0.9",
         "gulp-minify": "^3.1.0",
-        "gulp-sourcemaps": "^2.6.5",
-        "gulp-string-replace": "^1.1.2"
-    },
-    "devDependencies": {
-        "chai": "^4.2.0",
         "gulp-mocha-phantomjs": "^0.12.2",
+        "gulp-string-replace": "^1.1.2",
         "mocha": "^7.2.0"
     }
 }

@@ -1,4 +1,4 @@
-describe("tristateType", function () {
+describe("tristate type", function () {
 
     var element;
     var aria;
