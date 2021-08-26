@@ -18,7 +18,7 @@ Aria.js is a helper library for working with WAI-ARIA attributes, designed to ma
     var aria = new Aria(button);
     ```
 
-    (You can use the [extend-node plugin](docs/plugins.md#extend-node-plugin.md) to skip this step.)
+    (You can use the [extend-node plugin](docs/plugins.md#extend-node-plugin) to skip this step.)
 
 2. Your new `aria` object will help manage the WAI-ARIA attributes.
 
