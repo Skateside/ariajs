@@ -1,4 +1,4 @@
-/*! ariajs - v0.5.0 - MIT license - https://github.com/Skateside/ariajs - 2021-08-26 */
+/*! ariajs - v0.5.1 - MIT license - https://github.com/Skateside/ariajs - 2021-08-28 */
 (function (globalVariable) {
     "use strict";
 
@@ -89,7 +89,7 @@ function Aria() {
  */
 Object.defineProperty(Aria, "VERSION", {
     get: function () {
-        return "0.5.0";
+        return "0.5.1";
     }
 });
 
@@ -335,8 +335,6 @@ Aria.prototype = {
         var properties = Aria.properties;
 
         Object.keys(properties).forEach(function (property) {
-
-            var data = properties[property];
 
             Object.defineProperty(context, property, {
 

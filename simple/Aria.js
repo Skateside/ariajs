@@ -263,8 +263,6 @@ Aria.prototype = {
 
         Object.keys(properties).forEach(function (property) {
 
-            var data = properties[property];
-
             Object.defineProperty(context, property, {
 
                 get: function () {
