@@ -1,4 +1,4 @@
-/*! ariajs - v0.5.1 - MIT license - https://github.com/Skateside/ariajs - 2021-08-28 */
+/*! ariajs - v0.5.2 - MIT license - https://github.com/Skateside/ariajs - 2021-08-31 */
 (function (globalVariable) {
     "use strict";
 
@@ -89,7 +89,7 @@ function Aria() {
  */
 Object.defineProperty(Aria, "VERSION", {
     get: function () {
-        return "0.5.1";
+        return "0.5.2";
     }
 });
 
@@ -190,28 +190,6 @@ assign(Aria, /** @lends Aria */{
             type: type,
             name: attribute
         };
-        this.duplicateProperty(property);
-
-    },
-
-    /**
-     * Duplicates the property in {@link Aria.properties} so that both a
-     * prefixed and unprefixed version exist. This allow the either to be used.
-     *
-     * This method is only necessary in builds that don't include the proxy
-     * plugin and environments that understand Proxy.
-     *
-     * @param {String} property
-     *        Property in {@link Aria.properties} that should be duplicated.
-     */
-    duplicateProperty: function (property) {
-
-        var prefixed = this.prefix(property);
-        var unprefixed = this.unprefix(property);
-        var source = this.properties[property];
-
-        this.properties[prefixed] = source;
-        this.properties[unprefixed] = source;
 
     },
 

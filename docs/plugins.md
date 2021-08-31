@@ -144,7 +144,7 @@ jQdiv.identify(); // -> "ariajs-0"
 
 ### Proxy Plugin
 
-The `proxy` plugin takes advantage of `Proxy` and allows properties to be deleted using the `delete` keyword. Properties in `Aria.properties` are also no longer duplicated because they don't need to be.
+The `proxy` plugin takes advantage of `Proxy` and allows properties to be deleted using the `delete` keyword. The properties for the `Aria` instance can ignore a `aria-` prefix as well.
 
 ```html
 <button aria-expanded="true">Button</button>
@@ -153,7 +153,13 @@ The `proxy` plugin takes advantage of `Proxy` and allows properties to be delete
 var button = document.querySelector("button");
 var aria = new Aria(button);
 delete aria.expanded;
-button; // -> <button>Button</button>
+// <button>Button</button>
+
+var label = "aria-label";
+aria[label] = "testing";
+// <button aria-label="testing">Button</button>
+aria[label]; // -> "testing"
+aria.label; // -> "testing"
 </script>
 ```
 

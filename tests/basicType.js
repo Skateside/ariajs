@@ -32,15 +32,6 @@ describe("basic type", function () {
 
         });
 
-        it("should ignore an \"aria-\" prefix when writing", function () {
-
-            var value = randomString();
-
-            aria[ATTRIBUTE] = value;
-            chai.assert.strictEqual(element.getAttribute(ATTRIBUTE), value);
-
-        });
-
     });
 
     describe("reading", function () {
@@ -72,16 +63,6 @@ describe("basic type", function () {
 
         });
 
-        it("should ignore an \"aria-\" prefix when reading", function () {
-
-            var value = randomString();
-
-            aria[ATTRIBUTE] = value;
-            chai.assert.strictEqual(aria[ATTRIBUTE], value);
-            chai.assert.strictEqual(element.getAttribute(ATTRIBUTE), value);
-
-        });
-
     });
 
     // NOTE: this is testing Aria, not specifically basic type
@@ -95,18 +76,6 @@ describe("basic type", function () {
             element.setAttribute(ATTRIBUTE, value);
             chai.assert.isTrue(element.hasAttribute(ATTRIBUTE));
             aria[PROPERTY] = "";
-            chai.assert.isFalse(element.hasAttribute(ATTRIBUTE));
-
-        });
-
-        it("should ignore an \"aria-\" prefix when deleting", function () {
-
-            var value = randomString();
-
-            chai.assert.isFalse(element.hasAttribute(ATTRIBUTE));
-            element.setAttribute(ATTRIBUTE, value);
-            chai.assert.isTrue(element.hasAttribute(ATTRIBUTE));
-            aria[ATTRIBUTE] = "";
             chai.assert.isFalse(element.hasAttribute(ATTRIBUTE));
 
         });

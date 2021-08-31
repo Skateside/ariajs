@@ -8,15 +8,6 @@
     }
 
     /**
-     * Replaces the previous version of this function so that nothing happens.
-     * Proxy can unprefix the property as it's being set so there's no need to
-     * flood {@link Aria.properties}.
-     */
-    Aria.duplicateProperty = function () {
-        return;
-    };
-
-    /**
      * The deleteProperty trap that Proxy will use. If the property is
      * recognised as a type (see {@link Aria#getProperty}) then
      * {@link Aria#delete} is called. If the property is not recognised then the
